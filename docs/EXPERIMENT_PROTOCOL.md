@@ -16,16 +16,21 @@ Each run directory contains:
 | `events.jsonl` | Yes | Canonical event log (simulation time only) |
 | `summary.json` | Yes | Scenario bookkeeping counts |
 | `config.resolved.json` | Yes | The validated configuration, canonical JSON |
-| `manifest.json` | No (contains wall-clock `run_timestamp_utc`) | Provenance record listing the SHA-256 of the three files above |
+| `trajectory.csv` | Yes | `formation_dynamics` only: GCRS states (m, m/s) sampled every `output.trajectory_sample_interval_s`; floats as shortest round-trip repr |
+| `manifest.json` | No (contains wall-clock `run_timestamp_utc`) | Provenance record listing the SHA-256 of the deterministic files above |
 
 `manifest.json` fields: `experiment_id`, `scenario_id`, `run_timestamp_utc`, `git_commit`, `git_dirty`, `config_hash`, `seed`, `stream_seeds`, `dynamics_model`, `science_data_version`, `telemetry_data_version`, `algorithm`, `software_lockfile_hash`, `software` (Python, platform, package versions — `astropy-iers-data` is the Earth-orientation/IERS data version), `artifacts`.
 
 **Rule:** a result may be reported only if its manifest has `git_dirty: false` (run from a committed tree) and every data version it depends on is recorded. `results/` is Git-ignored; archive reported runs separately (to be decided, spec §11 mentions DVC/MLflow as later options).
 
+Diagnostic figures: `uv run astramesh plot <run_dir>` writes PNGs to `<run_dir>/figures/`. These are **not** run artifacts and are not hashed in the manifest, because PNG encoding is not byte-reproducible.
+
 ## 2. Replay verification — IMPLEMENTED
 
 - `tests/integration/test_toy_replay.py`: same config + seeds ⇒ byte-identical deterministic artifacts; different seed ⇒ different events.
-- `tests/regression/test_toy_golden.py`: pinned SHA-256 of the toy event log, checked on Windows, WSL2/Ubuntu 24.04, and CI.
+- `tests/regression/test_toy_golden.py`: pinned SHA-256 of the toy event log, checked on Windows, WSL2/Ubuntu 24.04, and CI. The toy config hash is also pinned, so schema refactors cannot silently change it.
+- `tests/integration/test_formation_run.py`: the formation scenario replays byte-identically, and the manifest lists every artifact.
+- `tests/regression/test_formation_baseline.py`: pinned SHA-256 digests of the 24 h J2 baseline's events and trajectory. These are guaranteed only on the reference platform (Ubuntu 24.04 x86_64), because initialization uses libm and ERFA (DL-029). The propagator-only digests in `test_two_body_determinism.py` are platform-independent.
 
 ## 3. Scenarios, metrics, statistical design — NOT STARTED
 

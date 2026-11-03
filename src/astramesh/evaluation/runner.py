@@ -5,6 +5,7 @@ Each run directory contains:
 * ``events.jsonl`` - canonical event log (deterministic)
 * ``summary.json`` - scenario bookkeeping counts (deterministic)
 * ``config.resolved.json`` - the validated configuration (deterministic)
+* ``trajectory.csv`` - sampled truth states (formation_dynamics only; deterministic)
 * ``manifest.json`` - provenance; lists the SHA-256 of the files above
 """
 
@@ -15,11 +16,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from astramesh.core.config import ScenarioConfig, load_scenario
+from astramesh.core.config import FormationDynamicsScenario, ToyHeartbeatScenario, load_scenario
 from astramesh.core.events import EventLog, canonical_json
 from astramesh.core.rng import RandomStreams
 from astramesh.evaluation.manifest import build_manifest, find_project_root, sha256_file
-from astramesh.scenarios import toy_heartbeat
+from astramesh.scenarios import formation_dynamics, toy_heartbeat
 
 EVENTS_FILE = "events.jsonl"
 SUMMARY_FILE = "summary.json"
@@ -41,7 +42,10 @@ def _write_canonical(path: Path, obj: Any) -> str:
     return sha256_file(path)
 
 
-def default_experiment_id(config: ScenarioConfig) -> str:
+AnyScenario = ToyHeartbeatScenario | FormationDynamicsScenario
+
+
+def default_experiment_id(config: AnyScenario) -> str:
     return f"{config.scenario_id}_seed{config.random.seed:03d}"
 
 
@@ -64,7 +68,7 @@ def run_scenario(
 
 
 def run_config(
-    config: ScenarioConfig,
+    config: AnyScenario,
     output_dir: Path,
     *,
     experiment_id: str | None = None,
@@ -77,13 +81,24 @@ def run_config(
 
     streams = RandomStreams(config.random.seed, config.random.stream_seeds)
     log = EventLog()
-    if config.scenario_type == "toy_heartbeat":
+    extra_artifacts: dict[str, str] = {}
+    dynamics_model = "none"
+    if isinstance(config, ToyHeartbeatScenario):
         summary = toy_heartbeat.run_toy_heartbeat(config, streams, log).to_dict()
         algorithm = toy_heartbeat.ALGORITHM_NAME
-    else:  # pragma: no cover - guarded by the schema's Literal type
+    elif isinstance(config, FormationDynamicsScenario):
+        run = formation_dynamics.run_formation_dynamics(config, log)
+        summary = run.summary
+        algorithm = formation_dynamics.ALGORITHM_NAME
+        dynamics_model = run.trajectory.model_id
+        traj_path = output_dir / formation_dynamics.TRAJECTORY_FILE
+        formation_dynamics.write_trajectory_csv(run, traj_path)
+        extra_artifacts[formation_dynamics.TRAJECTORY_FILE] = sha256_file(traj_path)
+    else:  # pragma: no cover - guarded by the schema's discriminated union
         raise ValueError(f"unsupported scenario_type {config.scenario_type!r}")
 
     artifacts = {
+        **extra_artifacts,
         EVENTS_FILE: log.write_jsonl(output_dir / EVENTS_FILE),
         SUMMARY_FILE: _write_canonical(output_dir / SUMMARY_FILE, summary),
         RESOLVED_CONFIG_FILE: _write_canonical(
@@ -99,6 +114,7 @@ def run_config(
         algorithm=algorithm,
         artifacts=artifacts,
         project_root=project_root,
+        dynamics_model=dynamics_model,
     )
     with (output_dir / MANIFEST_FILE).open("w", encoding="utf-8", newline="\n") as fh:
         json.dump(manifest, fh, indent=2, sort_keys=True)

@@ -7,7 +7,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | Phase | Focus | Status |
 |---|---|---|
 | 0 | Research and reproducibility foundation | **Complete except** Priority A full-text review (proceeding in parallel, DL-016) |
-| 1 | Validated four-spacecraft dynamics and mission geometry | **In progress** (DL-016). Increment 1 (D0 two-body core) implemented |
+| 1 | Validated four-spacecraft dynamics and mission geometry | **In progress** (DL-016). Increments 1–5 done or implemented; increment 6 (science opportunities, resources) remains for Gate P1 |
 | 2 | Decentralized nominal science operations | Not started |
 | 3 | Deterministic faults and protection supervisor | Not started |
 | 4 | External data and probabilistic/ML experiments | Not started |
@@ -35,9 +35,17 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 2 | Astropy time scales (UTC→TT/UT1) and GCRS↔ITRS with IERS version in manifest; PA-04 (ITRS) | **Done**: commit `934b8e5`, CI passing; ITRS tolerances approved 2026-11-03 |
 | 3 | Formation initialization from consistent elements (~20 km along-track); PA-06; CW cross-check PA-07 | **Done**: commit `abc50c2`, CI passing; tolerances approved 2026-11-03 |
 | 4 | J2 (D1) and secular nodal-precession check PA-08; Part A SSO question | **Done**: commit `7cad3da`, CI passing; tolerances approved |
-| 4b | Mean-element initialization (DL-026/027): reference orbit as mean elements; mean-matched formation | Implemented; §B.6 tolerances pending owner review |
-| 5 | Dynamics scenario config (unit-suffixed schema), 24 h baseline run with manifest `dynamics_model`, basic plots | Not started |
+| 4b | Mean-element initialization (DL-026/027): reference orbit as mean elements; mean-matched formation | **Done**: commit `7c8f7dd`, CI passing; tolerances approved 2026-11-03 |
+| 5 | Dynamics scenario config (unit-suffixed schema), 24 h baseline run with manifest `dynamics_model`, basic plots | Implemented (`configs/experiments/formation_24h_j2.yaml`, `astramesh plot`) |
 | 6 | Synthetic science opportunities from modeled geometry; finite resource accounting (energy, storage, Δv) | Not started |
+
+## Gate P1 checklist (spec §13)
+
+- [x] Independent propagation and convergence checks pass (PA-01–PA-04, PA-08; `NUMERICAL_MISSION_DESIGN.md` §B.2–§B.5)
+- [x] Four initial orbits are consistent (PA-06; mean-element initialization §B.6)
+- [x] 24 h baseline completes (`formation_24h_j2.yaml`; regression test and CI smoke run)
+- [ ] Science eligibility can be explained by modeled geometry (increment 6)
+- [x] Fixed seeds replay identically (scenario replay test, pinned digests; scope DL-029)
 
 ## Gate P0 checklist (spec §13)
 

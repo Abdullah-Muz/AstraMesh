@@ -1,0 +1,33 @@
+# Phase 1 baseline: four-spacecraft along-track formation, 24 h truth dynamics
+# with J2. Reference orbit given as MEAN elements (DL-026); formation
+# initialized by mean-element matching (DL-027). Truth dynamics only.
+schema_version: 1
+scenario_id: FORMATION_24H_J2
+description: >-
+  Phase 1 dynamics baseline. Four spacecraft, 20 km along-track spacing,
+  mean 525 km / 97.5 deg circular reference orbit, point mass + J2, RK4 at 10 s.
+scenario_type: formation_dynamics
+
+time:
+  epoch_utc: "2025-06-01T00:00:00Z"   # reference epoch (docs/CONVENTIONS.md §2.3)
+  duration_s: 86400                    # 24 h nominal (spec §3.2)
+  time_step_s: 10                      # validated in NUMERICAL_MISSION_DESIGN.md §B.2/§B.5
+
+random:
+  seed: 1                              # unused by truth dynamics; recorded for provenance
+
+dynamics:
+  model: j2                            # two_body | j2
+
+reference_orbit:                       # mean elements, Earth equatorial frame
+  mean_altitude_km: 525                # mean a minus WGS 84 equatorial radius
+  mean_inclination_deg: 97.5
+  raan_deg: 0
+  start_argument_of_latitude_deg: 0
+
+formation:
+  n_spacecraft: 4
+  along_track_spacing_km: 20
+
+output:
+  trajectory_sample_interval_s: 60

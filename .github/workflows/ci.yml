@@ -46,3 +46,8 @@ jobs:
 
       - name: Toy scenario smoke run
         run: uv run --locked astramesh run configs/experiments/toy_heartbeat.yaml --out "$RUNNER_TEMP/toy"
+
+      - name: Formation dynamics baseline (24 h, J2) smoke run and plots
+        run: |
+          uv run --locked astramesh run configs/experiments/formation_24h_j2.yaml --out "$RUNNER_TEMP/formation"
+          uv run --locked astramesh plot "$RUNNER_TEMP/formation"

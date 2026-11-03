@@ -16,7 +16,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from astramesh.core.clock import SimulationClock, seconds_to_ns
-from astramesh.core.config import ScenarioConfig
+from astramesh.core.config import ToyHeartbeatScenario
 from astramesh.core.events import EventLog
 from astramesh.core.rng import RandomStreams
 
@@ -41,7 +41,9 @@ class ToySummary:
         }
 
 
-def run_toy_heartbeat(config: ScenarioConfig, streams: RandomStreams, log: EventLog) -> ToySummary:
+def run_toy_heartbeat(
+    config: ToyHeartbeatScenario, streams: RandomStreams, log: EventLog
+) -> ToySummary:
     cfg = config.toy_heartbeat
     clock = SimulationClock(config.time.clock_spec())
     interval_ticks = seconds_to_ns(cfg.heartbeat_interval_s) // clock.spec.step_ns

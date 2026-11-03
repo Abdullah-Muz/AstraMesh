@@ -97,4 +97,6 @@ def test_load_reports_missing_file(tmp_path: Path) -> None:
 def test_json_schema_exports() -> None:
     schema = scenario_json_schema()
     assert schema["title"] == "ScenarioConfig"
-    assert "time" in schema["properties"]
+    assert set(schema["discriminator"]["mapping"]) == {"toy_heartbeat", "formation_dynamics"}
+    for name in ("ToyHeartbeatScenario", "FormationDynamicsScenario"):
+        assert "time" in schema["$defs"][name]["properties"]

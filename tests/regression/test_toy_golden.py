@@ -20,3 +20,13 @@ def test_toy_heartbeat_matches_golden_digest(toy_config_path: Path, tmp_path: Pa
     result = run_scenario(toy_config_path, tmp_path / "run")
     assert result.n_events == GOLDEN_N_EVENTS
     assert result.events_sha256 == GOLDEN_EVENTS_SHA256
+
+
+GOLDEN_TOY_CONFIG_HASH = "bfe1fa070c21097231ec399a45aa0f9d2fa8529983b237ab3e3759a0584604a3"
+
+
+def test_toy_config_hash_is_stable(toy_config_path: Path) -> None:
+    """Schema refactors must not change the hash of an existing config."""
+    from astramesh.core.config import load_scenario
+
+    assert load_scenario(toy_config_path).config_hash() == GOLDEN_TOY_CONFIG_HASH

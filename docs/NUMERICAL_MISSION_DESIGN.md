@@ -1,6 +1,6 @@
 # Numerical Mission Design and Physics Acceptance Plan
 
-> **Owner:** Abdullah Muzher · **Status:** Part B (physics acceptance plan) APPROVED 2026-11-03; §B.2 D0 reference studies recorded, derived tolerances APPROVED 2026-11-03; §B.3 ITRS study recorded, tolerances APPROVED 2026-11-03; §B.4 formation/CW study recorded, tolerances APPROVED 2026-11-03; §B.5 J2 study recorded, tolerances APPROVED 2026-11-03; Part A questions 1–2 answered and resolved (DL-026/027, §B.6 tolerances PROPOSED); Part A in progress · **Spec:** §3.2–§3.3, §4.1, §4.4, §14.3, §18 · **Last updated:** 2026-11-03
+> **Owner:** Abdullah Muzher · **Status:** Part B (physics acceptance plan) APPROVED 2026-11-03; §B.2 D0 reference studies recorded, derived tolerances APPROVED 2026-11-03; §B.3 ITRS study recorded, tolerances APPROVED 2026-11-03; §B.4 formation/CW study recorded, tolerances APPROVED 2026-11-03; §B.5 J2 study recorded, tolerances APPROVED 2026-11-03; Part A questions 1–2 answered and resolved (DL-026/027, §B.6 tolerances APPROVED 2026-11-03); Part A in progress · **Spec:** §3.2–§3.3, §4.1, §4.4, §14.3, §18 · **Last updated:** 2026-11-03
 
 ## Purpose
 
@@ -340,4 +340,4 @@ The previous method (equal osculating elements, §B.5.4) gave 107 m – 7.7 km o
 | ITRS (PA-04) tolerances and independent checks (§B.3) | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | Formation (PA-06) and CW (PA-07) tolerances and bands (§B.4) | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | J2 (PA-08 and D1 checks) tolerances (§B.5) | ☑ approved — Abdullah Muzher | 2026-11-03 |
-| Mean-element initialization tolerances (§B.6) | ☐ pending owner review | — |
+| Mean-element initialization tolerances (§B.6), including mean-eccentricity matching | ☑ approved — Abdullah Muzher | 2026-11-03 |

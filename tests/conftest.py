@@ -18,6 +18,7 @@ settings.load_profile(os.environ.get("HYPOTHESIS_PROFILE", "dev"))
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 TOY_CONFIG = REPO_ROOT / "configs" / "experiments" / "toy_heartbeat.yaml"
+FORMATION_CONFIG = REPO_ROOT / "configs" / "experiments" / "formation_24h_j2.yaml"
 
 
 @pytest.fixture
@@ -28,5 +29,17 @@ def toy_config_path() -> Path:
 @pytest.fixture
 def toy_config_dict() -> dict[str, Any]:
     data = yaml.safe_load(TOY_CONFIG.read_text(encoding="utf-8"))
+    assert isinstance(data, dict)
+    return data
+
+
+@pytest.fixture
+def formation_config_path() -> Path:
+    return FORMATION_CONFIG
+
+
+@pytest.fixture
+def formation_config_dict() -> dict[str, Any]:
+    data = yaml.safe_load(FORMATION_CONFIG.read_text(encoding="utf-8"))
     assert isinstance(data, dict)
     return data

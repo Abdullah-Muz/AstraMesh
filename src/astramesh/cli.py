@@ -1,4 +1,4 @@
-"""Command-line interface: ``astramesh {run,validate,schema}``."""
+"""Command-line interface: ``astramesh {run,validate,schema,plot}``."""
 
 from __future__ import annotations
 
@@ -34,6 +34,12 @@ def _build_parser() -> argparse.ArgumentParser:
     validate.add_argument("config", type=Path)
 
     sub.add_parser("schema", help="print the scenario configuration JSON Schema")
+
+    plot = sub.add_parser("plot", help="write diagnostic figures for a formation_dynamics run")
+    plot.add_argument("run_dir", type=Path, help="run directory produced by 'astramesh run'")
+    plot.add_argument(
+        "--out", type=Path, default=None, help="figure directory (default RUN/figures)"
+    )
     return parser
 
 
@@ -53,6 +59,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             config = load_scenario(args.config)
             print(f"valid: {args.config} (scenario_id={config.scenario_id})")
             print(f"  config hash: {config.config_hash()}")
+            return EXIT_OK
+        if args.command == "plot":
+            from astramesh.visualization.formation_plots import plot_run
+
+            for path in plot_run(args.run_dir, args.out):
+                print(f"wrote {path}")
             return EXIT_OK
         if args.command == "schema":
             print(json.dumps(scenario_json_schema(), indent=2, sort_keys=True))
