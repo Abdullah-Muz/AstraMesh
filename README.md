@@ -4,8 +4,8 @@
 
 AstraMesh is an independent, public-methods computational research project. It is a Python-first, CPU-feasible simulation platform for a **simulated four-spacecraft, decentralized low-Earth-orbit mission** that cooperatively schedules ionospheric observations, coordinates over constrained inter-satellite links, assesses its own health and environmental risk, and tries to preserve scientific value when spacecraft become unavailable or space-weather conditions worsen.
 
-> **Project status: Phase 1 (validated four-spacecraft dynamics) in progress.**
-> The repository contains reproducibility infrastructure and a first two-body (D0) dynamics core with its physics acceptance tests. It contains **no** autonomy or science model yet, and no research results. Nothing here should be read as a validated or published finding.
+> **Project status: Phase 1 (validated four-spacecraft dynamics and mission geometry) complete; Phase 2 not started.**
+> The repository contains reproducibility infrastructure, validated truth dynamics (two-body and J2) for a four-spacecraft formation, mission geometry (illumination, geometry-only science opportunities), and resource accounting, each with its physics acceptance tests. It contains **no** autonomy, planning, or science-retrieval model yet, and no research results. Nothing here should be read as a validated or published finding.
 
 The authoritative design document is **[`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md)** (v1.0). Where this README and the specification differ, the specification governs.
 
@@ -95,7 +95,7 @@ A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a prove
 | Phase | Focus | Status |
 |---|---|---|
 | 0 | Research and reproducibility foundation | Complete except the Priority A full-text literature review (in parallel; see [`docs/ROADMAP.md`](docs/ROADMAP.md)) |
-| 1 | Validated four-spacecraft dynamics and mission geometry | In progress (dynamics, mission geometry, science opportunities and resource accounting implemented; phase review pending) |
+| 1 | Validated four-spacecraft dynamics and mission geometry | Complete (Gate P1 signed off 2026-11-03) |
 | 2 | Decentralized nominal science operations | Not started |
 | 3 | Deterministic faults and protection supervisor | Not started |
 | 4 | External data and probabilistic/ML experiments | Not started |

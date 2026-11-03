@@ -449,4 +449,5 @@ These are identities and round-off, so no physics tolerance needs approval beyon
 | Mean-element initialization tolerances (§B.6), including mean-eccentricity matching | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | Mission-geometry tolerances (§B.7), illumination model (DL-032), opportunity definition and 20° mask (DL-033), baseline RAAN 0° (LTAN 07:25) kept | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | Resource values (DL-035) and cold-gas propulsion (DL-036) | ☑ approved — Abdullah Muzher | 2026-11-03 |
-| Resource ledger model and checks (§B.8), Part A Q4/Q5 conclusions | ☐ pending owner review | |
+| Resource ledger model and checks (§B.8), Part A Q4/Q5 conclusions | ☑ approved — Abdullah Muzher | 2026-11-03 |
+| **Gate P1 / Phase 1 complete** (DL-037) | ☑ signed off — Abdullah Muzher | 2026-11-03 |
