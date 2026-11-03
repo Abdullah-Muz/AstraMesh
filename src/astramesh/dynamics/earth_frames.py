@@ -95,3 +95,16 @@ def state_to_gcrs(state: CartesianState) -> CartesianState:
     state.require_frame(Frame.ITRS)
     r, v = itrs_to_gcrs(state.epoch_utc, state.t_ns, state.r_m, state.v_mps)
     return CartesianState(Frame.GCRS, state.epoch_utc, state.t_ns, r, v)
+
+
+def earth_pole_gcrs(epoch_utc: datetime, t_ns: int = 0) -> tuple[float, float, float]:
+    """Unit vector of the ITRS z-axis (Earth's figure axis, for J2) in GCRS.
+
+    The ITRS z-axis differs from the Celestial Intermediate Pole only by polar
+    motion (< ~0.5 arcsec). The result comes from ERFA, so its last bits may
+    differ between platforms; record it with the run (or pass a literal vector
+    in regression tests) to keep propagation bit-for-bit reproducible.
+    """
+    r, _ = itrs_to_gcrs(epoch_utc, t_ns, [0.0, 0.0, 1.0], [0.0, 0.0, 0.0])
+    n = float(np.sqrt(r @ r))
+    return (float(r[0] / n), float(r[1] / n), float(r[2] / n))

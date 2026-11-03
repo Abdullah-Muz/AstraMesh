@@ -1,9 +1,10 @@
-"""Numerical two-body propagation of several spacecraft (dynamics level D0).
+"""Numerical orbit propagation of several spacecraft (dynamics levels D0, D1).
 
 Integrator: classical fixed-step 4th-order Runge-Kutta (RK4) on the scenario
 clock grid (integer-nanosecond time points, ``docs/CONVENTIONS.md`` §2.1).
-Each spacecraft is an independent point mass in the Earth's central field;
-there are no perturbations, thrust, or interactions.
+Each spacecraft is an independent point mass in the Earth's gravity field,
+given by a :class:`~astramesh.dynamics.forces.ForceModel`: point mass (D0) or
+point mass + J2 (D1). There is no drag, thrust, or interaction yet.
 
 Determinism (PA-09): all arithmetic is elementwise NumPy (no BLAS, no
 reductions with platform-dependent ordering, no transcendental functions), so
@@ -25,6 +26,7 @@ from numpy.typing import NDArray
 
 from astramesh.core.clock import NS_PER_S
 from astramesh.dynamics.constants import GM_EARTH_M3PS2, R_EARTH_EQ_M
+from astramesh.dynamics.forces import D0_MODEL_ID, ForceModel, acceleration
 from astramesh.dynamics.state import (
     CartesianState,
     Frame,
@@ -34,25 +36,24 @@ from astramesh.dynamics.state import (
     norm3,
 )
 
-DYNAMICS_MODEL_ID = "D0-two-body-rk4"
+DYNAMICS_MODEL_ID = D0_MODEL_ID  # kept for compatibility; use ForceModel.model_id
 
 
 def two_body_acceleration(r: NDArray[np.float64], mu: float) -> NDArray[np.float64]:
     """Central-field acceleration ``-mu r / |r|^3`` for positions of shape (..., 3)."""
-    rn = norm3(r)
-    return (-mu / (rn * rn * rn))[..., np.newaxis] * r
+    return acceleration(r, ForceModel.two_body(mu))
 
 
-def _derivative(y: NDArray[np.float64], mu: float) -> NDArray[np.float64]:
-    return np.concatenate((y[:, 3:], two_body_acceleration(y[:, :3], mu)), axis=1)
+def _derivative(y: NDArray[np.float64], fm: ForceModel) -> NDArray[np.float64]:
+    return np.concatenate((y[:, 3:], acceleration(y[:, :3], fm)), axis=1)
 
 
-def rk4_step(y: NDArray[np.float64], h_s: float, mu: float) -> NDArray[np.float64]:
+def rk4_step(y: NDArray[np.float64], h_s: float, fm: ForceModel) -> NDArray[np.float64]:
     """One classical RK4 step for stacked states ``y`` of shape (n, 6)."""
-    k1 = _derivative(y, mu)
-    k2 = _derivative(y + (0.5 * h_s) * k1, mu)
-    k3 = _derivative(y + (0.5 * h_s) * k2, mu)
-    k4 = _derivative(y + h_s * k3, mu)
+    k1 = _derivative(y, fm)
+    k2 = _derivative(y + (0.5 * h_s) * k1, fm)
+    k3 = _derivative(y + (0.5 * h_s) * k2, fm)
+    k4 = _derivative(y + h_s * k3, fm)
     return y + (h_s / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
 
 
@@ -78,16 +79,23 @@ class Trajectory:
         epoch_utc: Scenario epoch.
         t_ns: Time points, shape (n_times,), int64.
         y: States ``[x, y, z, vx, vy, vz]`` in m and m/s, shape (n_times, n_spacecraft, 6).
-        mu: Gravitational parameter used [m^3 s^-2].
-        model_id: Dynamics model identifier (recorded in run manifests).
+        forces: Force model used.
     """
 
     frame: Frame
     epoch_utc: datetime
     t_ns: NDArray[np.int64]
     y: NDArray[np.float64]
-    mu: float
-    model_id: str = DYNAMICS_MODEL_ID
+    forces: ForceModel
+
+    @property
+    def mu(self) -> float:
+        return self.forces.mu
+
+    @property
+    def model_id(self) -> str:
+        """Dynamics model identifier (recorded in run manifests)."""
+        return self.forces.model_id
 
     @property
     def n_spacecraft(self) -> int:
@@ -104,6 +112,19 @@ def propagate_two_body(
     step_ns: int,
     n_steps: int,
     mu: float = GM_EARTH_M3PS2,
+) -> Trajectory:
+    """Point-mass (D0) propagation; see :func:`propagate`."""
+    if not (np.isfinite(mu) and mu > 0):
+        raise NonPhysicalStateError(f"mu must be positive and finite, got {mu!r}")
+    return propagate(initial, step_ns=step_ns, n_steps=n_steps, forces=ForceModel.two_body(mu))
+
+
+def propagate(
+    initial: Sequence[CartesianState],
+    *,
+    step_ns: int,
+    n_steps: int,
+    forces: ForceModel,
 ) -> Trajectory:
     """Propagate GCRS states of several spacecraft with fixed-step RK4.
 
@@ -123,8 +144,6 @@ def propagate_two_body(
         raise ValueError(f"step_ns must be positive, got {step_ns}")
     if n_steps < 0:
         raise ValueError(f"n_steps must be non-negative, got {n_steps}")
-    if not (np.isfinite(mu) and mu > 0):
-        raise NonPhysicalStateError(f"mu must be positive and finite, got {mu!r}")
 
     y0 = np.stack([np.concatenate((s.r_m, s.v_mps)) for s in initial])
     _check_physical(y0, first.t_ns)
@@ -134,12 +153,12 @@ def propagate_two_body(
     h_s = step_ns / NS_PER_S
     y = y0
     for k in range(1, n_steps + 1):
-        y = rk4_step(y, h_s, mu)
+        y = rk4_step(y, h_s, forces)
         _check_physical(y, int(t_ns[k]))
         out[k] = y
     out.setflags(write=False)
     t_ns.setflags(write=False)
-    return Trajectory(Frame.GCRS, first.epoch_utc, t_ns, out, float(mu))
+    return Trajectory(Frame.GCRS, first.epoch_utc, t_ns, out, forces)
 
 
 def specific_energy(y: NDArray[np.float64], mu: float) -> NDArray[np.float64]:

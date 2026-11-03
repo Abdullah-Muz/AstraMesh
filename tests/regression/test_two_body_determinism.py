@@ -1,4 +1,4 @@
-"""PA-09: gravity-only propagation is bit-for-bit repeatable.
+"""PA-09: gravity-only propagation (D0 and D1/J2) is bit-for-bit repeatable.
 
 Initial states are written as literal floats (not computed with sin/cos) so the
 golden digest does not depend on the platform's libm. The propagator itself
@@ -12,8 +12,9 @@ from __future__ import annotations
 import hashlib
 from datetime import UTC, datetime
 
+from astramesh.dynamics.forces import ForceModel
 from astramesh.dynamics.state import CartesianState, Frame
-from astramesh.dynamics.twobody import Trajectory, propagate_two_body
+from astramesh.dynamics.twobody import Trajectory, propagate, propagate_two_body
 
 EPOCH = datetime(2025, 6, 1, tzinfo=UTC)
 # Four spacecraft on the 525 km / 97.5 deg reference orbit, 0.17 deg apart in
@@ -54,3 +55,22 @@ def test_pa09_same_inputs_bitwise_identical() -> None:
 
 def test_pa09_matches_golden_digest() -> None:
     assert _digest(_run()) == GOLDEN_SHA256
+
+
+# D1 (J2) with a literal pole (GCRS ITRS-z at the reference epoch), so the
+# digest does not depend on ERFA.
+J2_POLE = (0.002474555351741926, 3.4444800955196655e-05, 0.9999969376899945)
+GOLDEN_J2_SHA256 = "f3eba89104047e2e4cc84313efd0c0c720183dc960fb43520ad9779aa3c702b1"
+
+
+def _run_j2() -> Trajectory:
+    states = [CartesianState(Frame.GCRS, EPOCH, 0, r, v) for r, v in INITIAL]
+    return propagate(states, step_ns=10 * 10**9, n_steps=8640, forces=ForceModel.with_j2(J2_POLE))
+
+
+def test_pa09_j2_same_inputs_bitwise_identical() -> None:
+    assert _digest(_run_j2()) == _digest(_run_j2())
+
+
+def test_pa09_j2_matches_golden_digest() -> None:
+    assert _digest(_run_j2()) == GOLDEN_J2_SHA256

@@ -1,6 +1,6 @@
 # Numerical Mission Design and Physics Acceptance Plan
 
-> **Owner:** Abdullah Muzher · **Status:** Part B (physics acceptance plan) APPROVED 2026-11-03; §B.2 D0 reference studies recorded, derived tolerances APPROVED 2026-11-03; §B.3 ITRS study recorded, tolerances APPROVED 2026-11-03; §B.4 formation/CW study recorded, tolerances PROPOSED; Part A not started · **Spec:** §3.2–§3.3, §4.1, §4.4, §14.3, §18 · **Last updated:** 2026-11-03
+> **Owner:** Abdullah Muzher · **Status:** Part B (physics acceptance plan) APPROVED 2026-11-03; §B.2 D0 reference studies recorded, derived tolerances APPROVED 2026-11-03; §B.3 ITRS study recorded, tolerances APPROVED 2026-11-03; §B.4 formation/CW study recorded, tolerances APPROVED 2026-11-03; §B.5 J2 study recorded, tolerances PROPOSED; Part A questions 1–2 answered (decisions pending); Part A in progress · **Spec:** §3.2–§3.3, §4.1, §4.4, §14.3, §18 · **Last updated:** 2026-11-03
 
 ## Purpose
 
@@ -13,8 +13,20 @@ Phase 1 increment 1 (D0 two-body core) is implemented in `src/astramesh/dynamics
 
 Not started. To be filled in Phase 1, answering open validation questions 1, 2, 4, and 5 (spec §18):
 
-- [ ] Near-sun-synchronous behaviour of 525 km / 97.5° under J2 (nodal precession rate vs. the ~0.9856 °/day target).
-- [ ] Orbital elements that realize ~20 km along-track spacing without unintended secular drift. **Two-body part answered (§B.4.2):** equal osculating a, e, i, Ω, ω with mean-anomaly offsets of 20 km / a give no secular drift; the separation changes by 2e-5 m over 24 h (integrator error only). **Open:** under J2, equal *osculating* elements at different anomalies have different *mean* semi-major axes, which may cause along-track drift. This is examined in the J2 increment.
+- [x] Near-sun-synchronous behaviour of 525 km / 97.5° under J2 (nodal precession rate vs. the ~0.9856 °/day target). **Answer (§B.5.3):** it depends on whether 525 km / 97.5° are *mean* or *osculating* elements.
+  - **Read as mean elements:** the secular rate is 0.98605 °/day against the 0.98565 °/day target, which is +0.04% and a node drift of about 0.15°/yr. The exact sun-synchronous inclination is 97.497°. **Near-sun-synchronous: yes.**
+  - **Read as osculating elements at the ascending node** (as the code does today): the mean altitude comes out ~9.4 km lower (515.6 km). The measured rate is 0.99097 °/day, which is +0.54% and a drift of about 1.9°/yr (~8 min of local time per year). That is still "near" for 24 h scenarios (0.005°/day).
+  - **Recommendation:** define the reference orbit by mean elements (decision pending, DL-026).
+- [ ] Orbital elements that realize ~20 km along-track spacing without unintended secular drift. **Two-body part answered (§B.4.2):** equal osculating a, e, i, Ω, ω with mean-anomaly offsets of 20 km / a give no secular drift; the separation changes by 2e-5 m over 24 h (integrator error only). **J2 part (§B.5.4): equal osculating elements are NOT acceptable.** J2 short-period terms make mean a depend on the argument of latitude, so neighbours get different mean a and different periods. The resulting 24 h change in adjacent separation depends on where the formation starts:
+
+| Start (argument of latitude) | Change in separation over 24 h |
+|---|---|
+| 0° | 107 m |
+| 22.5° | 5.5 km |
+| 45° | 7.7 km (20 km closes to 12.3 km; the formation collapses in ~3 days) |
+| 90° | 160 m |
+
+A different initialization is needed; decision pending (DL-022 revision).
 - [ ] Eclipse fraction and eclipse-aware power balance for the 25 W / 100 Wh candidate.
 - [ ] Feasibility of the 0.5 mN / 5 m/s propulsion candidate (spec §3.3 notes ~33.3 h of accumulated thrust for 5 m/s).
 
@@ -29,9 +41,9 @@ Not started. To be filled in Phase 1, answering open validation questions 1, 2, 
 | PA-03 | Step-size convergence | Repeat a fixed scenario at Δt, Δt/2, Δt/4; check that the error decreases at the integrator's expected order | Richardson-style comparison against the finest run and PA-01 analytic reference | **Approved** observed order in [3.9, 5.1] at 20/10/5 s (§B.2.3) | `tests/physics_validation/test_two_body.py` |
 | PA-04 | Frame round trips | ECI → ITRS → ECI and ECI → RIC → ECI for randomized states (Hypothesis) | Identity; Astropy transforms as an external check | RIC: **Approved** 0.5 ε‖x_chief‖ (§B.2.5). ITRS: **Approved** §B.3 | `tests/physics_validation/test_frames_ric.py`, `test_frames_itrs.py`, `tests/unit/test_timescales.py` |
 | PA-05 | Units are explicit | Constructors reject ambiguous inputs; configs reject unit-less physical fields | Code inspection + schema tests | Pass/fail. Constructors done; dynamics config schema pending | `tests/unit/test_dynamics_inputs.py` |
-| PA-06 | Formation initialization | Four initial states from consistent orbital elements reproduce the intended along-track spacing and phasing | Independent element → state → element round trip; geometric check of the spacing | **Proposed** §B.4 | `tests/physics_validation/test_formation.py` |
-| PA-07 | Relative-motion cross-check | Compare relative motion against Clohessy–Wiltshire/Hill **only** within its assumptions (circular reference, small separation, short horizon) | CW closed-form solution | **Proposed** §B.4: second-order error scaling, plus the 20 km error matched to its analytic curvature form | `tests/physics_validation/test_cw.py` |
-| PA-08 | J2 before SSO claims | With J2 enabled, measured nodal precession matches the analytic secular J2 rate before any sun-synchronous claim is made | Analytic secular J2 formula | TBD | `tests/physics_validation/` |
+| PA-06 | Formation initialization | Four initial states from consistent orbital elements reproduce the intended along-track spacing and phasing | Independent element → state → element round trip; geometric check of the spacing | **Approved** §B.4 | `tests/physics_validation/test_formation.py` |
+| PA-07 | Relative-motion cross-check | Compare relative motion against Clohessy–Wiltshire/Hill **only** within its assumptions (circular reference, small separation, short horizon) | CW closed-form solution | **Approved** §B.4: second-order error scaling, plus the 20 km error matched to its analytic curvature form | `tests/physics_validation/test_cw.py` |
+| PA-08 | J2 before SSO claims | With J2 enabled, measured nodal precession matches the analytic secular J2 rate before any sun-synchronous claim is made | Analytic secular J2 formula | **Proposed** §B.5: 2e-3 relative (circular), 4e-4 (e = 0.1), against mean elements | `tests/physics_validation/test_j2.py` |
 | PA-09 | Determinism | Gravity-only and zero-thrust runs are bit-for-bit repeatable with the same config/seeds | Replay comparison (as already done for the Phase 0 toy scenario) | Exact equality (gravity-only done, golden SHA-256 pinned) | `tests/regression/test_two_body_determinism.py` |
 | PA-10 | Visible failure on invalid input | NaN/Inf states, non-physical parameters (e.g. r below Earth radius, e ≥ 1 for an orbit expected to be bound) raise explicit errors | Negative tests | Pass/fail | `tests/unit/test_dynamics_inputs.py` |
 
@@ -210,6 +222,60 @@ The disagreement is therefore entirely the known linearization (curvature) error
 
 **Implication:** rectilinear CW must **not** be used to predict or plan the 20 km formation's relative motion beyond very short horizons. Curvilinear coordinates or the full nonlinear propagator should be used instead.
 
+## B.5 D1 (point mass + J2) reference study (2026-11-03)
+
+**Reproduce:** `uv run python scripts/studies/j2_reference_errors.py`. It is deterministic and takes about 2 min.
+
+**Model** (`dynamics/forces.py`): point mass + J2, with J2 = −√5·C̄₂₀(EGM2008) = 1.0826262e-3. The source check is pending (DL-024).
+
+**Pole:** the J2 axis is the ITRS z-axis expressed in GCRS at the scenario epoch, from Astropy (`earth_pole_gcrs`). At the reference epoch it is (0.0024746, 3.44e-5, 0.9999969), 510″ from GCRS z, consistent with §B.3. It is held fixed for the run (DL-025). Over 24 h, precession and nutation move it by < 1e-6 rad, so the effect is negligible.
+
+### B.5.1 Force-model checks
+
+| Check | Independent reference | Observed worst | Tolerance |
+|---|---|---|---|
+| J2 acceleration vs ∇ of the J2 potential | central finite difference (h = 10 m) of an independently written potential expression, 5 000 random LEO positions | 2.4e-10 relative | 5e-10 |
+| `forces.potential` J2 part vs the independent expression | — | 5.2e-13 relative | 2e-12 |
+| j2 = 0 vs point mass | — | bit-identical | exact |
+
+### B.5.2 Invariants and step convergence with J2 (24 h)
+
+The pole is fixed in inertial space and the field is axisymmetric, so two quantities are exact invariants: energy v²/2 − V(r) and the angular-momentum component along the pole.
+
+| Case | Rel. energy drift at 10 s | Rel. h·p̂ drift at 10 s | Max ‖r(10 s) − r(5 s)‖ | Observed order (20/10/5) |
+|---|---|---|---|---|
+| circular 525 km | 4.3e-10 (tolerance 9e-10) | 2.1e-10 (tolerance 5e-10) | 0.41 m (tolerance 0.9 m) | 4.58 |
+| e = 0.1 | 1.9e-10 (tolerance 4e-10) | 7.0e-11 (tolerance 2e-10) | 0.20 m (tolerance 0.5 m) | 4.49 |
+
+The error at 10 s against a 1.25 s solution is 0.43 m and 0.22 m, the same as D0. **The 10 s step remains adequate with J2 (DL-017 re-check: passed).** The order band is [3.9, 5.1], as in §B.2.3.
+
+### B.5.3 Nodal precession (PA-08)
+
+**Method:** the secular RAAN rate about the pole is a least-squares fit to the osculating RAAN over 24 h at 10 s. The analytic rate is −(3/2) n J2 (R/p)² cos i, evaluated at *mean* a and i, which are 24 h averages of the osculating values. A first-order theory is expected to agree to O(J2) ≈ 1e-3.
+
+| Case | Measured | Analytic (mean elements) | Relative difference | Tolerance | Analytic at initial *osculating* elements |
+|---|---|---|---|---|---|
+| circular 525 km / 97.5° | +0.99097 °/day | +0.99167 °/day | −7.0e-4 | 2e-3 | +0.98605 °/day (+0.50% off) |
+| e = 0.1, 51.6° | −2.86449 °/day | −2.86495 °/day | −1.6e-4 | 4e-4 | −2.85741 °/day (+0.25% off) |
+
+For the circular case, the mean a is 9 350 m below the initial osculating a. The osculating a at the ascending node sits near the top of its short-period oscillation. This is why the choice between mean and osculating elements matters for both open questions 1 and 2.
+
+**Sun-synchronous target** = 360°/365.2422 d = 0.98565 °/day. Exact sun-synchronous inclination:
+
+- 97.461° at the measured mean a (515.6 km);
+- 97.497° if 525 km is the mean altitude.
+
+### B.5.4 Formation under J2 (open question 2)
+
+**Setup:** the formation of DL-022 (equal osculating a, e, i, Ω, ω; 20 km mean-anomaly offsets), propagated 24 h at 10 s.
+
+- **Two-body:** the separations change by 2e-5 m.
+- **With J2:** the separations drift by 107 m to 7.7 km depending on the start angle (Part A table). The drift is largest at 45°, where d(osculating − mean a)/du is greatest.
+- **At a 0° start:** the mean-a differences between neighbours are 0.26, 0.57 and 0.89 m.
+- **At a 45° start:** the drift is ~7.7 km/day, consistent with a mean-a difference of about 50 m (3π·Δā per orbit).
+
+**Conclusion:** formation initialization must equalize **mean** semi-major axis, not osculating. The options are in DL-026.
+
 ### Sign-off
 
 | Item | Decision | Date |
@@ -218,4 +284,5 @@ The disagreement is therefore entirely the known linearization (curvature) error
 | Tolerance policy (set only from reference studies) | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | D0 derived tolerances, PA-03 order band, and derivation rule (§B.2.3–§B.2.5) | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | ITRS (PA-04) tolerances and independent checks (§B.3) | ☑ approved — Abdullah Muzher | 2026-11-03 |
-| Formation (PA-06) and CW (PA-07) tolerances and bands (§B.4) | ☐ pending owner review | — |
+| Formation (PA-06) and CW (PA-07) tolerances and bands (§B.4) | ☑ approved — Abdullah Muzher | 2026-11-03 |
+| J2 (PA-08 and D1 checks) tolerances (§B.5) | ☐ pending owner review | — |
