@@ -15,9 +15,17 @@ import math
 from dataclasses import dataclass
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 from astramesh.dynamics.constants import GM_EARTH_M3PS2, R_EARTH_EQ_M
-from astramesh.dynamics.state import NonPhysicalStateError, Vector3
+from astramesh.dynamics.state import (
+    NonPhysicalStateError,
+    Vector3,
+    as_vector3,
+    cross3,
+    dot3,
+    norm3,
+)
 
 _KEPLER_MAX_ITER = 50
 
@@ -160,4 +168,58 @@ def mean_to_true_anomaly(m_rad: float, e: float) -> float:
         raise ArithmeticError(f"Kepler's equation did not converge (M={m_rad}, e={e})")
     return 2.0 * math.atan2(
         math.sqrt(1.0 + e) * math.sin(ecc_anom / 2.0), math.sqrt(1.0 - e) * math.cos(ecc_anom / 2.0)
+    )
+
+
+def rv_to_elements(r_m: ArrayLike, v_mps: ArrayLike, mu: float = GM_EARTH_M3PS2) -> KeplerElements:
+    """Osculating classical elements from an inertial position/velocity.
+
+    Angles are computed with ``atan2`` from the node and eccentricity vectors.
+    No near-circular or near-equatorial cut-off is applied: a cut-off that
+    zeroes ``argp`` while keeping a small non-zero ``e`` would misplace the
+    position by ~``a e`` (found by Hypothesis). For near-circular orbits the
+    split between ``argp_rad`` and ``nu_rad`` is ill-conditioned and only their
+    sum (argument of latitude) is meaningful; the state is still reproduced to
+    round-off. Only the exactly singular cases use conventions: ``e == 0`` gives
+    ``argp_rad = 0``; ``sin i == 0`` takes the node along the x-axis.
+
+    Unbound or non-physical states raise :class:`NonPhysicalStateError` (via
+    :class:`KeplerElements` validation).
+    """
+    r = as_vector3(r_m, name="r_m")
+    v = as_vector3(v_mps, name="v_mps")
+    rn = float(norm3(r))
+    if rn == 0.0:
+        raise NonPhysicalStateError("r_m must be non-zero")
+    h = cross3(r, v)
+    hn = float(norm3(h))
+    if hn <= 1e-12 * rn * float(norm3(v)):
+        raise NonPhysicalStateError("rectilinear motion has no orbital elements")
+    h_hat = h / hn
+    energy = 0.5 * float(dot3(v, v)) - mu / rn
+    if energy >= 0.0:
+        raise NonPhysicalStateError(f"state is not on a bound orbit (energy {energy:.3e} J/kg)")
+    a = -mu / (2.0 * energy)
+    e_vec = cross3(v, h) / mu - r / rn
+    e = float(norm3(e_vec))
+    sin_i = math.hypot(float(h_hat[0]), float(h_hat[1]))
+    inc = math.atan2(sin_i, float(h_hat[2]))
+    if sin_i == 0.0:
+        node = np.array([1.0, 0.0, 0.0])
+    else:
+        node = np.array([-float(h_hat[1]), float(h_hat[0]), 0.0]) / sin_i
+    raan = math.atan2(float(node[1]), float(node[0]))
+    u = math.atan2(float(dot3(cross3(node, r), h_hat)), float(dot3(node, r)))
+    if e == 0.0:
+        argp = 0.0
+    else:
+        argp = math.atan2(float(dot3(cross3(node, e_vec), h_hat)), float(dot3(node, e_vec)))
+    two_pi = 2.0 * math.pi
+    return KeplerElements(
+        a_m=a,
+        e=e,
+        i_rad=inc,
+        raan_rad=raan % two_pi,
+        argp_rad=argp % two_pi,
+        nu_rad=(u - argp) % two_pi,
     )

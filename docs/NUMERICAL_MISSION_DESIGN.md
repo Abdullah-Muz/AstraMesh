@@ -1,6 +1,6 @@
 # Numerical Mission Design and Physics Acceptance Plan
 
-> **Owner:** Abdullah Muzher · **Status:** Part B (physics acceptance plan) APPROVED 2026-11-03; §B.2 D0 reference studies recorded, derived tolerances APPROVED 2026-11-03; §B.3 ITRS study recorded, tolerances PROPOSED; Part A not started · **Spec:** §3.2–§3.3, §4.1, §4.4, §14.3, §18 · **Last updated:** 2026-11-03
+> **Owner:** Abdullah Muzher · **Status:** Part B (physics acceptance plan) APPROVED 2026-11-03; §B.2 D0 reference studies recorded, derived tolerances APPROVED 2026-11-03; §B.3 ITRS study recorded, tolerances APPROVED 2026-11-03; §B.4 formation/CW study recorded, tolerances PROPOSED; Part A not started · **Spec:** §3.2–§3.3, §4.1, §4.4, §14.3, §18 · **Last updated:** 2026-11-03
 
 ## Purpose
 
@@ -14,7 +14,7 @@ Phase 1 increment 1 (D0 two-body core) is implemented in `src/astramesh/dynamics
 Not started. To be filled in Phase 1, answering open validation questions 1, 2, 4, and 5 (spec §18):
 
 - [ ] Near-sun-synchronous behaviour of 525 km / 97.5° under J2 (nodal precession rate vs. the ~0.9856 °/day target).
-- [ ] Orbital elements that realize ~20 km along-track spacing without unintended secular drift.
+- [ ] Orbital elements that realize ~20 km along-track spacing without unintended secular drift. **Two-body part answered (§B.4.2):** equal osculating a, e, i, Ω, ω with mean-anomaly offsets of 20 km / a give no secular drift; the separation changes by 2e-5 m over 24 h (integrator error only). **Open:** under J2, equal *osculating* elements at different anomalies have different *mean* semi-major axes, which may cause along-track drift. This is examined in the J2 increment.
 - [ ] Eclipse fraction and eclipse-aware power balance for the 25 W / 100 Wh candidate.
 - [ ] Feasibility of the 0.5 mN / 5 m/s propulsion candidate (spec §3.3 notes ~33.3 h of accumulated thrust for 5 m/s).
 
@@ -27,10 +27,10 @@ Not started. To be filled in Phase 1, answering open validation questions 1, 2, 
 | PA-01 | Two-body propagation accuracy | Propagate each spacecraft over the defined horizon (24 h nominal) and compare positions/velocities | Analytic Kepler solution (universal-variable or eccentric-anomaly form), independently implemented; optionally a high-accuracy integrator at tight tolerances | **Approved** §B.2.4 (0.9 m / 1e-3 m/s circular; 0.5 m / 4e-4 m/s e = 0.1) | `tests/physics_validation/test_two_body.py` |
 | PA-02 | Conservation in the unperturbed model | Track specific orbital energy and specific angular-momentum vector over the horizon | Exact invariants of the two-body problem | **Approved** §B.2.4 | `tests/physics_validation/test_two_body.py` |
 | PA-03 | Step-size convergence | Repeat a fixed scenario at Δt, Δt/2, Δt/4; check that the error decreases at the integrator's expected order | Richardson-style comparison against the finest run and PA-01 analytic reference | **Approved** observed order in [3.9, 5.1] at 20/10/5 s (§B.2.3) | `tests/physics_validation/test_two_body.py` |
-| PA-04 | Frame round trips | ECI → ITRS → ECI and ECI → RIC → ECI for randomized states (Hypothesis) | Identity; Astropy transforms as an external check | RIC: **Approved** 0.5 ε‖x_chief‖ (§B.2.5). ITRS: **Proposed** §B.3 | `tests/physics_validation/test_frames_ric.py`, `test_frames_itrs.py`, `tests/unit/test_timescales.py` |
+| PA-04 | Frame round trips | ECI → ITRS → ECI and ECI → RIC → ECI for randomized states (Hypothesis) | Identity; Astropy transforms as an external check | RIC: **Approved** 0.5 ε‖x_chief‖ (§B.2.5). ITRS: **Approved** §B.3 | `tests/physics_validation/test_frames_ric.py`, `test_frames_itrs.py`, `tests/unit/test_timescales.py` |
 | PA-05 | Units are explicit | Constructors reject ambiguous inputs; configs reject unit-less physical fields | Code inspection + schema tests | Pass/fail. Constructors done; dynamics config schema pending | `tests/unit/test_dynamics_inputs.py` |
-| PA-06 | Formation initialization | Four initial states from consistent orbital elements reproduce the intended along-track spacing and phasing | Independent element → state → element round trip; geometric check of the spacing | TBD | `tests/physics_validation/` |
-| PA-07 | Relative-motion cross-check | Compare relative motion against Clohessy–Wiltshire/Hill **only** within its assumptions (circular reference, small separation, short horizon) | CW closed-form solution | TBD — must reflect known CW linearization error at ~20 km | `tests/physics_validation/` |
+| PA-06 | Formation initialization | Four initial states from consistent orbital elements reproduce the intended along-track spacing and phasing | Independent element → state → element round trip; geometric check of the spacing | **Proposed** §B.4 | `tests/physics_validation/test_formation.py` |
+| PA-07 | Relative-motion cross-check | Compare relative motion against Clohessy–Wiltshire/Hill **only** within its assumptions (circular reference, small separation, short horizon) | CW closed-form solution | **Proposed** §B.4: second-order error scaling, plus the 20 km error matched to its analytic curvature form | `tests/physics_validation/test_cw.py` |
 | PA-08 | J2 before SSO claims | With J2 enabled, measured nodal precession matches the analytic secular J2 rate before any sun-synchronous claim is made | Analytic secular J2 formula | TBD | `tests/physics_validation/` |
 | PA-09 | Determinism | Gravity-only and zero-thrust runs are bit-for-bit repeatable with the same config/seeds | Replay comparison (as already done for the Phase 0 toy scenario) | Exact equality (gravity-only done, golden SHA-256 pinned) | `tests/regression/test_two_body_determinism.py` |
 | PA-10 | Visible failure on invalid input | NaN/Inf states, non-physical parameters (e.g. r below Earth radius, e ≥ 1 for an orbit expected to be bound) raise explicit errors | Negative tests | Pass/fail | `tests/unit/test_dynamics_inputs.py` |
@@ -41,7 +41,7 @@ Not started. To be filled in Phase 1, answering open validation questions 1, 2, 
 - [x] Characterize the chosen integrator's error constant and order (PA-03). See §B.2.2–§B.2.3.
 - [x] Float64 round-off of the RIC round trip (PA-04, RIC part). See §B.2.5.
 - [x] Float64 round-off of the ITRS round trip (PA-04, ITRS part), plus independent checks of Astropy's transform. See §B.3.
-- [ ] Quantify CW linearization error at 20 km separation over the test horizon (PA-07).
+- [x] Quantify CW linearization error at 20 km separation over the test horizon (PA-07). See §B.4.3.
 
 ## B.2 D0 reference-error studies (2026-11-03)
 
@@ -151,6 +151,65 @@ The transform is Astropy's, so a round trip alone would only test self-consisten
 - 1 ns resolution is kept after 24 h (Astropy's precision is about 10 ps).
 - Times outside the bundled table raise an error.
 
+## B.4 Formation initialization and CW cross-check study (2026-11-03)
+
+**Reproduce:** `uv run python scripts/studies/formation_cw_reference_errors.py`. It is deterministic and takes about 20 s.
+
+**Implementation:**
+
+- **Formation** (`dynamics/formation.py`): spacecraft k shares the reference orbit's a, e, i, Ω and ω, and trails the leader (k = 0) by k·s/a radians of mean anomaly. For e = 0 this is an along-track arc of exactly s between neighbours.
+- **State to elements** (`elements.rv_to_elements`): uses atan2 and applies no near-circular cut-off. A first version had one, and Hypothesis found that it misplaced positions by ~a·e (≈ 7e-6 m at e = 1e-12). The cut-off was removed and a 200 000-sample edge-case stress test passes.
+- **CW** (`dynamics/relative.py`): closed-form state-transition matrix, in rectilinear RIC.
+
+### B.4.1 Element round trips (20 000 random LEO states; i ∈ [0.01, π − 0.01] with the low end oversampled, half with e = 0)
+
+| Quantity | Observed worst | Tolerance (Hypothesis-searched, ≥ 5× margin) |
+|---|---|---|
+| state → elements → state, position | 10.1 ε‖r‖ | 60 ε‖r‖ |
+| state → elements → state, velocity | 9.9 ε‖v‖ | 60 ε‖v‖ |
+| a (relative) | 1.7e-15 | 1e-14 |
+| e (absolute) | 1.0e-15 | 6e-15 |
+| i | 4.4e-16 rad | 3e-15 rad |
+| Ω × sin i | 8.9e-16 rad | 5e-15 rad |
+| u = ω + ν, × sin i | 2.3e-15 rad | 2e-14 rad |
+
+Angles measured from the node are scaled by sin i, because the node direction has absolute error of about ε, so their error grows as ε / sin i.
+
+### B.4.2 Formation geometry (4 spacecraft, s = 20 km, 525 km / 97.5° circular reference)
+
+Analytic expectations:
+
+- Adjacent chord: 2a sin(Δu/2) = 19 999.993 m.
+- Follower position in the leader's rectilinear RIC frame: (−a(1 − cos Δu), −a sin Δu, 0) = (**−28.97 m**, −19 999.97 m, 0).
+
+The ~29 m radial offset is pure curvature: both spacecraft are on the same circular orbit.
+
+| Check | Observed worst | Tolerance (2× rule) |
+|---|---|---|
+| Chord at t₀ vs formula (all pairs) | 1.1e-11 m | 3e-11 m |
+| RIC position at t₀ vs formula (all pairs) | 1.4e-9 m | 3e-9 m |
+| RIC velocity at t₀ (all pairs; truth 0) | 7.8e-13 m/s | 2e-12 m/s |
+| 24 h RK4: change in adjacent separation | 2.0e-5 m | 5e-5 m |
+| 24 h RK4: change in follower RIC position | 2.0e-5 m | 5e-5 m |
+| 24 h RK4: follower RIC velocity | 5.1e-9 m/s | 2e-8 m/s |
+
+**Result:** under two-body dynamics this initialization has no secular relative drift, only integrator error.
+
+### B.4.3 CW cross-check (truth: RK4 at 10 s for chief and deputy; horizon 5 700 s ≈ 1 orbit)
+
+**(a) Within its assumptions.** The relative states have separation ρ in a random direction and velocity ρ·n in a random direction. CW error is exactly second order in ρ, because CW is the first-order linearization. The observed order across ρ = 125 → 2000 m was 1.9987–2.0010. **Band: [1.9, 2.1].**
+
+The absolute error grows quickly when the initial velocity makes the relative orbit drift, up to 1.4e-4·ρ² per metre over one orbit (2.1 m at ρ = 125 m).
+
+**(b) At the 20 km in-train spacing.** CW treats the −29 m curvature offset as a lower orbit and predicts an along-track drift that truth does not have:
+
+- Error after one orbit: **1 092 m**.
+- The CW − truth difference matches the analytic form Δx = 3(1 − cos nt)x₀, Δy = 6(sin nt − nt)x₀ to within **9.4e-6 m** (tolerance 2e-5 m).
+
+The disagreement is therefore entirely the known linearization (curvature) error; the dynamics, the frames and the CW code are all correct.
+
+**Implication:** rectilinear CW must **not** be used to predict or plan the 20 km formation's relative motion beyond very short horizons. Curvilinear coordinates or the full nonlinear propagator should be used instead.
+
 ### Sign-off
 
 | Item | Decision | Date |
@@ -158,4 +217,5 @@ The transform is Astropy's, so a round trip alone would only test self-consisten
 | Test list PA-01 … PA-10 | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | Tolerance policy (set only from reference studies) | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | D0 derived tolerances, PA-03 order band, and derivation rule (§B.2.3–§B.2.5) | ☑ approved — Abdullah Muzher | 2026-11-03 |
-| ITRS (PA-04) tolerances and independent checks (§B.3) | ☐ pending owner review | — |
+| ITRS (PA-04) tolerances and independent checks (§B.3) | ☑ approved — Abdullah Muzher | 2026-11-03 |
+| Formation (PA-06) and CW (PA-07) tolerances and bands (§B.4) | ☐ pending owner review | — |

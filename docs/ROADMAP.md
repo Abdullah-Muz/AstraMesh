@@ -32,8 +32,8 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | # | Increment | Status |
 |---|---|---|
 | 1 | D0 core: frame-tagged states, WGS 84 constants, Kepler elements, universal-variable analytic reference, fixed-step RK4 multi-spacecraft propagator, RIC frame; reference-error studies; PA-01/02/03, PA-04 (RIC), PA-05 (constructors), PA-09 (gravity-only), PA-10 | **Done** — commit `4dd6010`, CI green; tolerances approved 2026-11-03 |
-| 2 | Astropy time scales (UTC→TT/UT1) and GCRS↔ITRS with IERS version in manifest; PA-04 (ITRS) | Implemented; ITRS tolerances pending owner review |
-| 3 | Formation initialization from consistent elements (~20 km along-track); PA-06; CW cross-check PA-07 | Not started |
+| 2 | Astropy time scales (UTC→TT/UT1) and GCRS↔ITRS with IERS version in manifest; PA-04 (ITRS) | **Done**: commit `934b8e5`, CI passing; ITRS tolerances approved 2026-11-03 |
+| 3 | Formation initialization from consistent elements (~20 km along-track); PA-06; CW cross-check PA-07 | Implemented; tolerances pending owner review |
 | 4 | J2 (D1) and secular nodal-precession check PA-08; Part A SSO question | Not started |
 | 5 | Dynamics scenario config (unit-suffixed schema), 24 h baseline run with manifest `dynamics_model`, basic plots | Not started |
 | 6 | Synthetic science opportunities from modeled geometry; finite resource accounting (energy, storage, Δv) | Not started |
