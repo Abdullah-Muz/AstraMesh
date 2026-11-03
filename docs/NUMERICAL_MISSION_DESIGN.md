@@ -392,4 +392,4 @@ At high β the shadow is crossed obliquely, so the penumbra lasts longer. The cy
 | Formation (PA-06) and CW (PA-07) tolerances and bands (§B.4) | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | J2 (PA-08 and D1 checks) tolerances (§B.5) | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | Mean-element initialization tolerances (§B.6), including mean-eccentricity matching | ☑ approved — Abdullah Muzher | 2026-11-03 |
-| Mission-geometry tolerances (§B.7), illumination model (DL-032), opportunity definition and 20° mask (DL-033) | ☐ pending owner approval | |
+| Mission-geometry tolerances (§B.7), illumination model (DL-032), opportunity definition and 20° mask (DL-033), baseline RAAN 0° (LTAN 07:25) kept | ☑ approved — Abdullah Muzher | 2026-11-03 |
