@@ -11,14 +11,14 @@ Phase 1 increment 1 (D0 two-body core) is implemented in `src/astramesh/dynamics
 
 ## Part A — Mission design derivations
 
-Not started. To be filled in Phase 1, answering open validation questions 1, 2, 4, and 5 (spec §18):
+Phase 1 answers to open validation questions 1, 2, 4, and 5 (spec §18):
 
 - [x] Near-sun-synchronous behaviour of 525 km / 97.5° under J2 (nodal precession rate vs. the ~0.9856 °/day target). **Answer (§B.5.3):** it depends on whether 525 km / 97.5° are *mean* or *osculating* elements.
   - **Read as mean elements:** the secular rate is 0.98605 °/day against the 0.98565 °/day target, which is +0.04% and a node drift of about 0.15°/yr. The exact sun-synchronous inclination is 97.497°. **Near-sun-synchronous: yes.**
   - **Read as osculating elements at the ascending node** (as the code does today): the mean altitude comes out ~9.4 km lower (515.6 km). The measured rate is 0.99097 °/day, which is +0.54% and a drift of about 1.9°/yr (~8 min of local time per year). That is still "near" for 24 h scenarios (0.005°/day).
   - **Decision DL-026: mean elements.**
   - **Result after implementing mean-element initialization (§B.6):** the measured secular rate is **0.98539 °/day**, **−0.026%** from sun-synchronous (−0.09°/yr). The first-order analytic formula gives +0.04%, so its O(J2) error is larger than the offset itself. **525 km / 97.5° as mean elements is sun-synchronous to within 0.03%.**
-- [ ] Orbital elements that realize ~20 km along-track spacing without unintended secular drift. **Two-body part answered (§B.4.2):** equal osculating a, e, i, Ω, ω with mean-anomaly offsets of 20 km / a give no secular drift; the separation changes by 2e-5 m over 24 h (integrator error only). **J2 part (§B.5.4): equal osculating elements are NOT acceptable.** J2 short-period terms make mean a depend on the argument of latitude, so neighbours get different mean a and different periods. The resulting 24 h change in adjacent separation depends on where the formation starts:
+- [x] Orbital elements that realize ~20 km along-track spacing without unintended secular drift. **Two-body part answered (§B.4.2):** equal osculating a, e, i, Ω, ω with mean-anomaly offsets of 20 km / a give no secular drift; the separation changes by 2e-5 m over 24 h (integrator error only). **J2 part (§B.5.4): equal osculating elements are NOT acceptable.** J2 short-period terms make mean a depend on the argument of latitude, so neighbours get different mean a and different periods. The resulting 24 h change in adjacent separation depends on where the formation starts:
 
 | Start (argument of latitude) | Change in separation over 24 h |
 |---|---|
@@ -32,8 +32,8 @@ Not started. To be filled in Phase 1, answering open validation questions 1, 2, 
 - secular drift ≤ 0.03 m per orbit;
 - in-orbit separation swing ≈ 18 m;
 - mean spacing 20.009–20.018 km.
-- [ ] Eclipse fraction and eclipse-aware power balance for the 25 W / 100 Wh candidate. **Eclipse fraction answered (§B.7, G6):** 0–28% over a year for the baseline's 07:25 node (13.7% on 2025-06-01), 32–37.5% for 09:00–13:30 nodes, 0–23% for dawn-dusk. The power balance is increment 6b.
-- [ ] Feasibility of the 0.5 mN / 5 m/s propulsion candidate (spec §3.3 notes ~33.3 h of accumulated thrust for 5 m/s).
+- [x] Eclipse fraction and eclipse-aware power balance for the 25 W / 100 Wh candidate. **Answered.** Eclipse fraction (§B.7, G6): 0–28% over a year for the baseline's 07:25 node (13.7% on 2025-06-01), 32–37.5% for 09:00–13:30 nodes, 0–23% for dawn-dusk. Power balance (§B.8): positive at every LTAN; worst eclipse discharge < 6% of 100 Wh. The binding assumption is 25 W generation: the 8 W bus needs ≥ 13.3 W orbit-average.
+- [x] Feasibility of the 0.5 mN / 5 m/s propulsion candidate (spec §3.3 notes ~33.3 h of accumulated thrust for 5 m/s). **Answered (§B.8, R3; cold gas, DL-036):** 87 g of propellant, 33.2 h of thrust, 66 Wh; power-positive while thrusting in sunlight. A slow, small-correction capability.
 
 ## Part B — Phase 1 physics acceptance test design
 
@@ -381,6 +381,61 @@ At high β the shadow is crossed obliquely, so the penumbra lasts longer. The cy
 
 **Part A question 4 (eclipse fraction):** answered above. The power balance, meaning whether 25 W of generation and 100 Wh of battery cover an eclipse fraction of up to 37.5%, is increment 6b.
 
+## B.8 Resource feasibility: energy and propulsion (2026-11-03; increment 6b; DL-035, DL-036)
+
+**Reproduce:** `uv run python scripts/studies/resources_feasibility.py`. It takes about 40 s.
+
+**Implementation:**
+- `resources/ledgers.py`: the energy ledger, data volume, and `PropulsionBudget`;
+- `scenarios/mission_geometry.py`: the resource accounting in the scenario.
+
+Values come from the `spacecraft` section of `mission_geometry_24h.yaml`.
+
+**Independent checks** (tests in `tests/unit/test_resources.py` and `tests/physics_validation/test_mission_geometry.py`):
+
+| Check | Reference | Observed | Tolerance |
+|---|---|---|---|
+| Ledger step arithmetic, clamping, curtailment, deficit | Hand-computed sequences | exact (1e-12 Wh) | 1e-12 Wh |
+| Energy identity: final = initial + η·(charged − curtailed) − discharged + deficit | Independent sum over steps | ≤ 1e-9 Wh | 1e-9 Wh |
+| Baseline worst eclipse discharge (bus only) | bus power × longest eclipse (battery is full before each eclipse) | exact (1e-9 Wh) | 1e-9 Wh |
+| Baseline generation | 25 W × sunlit time | exact | 1e-6 relative (`pytest.approx`) |
+| Thrust time for 5 m/s | RK4 integration of m′ = −F/ve, v′ = F/m at 1 s (in the study) | 1.9e-14 relative | 1e-14 relative in the unit test (closed form vs mp·ve/F) |
+
+These are identities and round-off, so no physics tolerance needs approval beyond the table.
+
+**R1: energy over 24 h by the ascending node's local time (LTAN)** on 2025-06-01, worst spacecraft of the four:
+
+| LTAN | β | Eclipse | Opportunities | Worst eclipse discharge, bus only | Worst eclipse discharge, payload in every window | Daily generated / used (payload profile) | Deficit |
+|---|---|---|---|---|---|---|---|
+| 06:00 | −75.4° | 0% | 42 | 0 Wh | 0 Wh | 600 / 206 Wh | 0 |
+| 07:25 (baseline) | −65.0° | 13.7% | 43 | 1.8 Wh | 2.4 Wh | 518 / 207 Wh | 0 |
+| 10:30 | −23.6° | 36.0% | 43 | 4.6 Wh | 5.7 Wh | 384 / 207 Wh | 0 |
+| 12:00 | −2.8° | 37.2% | 42 | 4.8 Wh | 5.8 Wh | 377 / 206 Wh | 0 |
+
+- The battery starts at 80%, is full after the first orbit, and stays within 6% of full.
+- 140–386 Wh a day is curtailed because the battery is already full.
+- The payload is on in some eligible window for about 10 600 s a day (2.9 h), which adds 14.7 Wh.
+- Storage use is 13 MB a day, 1.3% of 1 GB. With no downlink it would fill after about 75 days.
+
+**R2: break-even continuous load.** The orbit-average balance, with charging losses, gives P_max = G(1 − f)η / ((1 − f)η + f).
+- At LTAN 12:00 (f = 0.372) this is **15.1 W**.
+- A 3-day simulation confirms it. At 14.6 W the charge stays at or above 91 Wh. At 15.6 W it falls steadily, to 61 Wh after 3 days.
+- **Inverse, for the 8 W bus:** the minimum orbit-average generation is G_min = P((1 − f)η + f) / ((1 − f)η). That is **13.3 W** at f = 0.375 and 9.4 W at the baseline's f = 0.137.
+
+**R3: propulsion (cold gas, DL-036).**
+
+| Quantity | Value |
+|---|---|
+| Propellant for 5 m/s | 87.1 g (numerical integration agrees to 2e-12 kg) |
+| Thrust time | 33.21 h (spec §3.3's constant-mass estimate: 33.33 h) |
+| Thruster energy | 66.4 Wh in total, about 1/5 of one day's surplus |
+| Acceleration | 4.17e-5 m/s² |
+| Load while thrusting | 10 W (bus + thruster), below 25 W generation, so sunlit thrusting is power-positive |
+
+**Part A question 4 (power balance):** **feasible with a wide margin** for the spec's 25 W and 100 Wh at every LTAN, with the provisional 8 W bus and 5 W payload. The battery is not the limit; worst-case discharge per eclipse is under 6%. What is uncertain is the **generation assumption**: 25 W whenever sunlit, with no pointing or cosine loss. Generation is the parameter to verify; the margin disappears below about 13 W orbit-average.
+
+**Part A question 5 (propulsion):** **feasible** as a slow, limited capability. 5 m/s costs 87 g of propellant and 33 h of thrust, so the 5 m/s budget allows small corrections only, not reconfiguration. Electric propulsion was rejected for power (DL-036). Drag, the real consumer of Δv at 525 km, is not modelled yet (spec §4.1 D2).
+
 ### Sign-off
 
 | Item | Decision | Date |
@@ -393,3 +448,5 @@ At high β the shadow is crossed obliquely, so the penumbra lasts longer. The cy
 | J2 (PA-08 and D1 checks) tolerances (§B.5) | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | Mean-element initialization tolerances (§B.6), including mean-eccentricity matching | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | Mission-geometry tolerances (§B.7), illumination model (DL-032), opportunity definition and 20° mask (DL-033), baseline RAAN 0° (LTAN 07:25) kept | ☑ approved — Abdullah Muzher | 2026-11-03 |
+| Resource values (DL-035) and cold-gas propulsion (DL-036) | ☑ approved — Abdullah Muzher | 2026-11-03 |
+| Resource ledger model and checks (§B.8), Part A Q4/Q5 conclusions | ☐ pending owner review | |

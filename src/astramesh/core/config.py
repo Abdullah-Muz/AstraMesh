@@ -212,11 +212,36 @@ class ScienceConfig(_Model):
         return v
 
 
+Fraction = Annotated[float, Field(gt=0.0, le=1.0, allow_inf_nan=False)]
+PositiveFloat = Annotated[float, Field(gt=0.0, allow_inf_nan=False)]
+NonNegativeFloat = Annotated[float, Field(ge=0.0, allow_inf_nan=False)]
+
+
+class SpacecraftConfig(_Model):
+    """Resource model of every spacecraft (spec §3.3; values PROVISIONAL, DL-035/036)."""
+
+    mass_kg: PositiveFloat = Field(description="Initial (wet) mass [kg]")
+    solar_generation_w: NonNegativeFloat = Field(description="Generation while sunlit [W]")
+    bus_power_w: NonNegativeFloat = Field(description="Continuous essential load [W]")
+    battery_capacity_wh: PositiveFloat = Field(description="Usable battery energy [Wh]")
+    battery_initial_fraction: Fraction = Field(description="Initial state of charge")
+    charge_efficiency_fraction: Fraction = Field(description="Stored / delivered when charging")
+    payload_power_w: NonNegativeFloat = Field(description="Science payload load while on [W]")
+    payload_data_rate_kbps: NonNegativeFloat = Field(description="Science data rate [kbit/s]")
+    storage_capacity_mb: PositiveFloat = Field(description="Data storage [MB = 1e6 bytes]")
+    thrust_mn: PositiveFloat = Field(description="Maximum thrust [mN]")
+    thruster_power_w: NonNegativeFloat = Field(description="Load while thrusting [W]")
+    specific_impulse_s: PositiveFloat = Field(description="Propulsion specific impulse [s]")
+    delta_v_budget_mps: NonNegativeFloat = Field(description="Total delta-v budget [m/s]")
+
+
 class MissionGeometryScenario(FormationScenarioBase):
-    """Phase 1 mission geometry: formation dynamics + illumination + science opportunities."""
+    """Phase 1 mission geometry: formation dynamics + illumination + science opportunities
+    + finite resource accounting."""
 
     scenario_type: Literal["mission_geometry"]
     science: ScienceConfig
+    spacecraft: SpacecraftConfig
 
 
 AnyScenarioConfig = ToyHeartbeatScenario | FormationDynamicsScenario | MissionGeometryScenario

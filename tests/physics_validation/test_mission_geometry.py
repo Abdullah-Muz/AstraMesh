@@ -170,3 +170,49 @@ def test_opportunity_records_are_ordered_and_consistent(
         assert r["start_t_ns"] == min(e["start_t_ns"] for e in r["eligible_spacecraft"])
         assert r["end_t_ns"] == max(e["end_t_ns"] for e in r["eligible_spacecraft"])
         assert all(0 <= e["sunlit_ticks"] <= e["n_ticks"] for e in r["eligible_spacecraft"])
+
+
+def test_energy_ledger_matches_eclipse_geometry(
+    baseline: tuple[MissionGeometryScenario, MissionGeometryRun],
+) -> None:
+    """Bus-only: the battery is full before every eclipse after the first orbit, so the
+    worst discharge is exactly bus power x the longest eclipse; generation is G x sunlit time."""
+    config, run = baseline
+    sc = config.spacecraft
+    dt_h = config.time.time_step_s / 3600.0
+    res = run.summary["resources"]
+    for j, sc_id in enumerate(sorted(res["energy_bus_only"])):
+        dark = ~run.sunlit[:-1, j]  # left-endpoint steps
+        longest, cur = 0, 0
+        for d in dark.tolist():
+            cur = cur + 1 if d else 0
+            longest = max(longest, cur)
+        e = res["energy_bus_only"][sc_id]
+        assert e["max_drawdown_wh"] == pytest.approx(sc.bus_power_w * longest * dt_h, abs=1e-9)
+        lit_steps = int(np.count_nonzero(run.sunlit[:-1, j]))
+        assert e["generated_wh"] == pytest.approx(sc.solar_generation_w * lit_steps * dt_h)
+        assert e["deficit_wh"] == 0.0
+
+
+def test_task_costs_follow_windows(
+    baseline: tuple[MissionGeometryScenario, MissionGeometryRun],
+) -> None:
+    config, run = baseline
+    sc, step_s = config.spacecraft, config.time.time_step_s
+    total = dict.fromkeys(run.summary["resources"]["payload_on_s"], 0.0)
+    for rec in run.records:
+        for e in rec["eligible_spacecraft"]:
+            steps = e["n_ticks"] - (1 if e["truncated_end"] else 0)
+            assert e["payload_energy_wh"] == pytest.approx(
+                sc.payload_power_w * steps * step_s / 3600
+            )
+            assert e["storage_mb"] == pytest.approx(
+                sc.payload_data_rate_kbps * 1e3 / 8 * steps * step_s / 1e6
+            )
+            total[e["spacecraft"]] += steps * step_s
+        assert rec["payload_energy_wh"] == max(
+            e["payload_energy_wh"] for e in rec["eligible_spacecraft"]
+        )
+    # Windows of one spacecraft for different regions may overlap; payload-on time is the union.
+    for sc_id, on_s in run.summary["resources"]["payload_on_s"].items():
+        assert on_s <= total[sc_id]

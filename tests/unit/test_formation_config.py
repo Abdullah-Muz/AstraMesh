@@ -16,7 +16,7 @@ from astramesh.core.config import (
 )
 
 UNIT_SUFFIXES = ("_s", "_ns", "_m", "_km", "_mps", "_kg", "_w", "_wh", "_j", "_n", "_mn",
-                 "_rad", "_deg", "_mb", "_gb", "_probability")  # fmt: skip
+                 "_rad", "_deg", "_mb", "_gb", "_probability", "_fraction", "_kbps")  # fmt: skip
 # Non-physical (dimensionless, identifiers, or explicitly unit-less) fields.
 UNITLESS_OK = {"schema_version", "seed", "n_spacecraft", "n_nodes", "priority"}
 
@@ -123,4 +123,23 @@ def test_mission_geometry_rejects_duplicate_region_ids(
     cfg = copy.deepcopy(mission_config_dict)
     cfg["science"]["regions"][1]["region_id"] = cfg["science"]["regions"][0]["region_id"]
     with pytest.raises(ConfigError, match="unique"):
+        parse_scenario(cfg)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [("mass_kg", 0.0), ("battery_initial_fraction", 1.2), ("charge_efficiency_fraction", 0.0),
+     ("bus_power_w", -1.0), ("specific_impulse_s", 0.0), ("delta_v_budget_mps", -0.1)],
+)  # fmt: skip
+def test_mission_geometry_rejects_invalid_spacecraft(
+    mission_config_dict: dict[str, Any], field: str, value: float
+) -> None:
+    with pytest.raises(ConfigError):
+        parse_scenario(_with(mission_config_dict, f"spacecraft.{field}", value))
+
+
+def test_mission_geometry_requires_spacecraft(mission_config_dict: dict[str, Any]) -> None:
+    cfg = copy.deepcopy(mission_config_dict)
+    del cfg["spacecraft"]
+    with pytest.raises(ConfigError, match="spacecraft"):
         parse_scenario(cfg)

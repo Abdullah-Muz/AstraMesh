@@ -7,7 +7,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | Phase | Focus | Status |
 |---|---|---|
 | 0 | Research and reproducibility foundation | **Complete except** Priority A full-text review (proceeding in parallel, DL-016) |
-| 1 | Validated four-spacecraft dynamics and mission geometry | **In progress** (DL-016). Increments 1–6a done; 6b (resource accounting) remains |
+| 1 | Validated four-spacecraft dynamics and mission geometry | **In progress** (DL-016). Increments 1–6a done; 6b (resource accounting) implemented. All Gate P1 items met; phase sign-off pending owner review |
 | 2 | Decentralized nominal science operations | Not started |
 | 3 | Deterministic faults and protection supervisor | Not started |
 | 4 | External data and probabilistic/ML experiments | Not started |
@@ -38,7 +38,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 4b | Mean-element initialization (DL-026/027): reference orbit as mean elements; mean-matched formation | **Done**: commit `7c8f7dd`, CI passing; tolerances approved 2026-11-03 |
 | 5 | Dynamics scenario config (unit-suffixed schema), 24 h baseline run with manifest `dynamics_model`, basic plots | **Done**: commits `a700f54` and `428fb65` (DL-031 CPU-independence fix), CI passing |
 | 6a | Mission geometry: per-tick ERFA Earth rotation, Sun and cylindrical shadow, WGS 84 region access, geometry-only opportunities (spec §3.4), `mission_geometry` scenario, plots; Part A Q4 eclipse fraction | **Done**: commit `298dc87`, CI passing; §B.7 tolerances, DL-032 and DL-033 approved 2026-11-03 |
-| 6b | Finite resource accounting (energy with eclipse, storage, Δv); Part A Q4 power balance and Q5 propulsion feasibility | Not started |
+| 6b | Finite resource accounting (energy with eclipse, storage, Δv); Part A Q4 power balance and Q5 propulsion feasibility | Implemented (`resources/ledgers.py`, `spacecraft` config section; §B.8); values approved (DL-035, DL-036); §B.8 awaiting review |
 
 ## Gate P1 checklist (spec §13)
 

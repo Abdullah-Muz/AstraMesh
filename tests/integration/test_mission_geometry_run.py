@@ -43,6 +43,10 @@ def test_mission_geometry_run_replays_and_records(
     summary = json.loads((tmp_path / "a" / SUMMARY_FILE).read_text(encoding="utf-8"))
     assert summary["science"]["n_opportunities"] == len(records) > 0
     assert 0.0 < summary["illumination"]["eclipse_fraction"]["sc00"] < 0.5
+    res = summary["resources"]
+    assert res["energy_payload_all_eligible"]["sc00"]["deficit_wh"] == 0.0
+    assert res["propulsion"]["delta_v_used_mps"] == 0.0
+    assert all(r["payload_energy_wh"] > 0 and r["storage_mb"] > 0 for r in records)
 
 
 def test_mission_geometry_plots(mission_config_dict: dict[str, Any], tmp_path: Path) -> None:

@@ -8,6 +8,11 @@ Steps:
    (ERFA ``epv00``); cylindrical-shadow illumination per spacecraft and tick.
 3. Region access windows on the tick grid and their merger into
    opportunities (``astramesh.science``).
+4. Resource accounting (``astramesh.resources``): payload energy and data
+   cost of every eligible window; battery energy over the day for two load
+   profiles, *bus only* and *payload on in every eligible window* (the most
+   observing can draw, not a schedule); storage fill; the delta-v/propellant
+   budget. The profiles are bookkeeping, not agent decisions (Phase 2).
 
 Everything is evaluated at every simulation tick, not only at the trajectory
 sampling interval. The outputs are truth geometry, not agent knowledge. Nothing
@@ -29,6 +34,12 @@ from astramesh.dynamics.earth_frames import gcrs_to_itrs_matrices, rotate
 from astramesh.dynamics.forces import equatorial_basis
 from astramesh.dynamics.state import cross3, dot3, matvec3, norm3
 from astramesh.dynamics.sun import in_shadow, sun_direction_gcrs
+from astramesh.resources.ledgers import (
+    PropulsionBudget,
+    data_volume_mb,
+    energy_wh,
+    simulate_energy,
+)
 from astramesh.scenarios.formation_dynamics import (
     FormationRun,
     record_scenario_end,
@@ -94,6 +105,7 @@ def run_mission_geometry(config: MissionGeometryScenario, log: EventLog) -> Miss
         regions, ids, r_itrs, sunlit, config.science.min_elevation_deg
     )
     records = [o.to_record(traj.t_ns, step_ns) for o in opportunities]
+    resources = _account_resources(config, ids, sunlit, opportunities, records)
 
     # Events in time order: eclipse transitions, then opportunity open/close.
     pending: list[tuple[int, int, str, str, dict[str, Any]]] = []
@@ -140,6 +152,100 @@ def run_mission_geometry(config: MissionGeometryScenario, log: EventLog) -> Miss
                 "total_duration_s": sum(r["duration_s"] for r in records),
                 "note": "geometry-only scheduling abstraction (spec §3.1); not TEC retrieval",
             },
+            "resources": resources,
         }
     )
     return MissionGeometryRun(formation, sunlit, opportunities, records, summary)
+
+
+def _on_steps(first: int, last: int, n_t: int) -> int:
+    """Steps [t_k, t_k+1) covered by ticks first..last (no step after the final tick)."""
+    return min(last, n_t - 2) - first + 1
+
+
+def _account_resources(
+    config: MissionGeometryScenario,
+    ids: list[str],
+    sunlit: NDArray[np.bool_],
+    opportunities: list[Opportunity],
+    records: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Fill task costs in ``records`` (in place) and return the resource summary."""
+    sc = config.spacecraft
+    step_s = config.time.time_step_s
+    n_t = sunlit.shape[0]
+    payload_on = np.zeros_like(sunlit)
+    for o, rec in zip(opportunities, records, strict=True):
+        costs = []
+        for e, entry in zip(o.eligible, rec["eligible_spacecraft"], strict=True):
+            steps = _on_steps(e.window.first, e.window.last, n_t)
+            entry["payload_energy_wh"] = energy_wh(steps, step_s, sc.payload_power_w)
+            entry["storage_mb"] = data_volume_mb(steps, step_s, sc.payload_data_rate_kbps)
+            costs.append((entry["payload_energy_wh"], entry["storage_mb"]))
+            payload_on[e.window.first : e.window.last + 1, ids.index(e.spacecraft)] = True
+        # Task-level cost: one spacecraft observing its (longest) eligible window.
+        rec["payload_energy_wh"] = max(c[0] for c in costs)
+        rec["storage_mb"] = max(c[1] for c in costs)
+    payload_on[-1, :] = False  # no step after the final tick
+
+    def energy(profile_payload: NDArray[np.bool_], j: int) -> dict[str, Any]:
+        r = simulate_energy(
+            sunlit=sunlit[:, j],
+            payload_on=profile_payload[:, j],
+            step_s=step_s,
+            capacity_wh=sc.battery_capacity_wh,
+            initial_fraction=sc.battery_initial_fraction,
+            charge_efficiency=sc.charge_efficiency_fraction,
+            generation_w=sc.solar_generation_w,
+            bus_w=sc.bus_power_w,
+            payload_w=sc.payload_power_w,
+        )
+        return {
+            "min_wh": r.min_wh,
+            "min_fraction": r.min_wh / sc.battery_capacity_wh,
+            "min_t_ns": r.min_tick * config.time.clock_spec().step_ns,
+            "max_drawdown_wh": r.max_drawdown_wh,
+            "max_drawdown_fraction": r.max_drawdown_wh / sc.battery_capacity_wh,
+            "final_wh": r.final_wh,
+            "generated_wh": r.generated_wh,
+            "consumed_wh": r.consumed_wh,
+            "curtailed_wh": r.curtailed_wh,
+            "deficit_wh": r.deficit_wh,
+            "deficit_steps": r.deficit_steps,
+        }
+
+    bus_only = np.zeros_like(sunlit)
+    prop = PropulsionBudget(
+        mass_kg=sc.mass_kg,
+        thrust_n=sc.thrust_mn * 1e-3,
+        specific_impulse_s=sc.specific_impulse_s,
+        budget_mps=sc.delta_v_budget_mps,
+    )
+    full_burn_s = prop.burn_time_s(sc.delta_v_budget_mps)
+    data = {
+        sc_id: data_volume_mb(int(np.count_nonzero(payload_on[:, j])), step_s,
+                              sc.payload_data_rate_kbps)
+        for j, sc_id in enumerate(ids)
+    }  # fmt: skip
+    return {
+        "model": "left-endpoint steps; charge efficiency on charging; clamp [0, capacity]",
+        "energy_bus_only": {sc_id: energy(bus_only, j) for j, sc_id in enumerate(ids)},
+        "energy_payload_all_eligible": {
+            sc_id: energy(payload_on, j) for j, sc_id in enumerate(ids)
+        },
+        "payload_on_s": {
+            sc_id: float(np.count_nonzero(payload_on[:, j]) * step_s) for j, sc_id in enumerate(ids)
+        },
+        "storage_payload_all_eligible": {
+            sc_id: {"used_mb": mb, "fraction": mb / sc.storage_capacity_mb}
+            for sc_id, mb in data.items()
+        },
+        "propulsion": {
+            "delta_v_budget_mps": sc.delta_v_budget_mps,
+            "delta_v_used_mps": 0.0,
+            "propellant_for_budget_kg": prop.propellant_kg(sc.delta_v_budget_mps),
+            "thrust_time_for_budget_h": full_burn_s / 3600.0,
+            "thruster_energy_for_budget_wh": sc.thruster_power_w * full_burn_s / 3600.0,
+            "initial_acceleration_mps2": prop.thrust_n / sc.mass_kg,
+        },
+    }

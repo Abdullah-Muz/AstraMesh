@@ -1,4 +1,4 @@
-"""Gate P1: the 24 h mission-geometry baseline replays identically.
+"""Gate P1: the 24 h mission-geometry baseline (with resource accounting) replays identically.
 
 Digests pin ``configs/experiments/mission_geometry_24h.yaml``. Like the formation
 baseline they depend on libm and ERFA but not on the CPU model (no BLAS or NumPy
@@ -18,7 +18,9 @@ from astramesh.scenarios.formation_dynamics import TRAJECTORY_FILE
 from astramesh.scenarios.mission_geometry import OPPORTUNITIES_FILE
 
 GOLDEN_EVENTS_SHA256 = "c6c67589072d042e76457b3071be0d3d31535a5c91ae33724bba5fb9f7a8127c"
-GOLDEN_OPPORTUNITIES_SHA256 = "cc76a1ca132674f07be84e14646f3631ed0ad536aaeb3ecab8ebfda14b3554cc"
+GOLDEN_OPPORTUNITIES_SHA256 = "fa1247bfd21436a607335c55c3cd0aa452e1abf8e67a67507c46e32dc2c403c5"
+# summary.json carries the resource accounting (6b).
+GOLDEN_SUMMARY_SHA256 = "56d53c598cc77863f968c942c2dfcbd50b9adac83975940836228b91730a5c93"
 # Same value as GOLDEN_TRAJECTORY_SHA256 in test_formation_baseline.py (shared dynamics).
 FORMATION_TRAJECTORY_SHA256 = "80a1651bc2ac0c893ea2254b55340f5985f60c06ee262cfcdb5f3d878d988fa8"
 
@@ -29,5 +31,6 @@ def test_24h_mission_geometry_matches_golden(mission_config_path: Path, tmp_path
     summary = json.loads((out / SUMMARY_FILE).read_text(encoding="utf-8"))
     assert summary["science"]["n_opportunities"] == 43
     assert sha256_file(out / OPPORTUNITIES_FILE) == GOLDEN_OPPORTUNITIES_SHA256
+    assert sha256_file(out / SUMMARY_FILE) == GOLDEN_SUMMARY_SHA256
     assert result.events_sha256 == GOLDEN_EVENTS_SHA256
     assert sha256_file(out / TRAJECTORY_FILE) == FORMATION_TRAJECTORY_SHA256

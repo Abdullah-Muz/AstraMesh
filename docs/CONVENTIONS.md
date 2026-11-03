@@ -25,6 +25,8 @@ Gate P0 requires the "exact simulation epoch/frames/units" to be specified. This
   | `_rad`, `_deg` | radians, degrees | `inclination_deg` |
   | `_mb`, `_gb` | megabytes, gigabytes | `storage_gb` |
   | `_probability` | dimensionless in [0, 1] | `packet_loss_probability` |
+  | `_fraction` | dimensionless ratio in (0, 1] | `charge_efficiency_fraction` |
+  | `_kbps` | kilobits (1000 bit) per second | `payload_data_rate_kbps` |
 
 - Unit conversion happens exactly once, when a config is turned into an internal model object.
 
