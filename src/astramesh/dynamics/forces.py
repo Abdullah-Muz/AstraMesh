@@ -111,3 +111,18 @@ def potential(r: NDArray[np.float64], fm: ForceModel) -> NDArray[np.float64]:
 def specific_energy(y: NDArray[np.float64], fm: ForceModel) -> NDArray[np.float64]:
     """Conserved specific energy ``v^2/2 - V(r)`` for states of shape (..., 6)."""
     return 0.5 * dot3(y[..., 3:], y[..., 3:]) - potential(y[..., :3], fm)
+
+
+def equatorial_basis(pole: tuple[float, float, float]) -> NDArray[np.float64]:
+    """Rotation from GCRS to the equatorial frame of ``pole`` (rows x', y', pole).
+
+    x' is the GCRS x-axis projected onto the equator of ``pole``. Orbital
+    elements used with J2 (inclination, node) are referred to this frame, so
+    "inclination" means inclination to the Earth's true equator, not to the
+    GCRS xy-plane (which differs by ~0.14 deg; DL-025).
+    """
+    p = np.array(pole, dtype=np.float64)
+    x = np.array([1.0, 0.0, 0.0]) - p[0] * p
+    x /= np.linalg.norm(x)
+    y = np.array([p[1] * x[2] - p[2] * x[1], p[2] * x[0] - p[0] * x[2], p[0] * x[1] - p[1] * x[0]])
+    return np.stack((x, y, p))

@@ -7,10 +7,11 @@ trails it by ``k * spacing_m / a`` radians of mean anomaly. For a circular
 orbit this is an along-track arc of exactly ``spacing_m`` between neighbours
 (chord ``2 a sin(spacing_m / 2a)``).
 
-Equal semi-major axes give equal periods, so under two-body dynamics there is
-no secular along-track drift. Whether *osculating* equality is the right
-choice once J2 is added (mean vs osculating elements) is open validation
-question 2 and is examined in the J2 increment.
+Equal semi-major axes give equal periods, so under **two-body** dynamics there
+is no secular along-track drift. **Do not use this with J2:** equal osculating
+elements give unequal mean semi-major axes, and the formation drifts by up to
+7.7 km/day (``NUMERICAL_MISSION_DESIGN.md`` §B.5.4). For J2 dynamics use
+:func:`astramesh.dynamics.mean_elements.mean_matched_formation` (DL-027).
 """
 
 from __future__ import annotations

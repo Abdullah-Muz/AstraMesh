@@ -1,6 +1,6 @@
 # Numerical Mission Design and Physics Acceptance Plan
 
-> **Owner:** Abdullah Muzher · **Status:** Part B (physics acceptance plan) APPROVED 2026-11-03; §B.2 D0 reference studies recorded, derived tolerances APPROVED 2026-11-03; §B.3 ITRS study recorded, tolerances APPROVED 2026-11-03; §B.4 formation/CW study recorded, tolerances APPROVED 2026-11-03; §B.5 J2 study recorded, tolerances PROPOSED; Part A questions 1–2 answered (decisions pending); Part A in progress · **Spec:** §3.2–§3.3, §4.1, §4.4, §14.3, §18 · **Last updated:** 2026-11-03
+> **Owner:** Abdullah Muzher · **Status:** Part B (physics acceptance plan) APPROVED 2026-11-03; §B.2 D0 reference studies recorded, derived tolerances APPROVED 2026-11-03; §B.3 ITRS study recorded, tolerances APPROVED 2026-11-03; §B.4 formation/CW study recorded, tolerances APPROVED 2026-11-03; §B.5 J2 study recorded, tolerances APPROVED 2026-11-03; Part A questions 1–2 answered and resolved (DL-026/027, §B.6 tolerances PROPOSED); Part A in progress · **Spec:** §3.2–§3.3, §4.1, §4.4, §14.3, §18 · **Last updated:** 2026-11-03
 
 ## Purpose
 
@@ -16,7 +16,8 @@ Not started. To be filled in Phase 1, answering open validation questions 1, 2, 
 - [x] Near-sun-synchronous behaviour of 525 km / 97.5° under J2 (nodal precession rate vs. the ~0.9856 °/day target). **Answer (§B.5.3):** it depends on whether 525 km / 97.5° are *mean* or *osculating* elements.
   - **Read as mean elements:** the secular rate is 0.98605 °/day against the 0.98565 °/day target, which is +0.04% and a node drift of about 0.15°/yr. The exact sun-synchronous inclination is 97.497°. **Near-sun-synchronous: yes.**
   - **Read as osculating elements at the ascending node** (as the code does today): the mean altitude comes out ~9.4 km lower (515.6 km). The measured rate is 0.99097 °/day, which is +0.54% and a drift of about 1.9°/yr (~8 min of local time per year). That is still "near" for 24 h scenarios (0.005°/day).
-  - **Recommendation:** define the reference orbit by mean elements (decision pending, DL-026).
+  - **Decision DL-026: mean elements.**
+  - **Result after implementing mean-element initialization (§B.6):** the measured secular rate is **0.98539 °/day**, **−0.026%** from sun-synchronous (−0.09°/yr). The first-order analytic formula gives +0.04%, so its O(J2) error is larger than the offset itself. **525 km / 97.5° as mean elements is sun-synchronous to within 0.03%.**
 - [ ] Orbital elements that realize ~20 km along-track spacing without unintended secular drift. **Two-body part answered (§B.4.2):** equal osculating a, e, i, Ω, ω with mean-anomaly offsets of 20 km / a give no secular drift; the separation changes by 2e-5 m over 24 h (integrator error only). **J2 part (§B.5.4): equal osculating elements are NOT acceptable.** J2 short-period terms make mean a depend on the argument of latitude, so neighbours get different mean a and different periods. The resulting 24 h change in adjacent separation depends on where the formation starts:
 
 | Start (argument of latitude) | Change in separation over 24 h |
@@ -26,7 +27,11 @@ Not started. To be filled in Phase 1, answering open validation questions 1, 2, 
 | 45° | 7.7 km (20 km closes to 12.3 km; the formation collapses in ~3 days) |
 | 90° | 160 m |
 
-A different initialization is needed; decision pending (DL-022 revision).
+**Resolved (DL-026, DL-027; §B.6):** with mean-element initialization (equal mean a, and a mean eccentricity vector of 0), the results for start angles 0–90° are:
+
+- secular drift ≤ 0.03 m per orbit;
+- in-orbit separation swing ≈ 18 m;
+- mean spacing 20.009–20.018 km.
 - [ ] Eclipse fraction and eclipse-aware power balance for the 25 W / 100 Wh candidate.
 - [ ] Feasibility of the 0.5 mN / 5 m/s propulsion candidate (spec §3.3 notes ~33.3 h of accumulated thrust for 5 m/s).
 
@@ -43,7 +48,7 @@ A different initialization is needed; decision pending (DL-022 revision).
 | PA-05 | Units are explicit | Constructors reject ambiguous inputs; configs reject unit-less physical fields | Code inspection + schema tests | Pass/fail. Constructors done; dynamics config schema pending | `tests/unit/test_dynamics_inputs.py` |
 | PA-06 | Formation initialization | Four initial states from consistent orbital elements reproduce the intended along-track spacing and phasing | Independent element → state → element round trip; geometric check of the spacing | **Approved** §B.4 | `tests/physics_validation/test_formation.py` |
 | PA-07 | Relative-motion cross-check | Compare relative motion against Clohessy–Wiltshire/Hill **only** within its assumptions (circular reference, small separation, short horizon) | CW closed-form solution | **Approved** §B.4: second-order error scaling, plus the 20 km error matched to its analytic curvature form | `tests/physics_validation/test_cw.py` |
-| PA-08 | J2 before SSO claims | With J2 enabled, measured nodal precession matches the analytic secular J2 rate before any sun-synchronous claim is made | Analytic secular J2 formula | **Proposed** §B.5: 2e-3 relative (circular), 4e-4 (e = 0.1), against mean elements | `tests/physics_validation/test_j2.py` |
+| PA-08 | J2 before SSO claims | With J2 enabled, measured nodal precession matches the analytic secular J2 rate before any sun-synchronous claim is made | Analytic secular J2 formula | **Approved** §B.5: 2e-3 relative (circular), 4e-4 (e = 0.1), against mean elements | `tests/physics_validation/test_j2.py` |
 | PA-09 | Determinism | Gravity-only and zero-thrust runs are bit-for-bit repeatable with the same config/seeds | Replay comparison (as already done for the Phase 0 toy scenario) | Exact equality (gravity-only done, golden SHA-256 pinned) | `tests/regression/test_two_body_determinism.py` |
 | PA-10 | Visible failure on invalid input | NaN/Inf states, non-physical parameters (e.g. r below Earth radius, e ≥ 1 for an orbit expected to be bound) raise explicit errors | Negative tests | Pass/fail | `tests/unit/test_dynamics_inputs.py` |
 
@@ -276,6 +281,55 @@ For the circular case, the mean a is 9 350 m below the initial osculating a. The
 
 **Conclusion:** formation initialization must equalize **mean** semi-major axis, not osculating. The options are in DL-026.
 
+## B.6 Mean-element initialization study (2026-11-03; DL-026, DL-027)
+
+**Reproduce:** `uv run python scripts/studies/mean_init_reference.py`. It takes about 40 s.
+
+**Implementation:** `dynamics/mean_elements.py`.
+
+- **Definition of mean elements:** the time average of an osculating element over one *draconitic* period, i.e. while u advances by exactly 2π. Elements are referred to Earth's equator (`forces.equatorial_basis`; node origin = GCRS x projected onto that equator). J2 short-period terms are periodic in u, so this average removes them, and the result does not depend on where the average starts.
+- **Initialization:** fixed-point iteration on the initial osculating a, i and eccentricity vector until mean a, mean i and the mean eccentricity vector hit their targets: 525 km, 97.5° and 0 for the reference orbit. Followers use the leader's mean a, and the leader's osculating i is held fixed (DL-026 (b)). Non-convergence raises an error.
+- **Why mean eccentricity is matched:** this goes slightly beyond the literal option-2 text. It follows from decision (a), which reads the reference "e = 0" as a mean element. With a circular *osculating* start, the mean eccentricity is about 1e-3 and points differently for each spacecraft. That produced a 90–205 m in-orbit separation swing, which drops to 18 m once the mean eccentricity vector is matched.
+
+**A pitfall worth recording:** a plain 24 h average of osculating a is biased by **~50 m**, because 24 h is about 15.14 draconitic periods, and the leftover fraction biases the mean of the ±9.4 km a-oscillation. §B.5 used 24 h averages only inside the analytic precession formula, where this bias moves the rate by ≤ 2.5e-5 relative. That is well inside the 2e-3 tolerance, so §B.5 still stands.
+
+### B.6.1 Reference orbit (mean a = R⊕ + 525 km, mean i = 97.5°, mean e-vector = 0)
+
+| Quantity | Value | Tolerance |
+|---|---|---|
+| Iterations | 4 (0.8 s) | ≤ 10 |
+| Initial osculating a − mean a / i − mean i / e | +9 394.5 m / −0.0051° / 4.8e-4 | — |
+| One-period mean residuals: a / i / e-vector | 3.4e-5 m / 2.2e-13 rad / 5.0e-12 | convergence criteria 1e-4 m / 1e-10 / 1e-9 |
+| Mean re-measured at 1, 6, 12, 23 h along the trajectory: a / i / e-vector | 2.8e-3 m / 4.1e-13 rad / 7.8e-12 | 6e-3 m / 9e-13 rad / 2e-11 |
+| Average of the osculating \|e\| | 9.5e-4 | — (the J2 short-period eccentricity oscillation, which cannot be removed) |
+| \|r\| − R_eq over 24 h | 528.0–531.1 km | — (not geodetic altitude) |
+| Secular RAAN rate | 0.98539 °/day | vs analytic 0.98605 (−6.7e-4; PA-08 tolerance 2e-3) |
+| Secular RAAN rate vs sun-synchronous 0.98565 °/day | −2.6e-4 | — |
+
+### B.6.2 Mean-matched formation (4 spacecraft, 20 km; propagated 72 h)
+
+| Start u₀ | Mean-a spread | Secular drift (max) | In-orbit separation swing | Mean spacing (1st orbit) | Max separation change over 24 h |
+|---|---|---|---|---|---|
+| 0° | 3.6e-5 m | 0.0004 m/orbit | 18.2 m | 20 008.6 m | 18.2 m |
+| 22.5° | 2.2e-6 m | 0.020 m/orbit | 18.2 m | 20 009.9 m | 15.9 m |
+| 45° | 7.1e-5 m | 0.028 m/orbit | 18.2 m | 20 013.1 m | 9.6 m |
+| 67.5° | 1.1e-6 m | 0.020 m/orbit | 18.2 m | 20 016.3 m | 15.5 m |
+| 90° | 2.6e-6 m | 0.0004 m/orbit | 18.2 m | 20 017.7 m | 18.2 m |
+
+The previous method (equal osculating elements, §B.5.4) gave 107 m – 7.7 km over 24 h.
+
+**Tolerances (2× rule, worst case):**
+
+- mean-a spread: 2e-4 m;
+- secular drift: 0.06 m/orbit;
+- in-orbit swing: 40 m;
+- |mean spacing − 20 km|: 40 m.
+
+**Remaining effects**, which are small and documented:
+
+- **Mean spacing is 9–18 m above 20 km.** The offsets are set in osculating u, so this is a 0.05–0.09% spacing bias. That is acceptable for the "~20 km" provisional spacing.
+- **A residual drift of ≤ 0.03 m per orbit (≤ 0.45 m/day) at intermediate start angles.** It is likely due to the small mean-inclination differences between followers, since only the leader's mean i is iterated.
+
 ### Sign-off
 
 | Item | Decision | Date |
@@ -285,4 +339,5 @@ For the circular case, the mean a is 9 350 m below the initial osculating a. The
 | D0 derived tolerances, PA-03 order band, and derivation rule (§B.2.3–§B.2.5) | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | ITRS (PA-04) tolerances and independent checks (§B.3) | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | Formation (PA-06) and CW (PA-07) tolerances and bands (§B.4) | ☑ approved — Abdullah Muzher | 2026-11-03 |
-| J2 (PA-08 and D1 checks) tolerances (§B.5) | ☐ pending owner review | — |
+| J2 (PA-08 and D1 checks) tolerances (§B.5) | ☑ approved — Abdullah Muzher | 2026-11-03 |
+| Mean-element initialization tolerances (§B.6) | ☐ pending owner review | — |
