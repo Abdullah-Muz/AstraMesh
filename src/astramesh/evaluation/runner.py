@@ -7,6 +7,7 @@ Each run directory contains:
 * ``config.resolved.json`` - the validated configuration (deterministic)
 * ``trajectory.csv`` - sampled truth states (formation scenarios; deterministic)
 * ``opportunities.json`` - science task records (mission_geometry only; deterministic)
+* ``messages.jsonl`` - message send/deliver trace (agent_network only; deterministic)
 * ``manifest.json`` - provenance; lists the SHA-256 of the files above
 """
 
@@ -18,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 from astramesh.core.config import (
+    AgentNetworkScenario,
     AnyScenarioConfig,
     FormationDynamicsScenario,
     MissionGeometryScenario,
@@ -27,7 +29,7 @@ from astramesh.core.config import (
 from astramesh.core.events import EventLog, canonical_json
 from astramesh.core.rng import RandomStreams
 from astramesh.evaluation.manifest import build_manifest, find_project_root, sha256_file
-from astramesh.scenarios import formation_dynamics, mission_geometry, toy_heartbeat
+from astramesh.scenarios import agent_network, formation_dynamics, mission_geometry, toy_heartbeat
 
 EVENTS_FILE = "events.jsonl"
 SUMMARY_FILE = "summary.json"
@@ -112,6 +114,19 @@ def run_config(
         extra_artifacts[mission_geometry.OPPORTUNITIES_FILE] = _write_canonical(
             output_dir / mission_geometry.OPPORTUNITIES_FILE, mg.records
         )
+    elif isinstance(config, AgentNetworkScenario):
+        an = agent_network.run_agent_network(config, streams, log)
+        summary = an.summary
+        algorithm = agent_network.ALGORITHM_NAME
+        dynamics_model = an.formation.trajectory.model_id
+        traj_path = output_dir / formation_dynamics.TRAJECTORY_FILE
+        formation_dynamics.write_trajectory_csv(an.formation, traj_path)
+        extra_artifacts[formation_dynamics.TRAJECTORY_FILE] = sha256_file(traj_path)
+        msg_path = output_dir / agent_network.MESSAGES_FILE
+        with msg_path.open("w", encoding="ascii", newline="\n") as fh:
+            for line in an.trace:
+                fh.write(canonical_json(line) + "\n")
+        extra_artifacts[agent_network.MESSAGES_FILE] = sha256_file(msg_path)
     else:  # pragma: no cover - guarded by the schema's discriminated union
         raise ValueError(f"unsupported scenario_type {config.scenario_type!r}")
 

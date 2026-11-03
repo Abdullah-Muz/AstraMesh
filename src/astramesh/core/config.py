@@ -244,7 +244,50 @@ class MissionGeometryScenario(FormationScenarioBase):
     spacecraft: SpacecraftConfig
 
 
-AnyScenarioConfig = ToyHeartbeatScenario | FormationDynamicsScenario | MissionGeometryScenario
+class NetworkConfig(_Model):
+    """Crosslink model (spec §5.3; values PROVISIONAL)."""
+
+    crosslink_range_km: PositiveFloat = Field(description="Synthetic maximum link range [km]")
+    min_ray_altitude_km: NonNegativeFloat = Field(
+        description="Line of sight must clear R_eq + this altitude [km]"
+    )
+    delay_s: NonNegativeFloat = Field(description="Application-level delivery delay [s]")
+    loss_probability: float = Field(ge=0.0, le=1.0, allow_inf_nan=False)
+    duplicate_probability: float = Field(ge=0.0, le=1.0, allow_inf_nan=False)
+
+
+class AgentsConfig(_Model):
+    """Agent message timing and sensor noise (values PROVISIONAL)."""
+
+    status_interval_s: PositiveSeconds = Field(description="Status report period (spec: 30 s)")
+    status_lifetime_s: PositiveSeconds = Field(description="Status message expiry after creation")
+    nav_fix_interval_s: PositiveSeconds = Field(description="Own navigation-fix period")
+    nav_position_sigma_m: NonNegativeFloat = Field(description="1-sigma per axis [m]")
+    nav_velocity_sigma_mps: NonNegativeFloat = Field(description="1-sigma per axis [m/s]")
+
+
+class AgentNetworkScenario(FormationScenarioBase):
+    """Phase 2 increment 1: isolated agents exchanging status over the crosslink network."""
+
+    scenario_type: Literal["agent_network"]
+    network: NetworkConfig
+    agents: AgentsConfig
+
+    @model_validator(mode="after")
+    def _agent_timing_on_grid(self) -> AgentNetworkScenario:
+        self._require_on_grid(self.agents.nav_fix_interval_s, "agents.nav_fix_interval_s")
+        self._require_on_grid(self.agents.status_interval_s, "agents.status_interval_s")
+        seconds_to_ns(self.network.delay_s, name="network.delay_s")
+        seconds_to_ns(self.agents.status_lifetime_s, name="agents.status_lifetime_s")
+        return self
+
+
+AnyScenarioConfig = (
+    ToyHeartbeatScenario
+    | FormationDynamicsScenario
+    | MissionGeometryScenario
+    | AgentNetworkScenario
+)
 
 
 ScenarioConfig = Annotated[AnyScenarioConfig, Field(discriminator="scenario_type")]

@@ -20,6 +20,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 TOY_CONFIG = REPO_ROOT / "configs" / "experiments" / "toy_heartbeat.yaml"
 FORMATION_CONFIG = REPO_ROOT / "configs" / "experiments" / "formation_24h_j2.yaml"
 MISSION_CONFIG = REPO_ROOT / "configs" / "experiments" / "mission_geometry_24h.yaml"
+NETWORK_CONFIG = REPO_ROOT / "configs" / "experiments" / "agent_network_24h.yaml"
 
 
 @pytest.fixture
@@ -54,5 +55,17 @@ def mission_config_path() -> Path:
 @pytest.fixture
 def mission_config_dict() -> dict[str, Any]:
     data = yaml.safe_load(MISSION_CONFIG.read_text(encoding="utf-8"))
+    assert isinstance(data, dict)
+    return data
+
+
+@pytest.fixture
+def network_config_path() -> Path:
+    return NETWORK_CONFIG
+
+
+@pytest.fixture
+def network_config_dict() -> dict[str, Any]:
+    data = yaml.safe_load(NETWORK_CONFIG.read_text(encoding="utf-8"))
     assert isinstance(data, dict)
     return data

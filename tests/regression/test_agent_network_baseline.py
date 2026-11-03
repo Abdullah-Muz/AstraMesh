@@ -1,0 +1,33 @@
+"""Gate P2 (replay): the 24 h agent-network baseline replays identically.
+
+Pins events, the message trace and the summary of
+``configs/experiments/agent_network_24h.yaml``. Loss/duplication come from the
+``comms`` stream and navigation noise from ``sensors`` (seed 1). The trajectory
+equals the formation baseline's (shared dynamics). Scope as DL-029/DL-034.
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from astramesh.evaluation.manifest import sha256_file
+from astramesh.evaluation.runner import SUMMARY_FILE, run_scenario
+from astramesh.scenarios.agent_network import MESSAGES_FILE
+from astramesh.scenarios.formation_dynamics import TRAJECTORY_FILE
+
+GOLDEN_EVENTS_SHA256 = "a7c39464d6c9e5e0be2504989a03c54c728c6e6c352eb80b832c247cc6899c4f"
+GOLDEN_MESSAGES_SHA256 = "4d5988f119ece22d8a6a1a7635247176ee3408727cc6f8baef80e55d223078a3"
+GOLDEN_SUMMARY_SHA256 = "0fbc82332d4ff3562fb340aad96d48559418395b3d689a9d52afe04895ec5220"
+FORMATION_TRAJECTORY_SHA256 = "80a1651bc2ac0c893ea2254b55340f5985f60c06ee262cfcdb5f3d878d988fa8"
+
+
+def test_24h_agent_network_matches_golden(network_config_path: Path, tmp_path: Path) -> None:
+    out = tmp_path / "run"
+    result = run_scenario(network_config_path, out)
+    summary = json.loads((out / SUMMARY_FILE).read_text(encoding="utf-8"))
+    assert summary["network"]["sent"] == 4 * 2881
+    assert result.events_sha256 == GOLDEN_EVENTS_SHA256
+    assert sha256_file(out / MESSAGES_FILE) == GOLDEN_MESSAGES_SHA256
+    assert sha256_file(out / SUMMARY_FILE) == GOLDEN_SUMMARY_SHA256
+    assert sha256_file(out / TRAJECTORY_FILE) == FORMATION_TRAJECTORY_SHA256

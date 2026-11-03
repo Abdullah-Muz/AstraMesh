@@ -4,8 +4,8 @@
 
 AstraMesh is an independent, public-methods computational research project. It is a Python-first, CPU-feasible simulation platform for a **simulated four-spacecraft, decentralized low-Earth-orbit mission** that cooperatively schedules ionospheric observations, coordinates over constrained inter-satellite links, assesses its own health and environmental risk, and tries to preserve scientific value when spacecraft become unavailable or space-weather conditions worsen.
 
-> **Project status: Phase 1 (validated four-spacecraft dynamics and mission geometry) complete; Phase 2 not started.**
-> The repository contains reproducibility infrastructure, validated truth dynamics (two-body and J2) for a four-spacecraft formation, mission geometry (illumination, geometry-only science opportunities), and resource accounting, each with its physics acceptance tests. It contains **no** autonomy, planning, or science-retrieval model yet, and no research results. Nothing here should be read as a validated or published finding.
+> **Project status: Phase 1 complete; Phase 2 (decentralized nominal science operations) in progress.**
+> The repository contains reproducibility infrastructure, validated truth dynamics (two-body and J2) for a four-spacecraft formation, mission geometry (illumination, geometry-only science opportunities), and resource accounting, each with its physics acceptance tests. Phase 2 has started with isolated spacecraft agents exchanging messages over a modelled crosslink network. It contains **no** task-allocation, planning, or science-retrieval model yet, and no research results. Nothing here should be read as a validated or published finding.
 
 The authoritative design document is **[`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md)** (v1.0). Where this README and the specification differ, the specification governs.
 
@@ -86,6 +86,9 @@ uv run astramesh plot results/formation          # diagnostic figures in results
 # Phase 1 mission geometry: the same formation + illumination + science opportunities
 uv run astramesh run configs/experiments/mission_geometry_24h.yaml --out results/mission
 uv run astramesh plot results/mission
+
+# Phase 2 increment 1: isolated agents exchanging status over the crosslink network
+uv run astramesh run configs/experiments/agent_network_24h.yaml --out results/network
 ```
 
 A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a provenance `manifest.json` (git commit, config hash, seeds, lockfile hash, artifact hashes). The formation scenarios also write `trajectory.csv` (sampled truth states), and the mission-geometry scenario writes `opportunities.json` (geometry-only science task records with energy and data costs) and a resource summary (battery, storage, Δv) in `summary.json`. See [`docs/EXPERIMENT_PROTOCOL.md`](docs/EXPERIMENT_PROTOCOL.md).
@@ -96,7 +99,7 @@ A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a prove
 |---|---|---|
 | 0 | Research and reproducibility foundation | Complete except the Priority A full-text literature review (in parallel; see [`docs/ROADMAP.md`](docs/ROADMAP.md)) |
 | 1 | Validated four-spacecraft dynamics and mission geometry | Complete (Gate P1 signed off 2026-11-03) |
-| 2 | Decentralized nominal science operations | Not started |
+| 2 | Decentralized nominal science operations | In progress (agents and crosslink network; allocation after the literature review) |
 | 3 | Deterministic faults and protection supervisor | Not started |
 | 4 | External data and probabilistic/ML experiments | Not started |
 | 5 | Storm-aware distributed recovery | Not started |
@@ -114,7 +117,7 @@ AstraMesh is a **simulation and research project**. It is **not** a real satelli
 |---|---|
 | [`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md) | Authoritative research and engineering specification (v1.0) |
 | [`docs/`](docs/) | Supporting documents: conventions, physics test plan, literature matrix, dataset registry, decision log, roadmap |
-| [`src/astramesh/`](src/astramesh/) | Python package (`core/` clock, RNG, events, config; `dynamics/` validated truth dynamics, frames, time scales; `evaluation/` runner and manifests; `science/` region access and science opportunities; `resources/` energy, storage and Δv ledgers; `scenarios/` runnable scenarios; `visualization/` diagnostic plots) |
+| [`src/astramesh/`](src/astramesh/) | Python package (`core/` clock, RNG, events, config; `dynamics/` validated truth dynamics, frames, time scales; `evaluation/` runner and manifests; `science/` region access and science opportunities; `resources/` energy, storage and Δv ledgers; `agents/` isolated spacecraft agents; `communications/` messages and crosslink network; `scenarios/` runnable scenarios; `visualization/` diagnostic plots) |
 | [`scripts/studies/`](scripts/studies/) | Reference-error studies behind every physics test tolerance |
 | [`configs/`](configs/) | Scenario configuration files (YAML) |
 | [`tests/`](tests/) | Unit, integration, and regression tests |

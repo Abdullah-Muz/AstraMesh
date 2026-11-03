@@ -17,6 +17,7 @@ Each run directory contains:
 | `summary.json` | Yes | Scenario bookkeeping counts |
 | `config.resolved.json` | Yes | The validated configuration, canonical JSON |
 | `trajectory.csv` | Yes | `formation_dynamics` and `mission_geometry`: GCRS states (m, m/s) sampled every `output.trajectory_sample_interval_s`; floats as shortest round-trip repr |
+| `messages.jsonl` | Yes | `agent_network` only: one line per message send (sender, seq, type, bytes, lost/unreachable peers) and per delivery (receiver, accepted or rejection reason) |
 | `opportunities.json` | Yes | `mission_geometry` only: science task records (spec §3.4 fields), each with the eligible spacecraft and their access windows (tick-exact), peak elevation, sunlit ticks, and payload energy (Wh) and data (MB) costs. Eligibility is geometry only (DL-033); costs follow DL-035 |
 | `manifest.json` | No (contains wall-clock `run_timestamp_utc`) | Provenance record listing the SHA-256 of the deterministic files above |
 
@@ -32,6 +33,7 @@ Diagnostic figures: `uv run astramesh plot <run_dir>` writes PNGs to `<run_dir>/
 - `tests/regression/test_toy_golden.py`: pinned SHA-256 of the toy event log, checked on Windows, WSL2/Ubuntu 24.04, and CI. The toy config hash is also pinned, so schema refactors cannot silently change it.
 - `tests/integration/test_formation_run.py`: the formation scenario replays byte-identically, and the manifest lists every artifact.
 - `tests/regression/test_formation_baseline.py`: pinned SHA-256 digests of the 24 h J2 baseline's events and trajectory. These are guaranteed only on the reference platform (Ubuntu 24.04 x86_64), because initialization uses libm and ERFA (DL-029). Scenario code avoids BLAS, so the digests do not depend on the CPU model (DL-031). The propagator-only digests in `test_two_body_determinism.py` are platform-independent.
+- `tests/regression/test_agent_network_baseline.py`: pinned digests of the 24 h agent-network baseline's events, message trace and summary (comms and sensors streams, seed 1). Same scope (DL-029, DL-034).
 - `tests/regression/test_mission_geometry_baseline.py`: pinned digests of the 24 h mission-geometry baseline's events, `opportunities.json` and `summary.json` (resource accounting); its trajectory must equal the formation baseline's. The same scope applies (DL-029, DL-034).
 
 ## 3. Scenarios, metrics, statistical design — NOT STARTED

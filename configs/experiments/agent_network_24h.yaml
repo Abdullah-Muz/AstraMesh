@@ -1,0 +1,47 @@
+# Phase 2 increment 1: four isolated agents exchange status over the crosslink
+# network for 24 h. No allocation algorithm yet; plans stay at version 0.
+schema_version: 1
+scenario_id: AGENT_NETWORK_24H
+description: >-
+  Phase 2 increment 1. FORMATION_24H_J2 dynamics; agents receive noisy own
+  navigation fixes and exchange status messages over line-of-sight crosslinks
+  (100 km synthetic range, 1 s delay, 1% loss).
+scenario_type: agent_network
+
+time:
+  epoch_utc: "2025-06-01T00:00:00Z"
+  duration_s: 86400
+  time_step_s: 10
+
+random:
+  seed: 1                              # comms (loss/duplication) and sensors (nav noise) streams
+
+dynamics:
+  model: j2
+
+reference_orbit:
+  mean_altitude_km: 525
+  mean_inclination_deg: 97.5
+  raan_deg: 0
+  start_argument_of_latitude_deg: 0
+
+formation:
+  n_spacecraft: 4
+  along_track_spacing_km: 20
+
+output:
+  trajectory_sample_interval_s: 60
+
+network:                               # spec §5.3, PROVISIONAL (DL-040)
+  crosslink_range_km: 100              # synthetic maximum, not a link budget
+  min_ray_altitude_km: 0               # line of sight just clears the WGS 84 equatorial sphere
+  delay_s: 1                           # application-level, not propagation time
+  loss_probability: 0.01               # "normal" stress setting
+  duplicate_probability: 0.0
+
+agents:                                # PROVISIONAL (DL-040)
+  status_interval_s: 30                # spec §5.3
+  status_lifetime_s: 60                # expires after two status periods
+  nav_fix_interval_s: 10
+  nav_position_sigma_m: 10             # GNSS-like own fix, 1-sigma per axis
+  nav_velocity_sigma_mps: 0.1

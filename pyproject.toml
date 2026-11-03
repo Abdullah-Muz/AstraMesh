@@ -21,10 +21,12 @@ classifiers = [
 dependencies = [
     "astropy>=7.0",
     "matplotlib>=3.9",
+    "networkx>=3.3",
     "numpy>=2.1",
     "pydantic>=2.9",
     "pyerfa>=2.0",
     "pyyaml>=6.0.2",
+    "simpy>=4.1",
 ]
 
 [project.urls]
@@ -85,8 +87,8 @@ warn_unreachable = true
 module = ["hypothesis.*"]
 follow_untyped_imports = true
 
-# Astropy and pyerfa ship no py.typed marker; treat them as untyped (Any) rather than
+# Astropy, pyerfa and NetworkX ship no py.typed marker; treat them as untyped (Any) rather than
 # analysing its sources. Our wrappers convert its outputs to typed NumPy arrays.
 [[tool.mypy.overrides]]
-module = ["astropy", "astropy.*", "erfa"]
+module = ["astropy", "astropy.*", "erfa", "networkx", "networkx.*"]
 ignore_missing_imports = true

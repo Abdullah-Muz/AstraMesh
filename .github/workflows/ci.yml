@@ -56,3 +56,6 @@ jobs:
         run: |
           uv run --locked astramesh run configs/experiments/mission_geometry_24h.yaml --out "$RUNNER_TEMP/mission"
           uv run --locked astramesh plot "$RUNNER_TEMP/mission"
+
+      - name: Agent network baseline (24 h) smoke run
+        run: uv run --locked astramesh run configs/experiments/agent_network_24h.yaml --out "$RUNNER_TEMP/network"

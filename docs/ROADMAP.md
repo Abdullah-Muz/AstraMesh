@@ -8,7 +8,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 |---|---|---|
 | 0 | Research and reproducibility foundation | **Complete except** Priority A full-text review (proceeding in parallel, DL-016) |
 | 1 | Validated four-spacecraft dynamics and mission geometry | **Complete**: Gate P1 signed off 2026-11-03 (DL-037); open follow-ups listed there |
-| 2 | Decentralized nominal science operations | Not started |
+| 2 | Decentralized nominal science operations | **In progress** (DL-038). Increment 1 (agents, messages, network) implemented; allocation waits for the Priority A review |
 | 3 | Deterministic faults and protection supervisor | Not started |
 | 4 | External data and probabilistic/ML experiments | Not started |
 | 5 | Storm-aware distributed recovery | Not started |
@@ -39,6 +39,22 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 5 | Dynamics scenario config (unit-suffixed schema), 24 h baseline run with manifest `dynamics_model`, basic plots | **Done**: commits `a700f54` and `428fb65` (DL-031 CPU-independence fix), CI passing |
 | 6a | Mission geometry: per-tick ERFA Earth rotation, Sun and cylindrical shadow, WGS 84 region access, geometry-only opportunities (spec §3.4), `mission_geometry` scenario, plots; Part A Q4 eclipse fraction | **Done**: commit `298dc87`, CI passing; §B.7 tolerances, DL-032 and DL-033 approved 2026-11-03 |
 | 6b | Finite resource accounting (energy with eclipse, storage, Δv); Part A Q4 power balance and Q5 propulsion feasibility | **Done**: commit `5493310`, CI passing; values (DL-035, DL-036) and §B.8 approved 2026-11-03 |
+
+## Phase 2 increments
+
+| # | Increment | Status |
+|---|---|---|
+| 1 | Isolated `SpacecraftAgent`s, message schema, NetworkX G(t) crosslinks, SimPy kernel, acceptance rules, isolation tests (`agent_network` scenario) | Implemented (`configs/experiments/agent_network_24h.yaml`); values DL-040 awaiting approval |
+| 2 | Task utility (spec §3.4), metrics, live resource truth, B0 static scheduler, B1 centralized reference | Not started |
+| 3 | B2 auction, B3 CBBA | Waits for the Priority A full-text review (DL-016, DL-038) |
+| 4 | Nominal S00 comparison on identical tasks and resources | Not started |
+
+## Gate P2 checklist (spec §13)
+
+- [ ] Each agent acts only on local state/delivered messages (increment 1: static and dynamic isolation tests in `tests/agent_isolation/`)
+- [ ] No privileged leakage (increment 1 tests; to be extended to task and plan data)
+- [ ] Baseline comparisons operate on identical tasks/resources (increment 4)
+- [ ] Unhandled network messages cannot alter plans (increment 1: acceptance rules + property test; to be re-checked once plans exist)
 
 ## Gate P1 checklist (spec §13)
 
