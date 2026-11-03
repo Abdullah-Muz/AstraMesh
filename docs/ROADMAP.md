@@ -6,9 +6,9 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 
 | Phase | Focus | Status |
 |---|---|---|
-| 0 | Research and reproducibility foundation | **Complete except** Priority A full-text review (proceeding in parallel, DL-016) |
+| 0 | Research and reproducibility foundation | **Complete except** Priority A full-text review (8 of 10 items drafted from full text, owner verification pending; P01 unavailable, P21 paywalled; see `LITERATURE_REVIEW.md`) |
 | 1 | Validated four-spacecraft dynamics and mission geometry | **Complete**: Gate P1 signed off 2026-11-03 (DL-037); open follow-ups listed there |
-| 2 | Decentralized nominal science operations | **In progress** (DL-038). Increment 1 (agents, messages, network) implemented; allocation waits for the Priority A review |
+| 2 | Decentralized nominal science operations | **In progress** (DL-038). Increment 1 (agents, messages, network) done; Priority A review drafted (8 of 10) |
 | 3 | Deterministic faults and protection supervisor | Not started |
 | 4 | External data and probabilistic/ML experiments | Not started |
 | 5 | Storm-aware distributed recovery | Not started |
@@ -44,9 +44,9 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 
 | # | Increment | Status |
 |---|---|---|
-| 1 | Isolated `SpacecraftAgent`s, message schema, NetworkX G(t) crosslinks, SimPy kernel, acceptance rules, isolation tests (`agent_network` scenario) | Implemented (`configs/experiments/agent_network_24h.yaml`); values DL-040 awaiting approval |
+| 1 | Isolated `SpacecraftAgent`s, message schema, NetworkX G(t) crosslinks, SimPy kernel, acceptance rules, isolation tests (`agent_network` scenario) | **Done**: commit `414bf2d`, CI passing; values and acceptance rules (DL-040) approved 2026-11-03 |
 | 2 | Task utility (spec §3.4), metrics, live resource truth, B0 static scheduler, B1 centralized reference | Not started |
-| 3 | B2 auction, B3 CBBA | Waits for the Priority A full-text review (DL-016, DL-038) |
+| 3 | B2 auction, B3 CBBA | Unblocked: P06 (CBBA) read and specified (`literature/P06.md` §3); starts after increment 2 |
 | 4 | Nominal S00 comparison on identical tasks and resources | Not started |
 
 ## Gate P2 checklist (spec §13)
