@@ -87,7 +87,20 @@ AstraMesh is a **simulation and research project**. It is **not** a real satelli
 | [`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md) | Authoritative research and engineering specification (v1.0) |
 | `README.md` | This overview |
 | `.gitignore` | Keeps datasets, experiment outputs, environments, and credentials out of version control |
+| [`LICENSE`](LICENSE) | MIT License — applies to source code |
+| [`LICENSE-DOCS`](LICENSE-DOCS) | Creative Commons Attribution 4.0 International — applies to documentation |
 
 ## License
 
-A license has **not yet been selected**. Until one is added, all rights are reserved by the author.
+AstraMesh uses two licenses:
+
+- **Code — [MIT License](LICENSE).** Applies to all source code, tests, scripts, configuration files, and other software in this repository unless a file states otherwise.
+- **Documentation — [CC BY 4.0](LICENSE-DOCS).** Applies to [`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md), this README, the contents of `docs/`, and written reports, diagrams, and figures, unless a file states otherwise.
+
+Copyright © 2026 Abdullah Muzher.
+
+**Attributing the documentation:** when reusing or adapting documentation, credit it as, for example:
+
+> *AstraMesh Master Research & Engineering Specification* by Abdullah Muzher, https://github.com/Abdullah-Muz/AstraMesh, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Indicate if changes were made.
+
+**Not covered:** external datasets, third-party publications, and other third-party material referenced by this project remain under their owners' terms and are not relicensed here.
