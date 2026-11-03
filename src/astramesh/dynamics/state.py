@@ -73,6 +73,16 @@ def dot3(a: NDArray[np.float64], b: NDArray[np.float64]) -> NDArray[np.float64]:
     return a[..., 0] * b[..., 0] + a[..., 1] * b[..., 1] + a[..., 2] * b[..., 2]
 
 
+def matvec3(m: NDArray[np.float64], v: NDArray[np.float64]) -> NDArray[np.float64]:
+    """``m @ v`` for a 3x3 matrix and a 3-vector, with a fixed evaluation order.
+
+    NumPy's ``@`` dispatches to BLAS, whose kernel (and so the last bit of the
+    result) depends on the CPU. This version gives the same bits everywhere.
+    """
+    out: NDArray[np.float64] = m[:, 0] * v[0] + m[:, 1] * v[1] + m[:, 2] * v[2]
+    return out
+
+
 @dataclass(frozen=True, slots=True, eq=False)
 class CartesianState:
     """Position and velocity in a named frame at a scenario time.

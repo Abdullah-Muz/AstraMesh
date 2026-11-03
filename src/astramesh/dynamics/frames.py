@@ -26,6 +26,7 @@ from astramesh.dynamics.state import (
     NonPhysicalStateError,
     cross3,
     dot3,
+    matvec3,
     norm3,
 )
 
@@ -56,7 +57,7 @@ def eci_to_ric(chief: CartesianState, deputy: CartesianState) -> CartesianState:
     a = ric_basis(chief.r_m, chief.v_mps)
     dr = deputy.r_m - chief.r_m
     dv = deputy.v_mps - chief.v_mps - cross3(_omega(chief), dr)
-    return CartesianState(Frame.RIC, chief.epoch_utc, chief.t_ns, a @ dr, a @ dv)
+    return CartesianState(Frame.RIC, chief.epoch_utc, chief.t_ns, matvec3(a, dr), matvec3(a, dv))
 
 
 def ric_to_eci(chief: CartesianState, relative: CartesianState) -> CartesianState:
@@ -65,6 +66,6 @@ def ric_to_eci(chief: CartesianState, relative: CartesianState) -> CartesianStat
     relative.require_frame(Frame.RIC)
     chief.require_same_time(relative)
     a = ric_basis(chief.r_m, chief.v_mps)
-    dr = a.T @ relative.r_m
-    dv = a.T @ relative.v_mps + cross3(_omega(chief), dr)
+    dr = matvec3(a.T, relative.r_m)
+    dv = matvec3(a.T, relative.v_mps) + cross3(_omega(chief), dr)
     return CartesianState(Frame.GCRS, chief.epoch_utc, chief.t_ns, chief.r_m + dr, chief.v_mps + dv)

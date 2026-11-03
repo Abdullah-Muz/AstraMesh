@@ -25,7 +25,7 @@ import numpy as np
 
 from astramesh.dynamics.elements import KeplerElements, rv_to_elements
 from astramesh.dynamics.forces import ForceModel, equatorial_basis
-from astramesh.dynamics.state import CartesianState, Frame, NonPhysicalStateError
+from astramesh.dynamics.state import CartesianState, Frame, NonPhysicalStateError, matvec3
 from astramesh.dynamics.twobody import propagate
 
 DEFAULT_STEP_NS = 10 * 10**9
@@ -48,7 +48,7 @@ def equatorial_state(el: KeplerElements, forces: ForceModel) -> tuple[np.ndarray
     """GCRS position/velocity for elements referred to the equator of ``forces.pole``."""
     r, v = el.to_rv(forces.mu)
     rot = equatorial_basis(forces.pole)
-    return rot.T @ r, rot.T @ v
+    return matvec3(rot.T, r), matvec3(rot.T, v)
 
 
 def measure_mean_elements(
@@ -61,13 +61,13 @@ def measure_mean_elements(
 ) -> MeanElements:
     """Average osculating a, e, i over one draconitic period starting at the given state."""
     rot = equatorial_basis(forces.pole)
-    el0 = rv_to_elements(rot @ r_m, rot @ v_mps, forces.mu)
+    el0 = rv_to_elements(matvec3(rot, r_m), matvec3(rot, v_mps), forces.mu)
     n_steps = int(1.2 * el0.period_s(forces.mu) * 1e9 / step_ns) + 2
     start = CartesianState(Frame.GCRS, epoch_utc, 0, r_m, v_mps)
     traj = propagate([start], step_ns=step_ns, n_steps=n_steps, forces=forces)
     y = traj.y[:, 0, :]
     t = traj.t_ns.astype(np.float64) / 1e9
-    osc = [rv_to_elements(rot @ row[:3], rot @ row[3:], forces.mu) for row in y]
+    osc = [rv_to_elements(matvec3(rot, row[:3]), matvec3(rot, row[3:]), forces.mu) for row in y]
     u = np.unwrap([(o.argp_rad + o.nu_rad) % (2 * math.pi) for o in osc])
     target = u[0] + 2 * math.pi
     k = int(np.searchsorted(u, target))  # u is strictly increasing for a prograde-in-u orbit

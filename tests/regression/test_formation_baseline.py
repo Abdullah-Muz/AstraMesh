@@ -3,7 +3,8 @@
 The digests pin the deterministic artifacts of ``configs/experiments/formation_24h_j2.yaml``.
 They depend on libm (initial elements -> state) and ERFA (epoch pole), so they
 are expected to hold on the reference platform (Ubuntu 24.04 x86_64: WSL2 and
-CI); see docs/DECISION_LOG.md DL-029. If they change, either the dynamics or
+CI) on any x86_64 CPU, because scenario code avoids BLAS (DL-031); see
+docs/DECISION_LOG.md DL-029. If they change, either the dynamics or
 initialization changed deliberately (update with a decision-log entry) or
 replay broke.
 """
@@ -17,8 +18,8 @@ from astramesh.evaluation.manifest import sha256_file
 from astramesh.evaluation.runner import SUMMARY_FILE, run_scenario
 from astramesh.scenarios.formation_dynamics import TRAJECTORY_FILE
 
-GOLDEN_TRAJECTORY_SHA256 = "452950d89c6814ae1334f8e9e431610ad3d5ce64374f2fa9b73687b22b6b46ae"
-GOLDEN_EVENTS_SHA256 = "21e8a5021e68a78b4dc742678376bc9895f01eaa54b4934faf7146484f0917dc"
+GOLDEN_TRAJECTORY_SHA256 = "80a1651bc2ac0c893ea2254b55340f5985f60c06ee262cfcdb5f3d878d988fa8"
+GOLDEN_EVENTS_SHA256 = "6f1de1a5e8544fe4029e60196a0ea6a87b50bd297781f81c8f4196d8128ee793"
 
 
 def test_24h_j2_baseline_completes_and_matches_golden(

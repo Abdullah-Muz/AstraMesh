@@ -15,7 +15,13 @@ from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from astramesh.dynamics.constants import R_EARTH_EQ_M
-from astramesh.dynamics.earth_frames import gcrs_to_itrs, itrs_to_gcrs, state_to_gcrs, state_to_itrs
+from astramesh.dynamics.earth_frames import (
+    earth_pole_gcrs,
+    gcrs_to_itrs,
+    itrs_to_gcrs,
+    state_to_gcrs,
+    state_to_itrs,
+)
 from astramesh.dynamics.elements import KeplerElements
 from astramesh.dynamics.kepler import kepler_propagate
 from astramesh.dynamics.state import CartesianState, Frame, FrameError, NonPhysicalStateError
@@ -142,3 +148,16 @@ def test_invalid_inputs_raise() -> None:
         gcrs_to_itrs(epoch, 0, [1.0, 2.0], [0, 0])
     with pytest.raises(ValueError, match="entries"):
         gcrs_to_itrs(epoch, np.array([0, 1]), np.ones((3, 3)), np.ones((3, 3)))
+
+
+@pytest.mark.parametrize("epoch", EPOCHS)
+@pytest.mark.parametrize("t_ns", [0, 3 * 86_400 * 10**9])
+def test_erfa_pole_matches_astropy_transform(epoch: datetime, t_ns: int) -> None:
+    """DL-031: the BLAS-free ERFA pole is the same vector Astropy's ITRS->GCRS gives.
+
+    Round-off only (observed <= 1.1e-16 on unit vectors), so the bound is ~10x.
+    """
+    r, _ = itrs_to_gcrs(epoch, t_ns, [0.0, 0.0, 1.0], [0.0, 0.0, 0.0])
+    pole = np.array(earth_pole_gcrs(epoch, t_ns))
+    np.testing.assert_allclose(pole, r / np.linalg.norm(r), rtol=0, atol=1e-15)
+    assert abs(float(np.linalg.norm(pole)) - 1.0) <= 1e-15

@@ -30,7 +30,7 @@ Diagnostic figures: `uv run astramesh plot <run_dir>` writes PNGs to `<run_dir>/
 - `tests/integration/test_toy_replay.py`: same config + seeds ⇒ byte-identical deterministic artifacts; different seed ⇒ different events.
 - `tests/regression/test_toy_golden.py`: pinned SHA-256 of the toy event log, checked on Windows, WSL2/Ubuntu 24.04, and CI. The toy config hash is also pinned, so schema refactors cannot silently change it.
 - `tests/integration/test_formation_run.py`: the formation scenario replays byte-identically, and the manifest lists every artifact.
-- `tests/regression/test_formation_baseline.py`: pinned SHA-256 digests of the 24 h J2 baseline's events and trajectory. These are guaranteed only on the reference platform (Ubuntu 24.04 x86_64), because initialization uses libm and ERFA (DL-029). The propagator-only digests in `test_two_body_determinism.py` are platform-independent.
+- `tests/regression/test_formation_baseline.py`: pinned SHA-256 digests of the 24 h J2 baseline's events and trajectory. These are guaranteed only on the reference platform (Ubuntu 24.04 x86_64), because initialization uses libm and ERFA (DL-029). Scenario code avoids BLAS, so the digests do not depend on the CPU model (DL-031). The propagator-only digests in `test_two_body_determinism.py` are platform-independent.
 
 ## 3. Scenarios, metrics, statistical design — NOT STARTED
 

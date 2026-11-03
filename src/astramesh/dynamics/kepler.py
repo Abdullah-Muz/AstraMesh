@@ -20,7 +20,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 from astramesh.dynamics.constants import GM_EARTH_M3PS2
-from astramesh.dynamics.state import NonPhysicalStateError, Vector3, as_vector3
+from astramesh.dynamics.state import NonPhysicalStateError, Vector3, as_vector3, dot3
 
 _MAX_ITER = 100
 _SERIES_Z = 1e-3  # below this |z|, use the Stumpff series (avoids cancellation)
@@ -50,11 +50,11 @@ def kepler_propagate(
     v0 = as_vector3(v0_mps, name="v0_mps")
     if not math.isfinite(dt_s):
         raise NonPhysicalStateError(f"dt_s must be finite, got {dt_s!r}")
-    r0n = math.sqrt(float(r0 @ r0))
+    r0n = math.sqrt(float(dot3(r0, r0)))
     if r0n == 0.0:
         raise NonPhysicalStateError("r0_m must be non-zero")
-    vr0 = float(r0 @ v0) / r0n
-    v0sq = float(v0 @ v0)
+    vr0 = float(dot3(r0, v0)) / r0n
+    v0sq = float(dot3(v0, v0))
     alpha = 2.0 / r0n - v0sq / mu  # reciprocal semi-major axis
     if alpha <= 0.0:
         raise NonPhysicalStateError(
@@ -92,7 +92,7 @@ def kepler_propagate(
     f = 1.0 - chi * chi / r0n * c
     g = dt_s - chi**3 / sqrt_mu * s
     r = f * r0 + g * v0
-    rn = math.sqrt(float(r @ r))
+    rn = math.sqrt(float(dot3(r, r)))
     fdot = sqrt_mu / (rn * r0n) * (alpha * chi**3 * s - chi)
     gdot = 1.0 - chi * chi / rn * c
     v = fdot * r0 + gdot * v0

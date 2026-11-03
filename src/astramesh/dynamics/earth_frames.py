@@ -5,17 +5,22 @@ IERS polar motion and UT1 from the locked ``astropy-iers-data`` package; see
 :mod:`astramesh.dynamics.timescales`). Velocities are transformed too: the
 ITRS velocity is relative to the rotating Earth.
 
-These transforms use ERFA's transcendental functions, so their results are
-not guaranteed bit-identical across platforms (unlike the GCRS propagator).
+These transforms use ERFA's transcendental functions, and Astropy applies the
+matrices with NumPy ``matmul`` (BLAS), so their last bits can depend on the
+platform and even the CPU model (unlike the GCRS propagator). Do not feed their
+output into anything that is digest-pinned without rounding or a study;
+:func:`earth_pole_gcrs` avoids BLAS for this reason (DL-031).
 Propagation stays in GCRS; ITRS is used for geometry (ground tracks,
 observation access) only.
 """
 
 from __future__ import annotations
 
+import math
 from datetime import datetime
 
 import astropy.units as u
+import erfa
 import numpy as np
 from astropy.coordinates import (
     GCRS,
@@ -24,6 +29,7 @@ from astropy.coordinates import (
     CartesianDifferential,
     CartesianRepresentation,
 )
+from astropy.coordinates.builtin_frames.utils import get_jd12, get_polar_motion
 from numpy.typing import ArrayLike, NDArray
 
 from astramesh.dynamics.state import CartesianState, Frame, NonPhysicalStateError
@@ -101,10 +107,21 @@ def earth_pole_gcrs(epoch_utc: datetime, t_ns: int = 0) -> tuple[float, float, f
     """Unit vector of the ITRS z-axis (Earth's figure axis, for J2) in GCRS.
 
     The ITRS z-axis differs from the Celestial Intermediate Pole only by polar
-    motion (< ~0.5 arcsec). The result comes from ERFA, so its last bits may
-    differ between platforms; record it with the run (or pass a literal vector
-    in regression tests) to keep propagation bit-for-bit reproducible.
+    motion (< ~0.5 arcsec). The GCRS-to-ITRS matrix is built exactly as Astropy
+    builds it (``c2i06a``, ``era00``, ``pom00`` with IERS polar motion and
+    ``sp00``) but combined by ERFA's ``c2tcio`` in C. The pole is the matrix's
+    third row, so no NumPy ``@`` (BLAS, whose last bit depends on the CPU) is
+    involved (DL-031). The result can still differ between C math libraries;
+    it is recorded with every run.
     """
-    r, _ = itrs_to_gcrs(epoch_utc, t_ns, [0.0, 0.0, 1.0], [0.0, 0.0, 0.0])
-    n = float(np.sqrt(r @ r))
-    return (float(r[0] / n), float(r[1] / n), float(r[2] / n))
+    obstime = scenario_time(epoch_utc, t_ns)
+    require_eop_coverage(obstime)
+    tt1, tt2 = get_jd12(obstime, "tt")
+    ut1, ut2 = get_jd12(obstime, "ut1")
+    xp, yp = get_polar_motion(obstime)
+    rc2i = erfa.c2i06a(tt1, tt2)
+    pom = erfa.pom00(xp, yp, erfa.sp00(tt1, tt2))
+    rc2t = np.asarray(erfa.c2tcio(rc2i, erfa.era00(ut1, ut2), pom), dtype=np.float64)
+    x, y, z = (float(c) for c in rc2t[2])
+    n = math.sqrt(x * x + y * y + z * z)
+    return (x / n, y / n, z / n)

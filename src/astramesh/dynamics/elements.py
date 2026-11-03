@@ -24,6 +24,7 @@ from astramesh.dynamics.state import (
     as_vector3,
     cross3,
     dot3,
+    matvec3,
     norm3,
 )
 
@@ -110,7 +111,7 @@ class KeplerElements:
         r_pqw = np.array([r * cnu, r * snu, 0.0])
         v_pqw = np.array([-sqrt_mu_p * snu, sqrt_mu_p * (e + cnu), 0.0])
         rot = _pqw_to_inertial(self.raan_rad, self.i_rad, self.argp_rad)
-        return rot @ r_pqw, rot @ v_pqw
+        return matvec3(rot, r_pqw), matvec3(rot, v_pqw)
 
     def advanced(self, dt_s: float, mu: float = GM_EARTH_M3PS2) -> KeplerElements:
         """Elements after ``dt_s`` s of unperturbed two-body motion (via Kepler's equation)."""

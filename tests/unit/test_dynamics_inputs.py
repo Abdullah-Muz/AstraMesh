@@ -11,7 +11,13 @@ import pytest
 from astramesh.dynamics.constants import R_EARTH_EQ_M
 from astramesh.dynamics.elements import KeplerElements, mean_to_true_anomaly, true_to_mean_anomaly
 from astramesh.dynamics.kepler import kepler_propagate
-from astramesh.dynamics.state import CartesianState, Frame, FrameError, NonPhysicalStateError
+from astramesh.dynamics.state import (
+    CartesianState,
+    Frame,
+    FrameError,
+    NonPhysicalStateError,
+    matvec3,
+)
 from astramesh.dynamics.twobody import propagate_two_body
 
 EPOCH = datetime(2025, 6, 1, tzinfo=UTC)
@@ -131,3 +137,15 @@ def test_propagation_rejects_mixed_frames_or_times() -> None:
 @pytest.mark.parametrize("nu", [-3.0, -1.0, 0.0, 0.5, 2.0, 3.1])
 def test_kepler_equation_round_trip(e: float, nu: float) -> None:
     assert mean_to_true_anomaly(true_to_mean_anomaly(nu, e), e) == pytest.approx(nu, abs=1e-11)
+
+
+def test_matvec3_matches_matmul_and_transposed_views() -> None:
+    """``matvec3`` is ``m @ v`` in a fixed order (no BLAS, DL-031)."""
+    rng = np.random.default_rng(7)
+    for _ in range(100):
+        m = rng.standard_normal((3, 3))
+        v = rng.standard_normal(3) * 1e7
+        np.testing.assert_allclose(matvec3(m, v), m @ v, rtol=1e-13, atol=1e-6)
+        np.testing.assert_allclose(matvec3(m.T, v), m.T @ v, rtol=1e-13, atol=1e-6)
+    m = np.arange(9.0).reshape(3, 3)
+    np.testing.assert_array_equal(matvec3(m, np.array([1.0, 0.0, 0.0])), m[:, 0])
