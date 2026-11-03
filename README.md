@@ -1,0 +1,93 @@
+# AstraMesh
+
+**Research platform for fault-tolerant decentralized spacecraft autonomy, intelligent mission planning, and space-weather resilience.**
+
+AstraMesh is an independent, public-methods computational research project. It is a Python-first, CPU-feasible simulation platform for a **simulated four-spacecraft, decentralized low-Earth-orbit mission** that cooperatively schedules ionospheric observations, coordinates over constrained inter-satellite links, assesses its own health and environmental risk, and tries to preserve scientific value when spacecraft become unavailable or space-weather conditions worsen.
+
+> **Project status: design baseline approved — implementation not started.**
+> No simulator code, experiments, or research results exist yet. Nothing in this repository should be read as a validated or published finding.
+
+The authoritative design document is **[`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md)** (v1.0). Where this README and the specification differ, the specification governs.
+
+---
+
+## The problem
+
+The core challenge is **decision-making under incomplete information**. A satellite that stops transmitting might be failed, healthy but disconnected, or deliberately in a protective mode. Each simulated spacecraft agent must act on its own estimates and the messages it actually receives — never on the simulator's global truth — while respecting finite power, storage, communication, propulsion, and safety constraints.
+
+## Primary research question
+
+> Can a decentralized spacecraft constellation preserve useful scientific operations during uncertain spacecraft-health events, communication disruption, and hazardous space-weather conditions while keeping local protection and maneuver constraints satisfied?
+
+The specification defines five testable hypotheses (H1–H5) covering fault-aware task planning, explicit health uncertainty, space-weather-aware protection, a local safety supervisor, and forecast-informed protection. **These are hypotheses, not promised outcomes**; the final contribution may be narrowed to one of them after literature review and baseline experiments.
+
+## Research tracks
+
+1. **Validated astrodynamics** — relative orbits, propagation (two-body first, then J2/drag), and resource-constrained maneuver modeling.
+2. **Decentralized autonomy** — science-task allocation, network partitions, message delays, plan reconciliation, and graceful degradation.
+3. **Intelligent state assessment** — probabilistic spacecraft-health inference, telemetry anomaly detection, and optional lightweight ML.
+4. **Space-weather-aware protection** — a five-mode local supervisor (`NOMINAL`, `STORM_WATCH`, `PROTECTIVE`, `RECOVERY`, `SAFE`) that mission planning cannot override.
+5. **Reproducible experiments** — strong classical baselines, external space-data sources, Monte Carlo evaluation, and honest reporting of failures and limitations.
+
+Reinforcement learning is **optional**, not a requirement. ML is used for prediction and inference only, never as an unbounded controller.
+
+## Reference mission (provisional values)
+
+| Parameter | Starting value | Status |
+|---|---|---|
+| Spacecraft | 4 × 6U CubeSat-class abstractions | Approved |
+| Orbit | ~525 km near-circular LEO, 97.5° inclination | Provisional — requires J2 validation |
+| Formation | Along-track ("string-of-pearls"), ~20 km spacing | Provisional |
+| Science | Simplified dual-frequency GNSS/TEC observation scheduling | Approved — a scheduling abstraction, not RO retrieval or tomography |
+
+All physical and numerical parameters are starting points that must be validated; see §3 of the specification.
+
+## Planned technology stack
+
+| Area | Core / near-term |
+|---|---|
+| Language & environment | Python on Ubuntu 24.04 (WSL2), Git |
+| Dependency management | `uv`, `pyproject.toml`, `uv.lock` |
+| Numerics & physics | NumPy, SciPy; Astropy for time, frames, and units |
+| Networking & discrete events | NetworkX, SimPy |
+| Data | pandas, PyArrow, Xarray |
+| Machine learning | scikit-learn (others only if justified) |
+| Visualization | Matplotlib, Plotly |
+| Testing | pytest, Hypothesis |
+| Later / optional | Basilisk (validation), CVXPY + OSQP, atmospheric models, PyTorch |
+
+Dependencies will be added incrementally, phase by phase, only when a tested requirement needs them (specification §11).
+
+## Planned external data sources
+
+ESA Anomaly Dataset (ESA-ADB), ESA OPS-SAT-AD, NOAA GloTEC, CelesTrak GP/OMM, UCAR COSMIC-2, NASA OMNI/SPDF, and NOAA SWPC/NCEI. **No datasets are included in this repository**; large raw data is kept out of Git, and every source will be recorded with version, hash, license, and caveats in a dataset registry (specification §8).
+
+## Roadmap
+
+| Phase | Focus | Status |
+|---|---|---|
+| 0 | Research and reproducibility foundation | Not started |
+| 1 | Validated four-spacecraft dynamics and mission geometry | Not started |
+| 2 | Decentralized nominal science operations | Not started |
+| 3 | Deterministic faults and protection supervisor | Not started |
+| 4 | External data and probabilistic/ML experiments | Not started |
+| 5 | Storm-aware distributed recovery | Not started |
+| 6 | Research conclusion and public demonstration | Not started |
+
+Each phase has explicit exit gates defined in specification §13.
+
+## Scope and integrity
+
+AstraMesh is a **simulation and research project**. It is **not** a real satellite constellation, flight software, a flight-validated system, or a NASA/ESA collaboration, and it makes no claim of a novel algorithm before a full related-work comparison. Results will be reported as **simulated**, **model-based**, or **data-informed** as appropriate, and negative results will be reported as valid outcomes.
+
+## Repository contents
+
+| File | Purpose |
+|---|---|
+| [`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md) | Authoritative research and engineering specification (v1.0) |
+| `README.md` | This overview |
+| `.gitignore` | Keeps datasets, experiment outputs, environments, and credentials out of version control |
+
+## License
+
+A license has **not yet been selected**. Until one is added, all rights are reserved by the author.
