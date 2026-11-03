@@ -18,6 +18,6 @@ Project-level decisions live in the master specification's Decision Register (§
 | DL-010 | 2026-11-03 | Run artifacts named `summary.json` (not `metrics.json`) for the toy scenario | APPROVED (implementation) | Avoids implying research metrics; `metrics.json` reserved for real experiments (spec §10.4). |
 | DL-011 | 2026-11-03 | CI on `ubuntu-24.04`, actions pinned to commit SHAs, read-only token | APPROVED (implementation) | Matches target OS; supply-chain hygiene; CI cannot push or create commits. |
 | DL-012 | 2026-11-03 | `ruff` + `mypy --strict` + `pytest` + `hypothesis` as required checks | APPROVED (implementation) | Spec §13 Gate P0 "lint/test conventions". |
-| DL-013 | 2026-11-03 | Units/time/frames/reference epoch per `docs/CONVENTIONS.md` | PROPOSED | Requires sign-off (Gate P0). |
-| DL-014 | 2026-11-03 | Phase 1 physics acceptance tests PA-01…PA-10 per `docs/NUMERICAL_MISSION_DESIGN.md` | PROPOSED | Requires sign-off (Gate P0). |
+| DL-013 | 2026-11-03 | Units/time/frames/reference epoch per `docs/CONVENTIONS.md` | APPROVED | Signed off 2026-11-03 (Gate P0). Reference epoch `2025-06-01T00:00:00Z`; frames GCRS/ITRS/RIC; SI internally. |
+| DL-014 | 2026-11-03 | Phase 1 physics acceptance tests PA-01…PA-10 per `docs/NUMERICAL_MISSION_DESIGN.md` | APPROVED | Signed off 2026-11-03 (Gate P0). Tolerances remain TBD until reference-error studies. |
 | DL-015 | 2026-11-03 | Development environment: Windows-native `.venv` in the OneDrive workspace; tests also verified under WSL2 Ubuntu 24.04 with a separate environment | OPEN | Spec §11 names Ubuntu 24.04 WSL2 as the runtime. Moving the repository into the WSL filesystem would match the spec and avoid OneDrive sync interfering with `.git`; decision pending. |

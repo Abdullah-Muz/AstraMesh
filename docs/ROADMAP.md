@@ -21,17 +21,17 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 1 | Repository and `astramesh` package | Done |
 | 2 | `uv`, pinned Python, pytest, Hypothesis, minimal CPU dependency set | Done |
 | 3 | Master spec + linked docs with owners/requirements | Done (this `docs/` set) |
-| 4 | Validated scenario-config schema; units/time/frame conventions | Schema done; conventions **proposed**, awaiting sign-off |
+| 4 | Validated scenario-config schema; units/time/frame conventions | Done — conventions approved 2026-11-03 |
 | 5 | Deterministic clocks, random seeds, event logging, result manifests | Done |
-| 6 | Tiny deterministic scenario proving same-seed replay; basic CI | Done locally (Windows + WSL2); CI runs on first push |
-| 7 | First literature-matrix entries; initial physics-test design | Priority A metadata entered; physics test plan **drafted**, awaiting sign-off |
+| 6 | Tiny deterministic scenario proving same-seed replay; basic CI | Done — replay verified on Windows, WSL2, and GitHub Actions |
+| 7 | First literature-matrix entries; initial physics-test design | Priority A metadata entered; physics test plan approved 2026-11-03 |
 | 8 | License/terms documentation for external data; no large downloads | Registry started; 2 of 7 licenses checked; nothing downloaded |
 
 ## Gate P0 checklist (spec §13)
 
 - [x] Clean environment setup (`uv sync --locked`)
-- [ ] Unit-test runner **and CI** passing — local: yes; CI: pending first push
+- [x] Unit-test runner and CI passing (first CI run on commit `0522165`: success)
 - [x] Repeatable toy experiment (byte-identical replay, golden hash)
 - [ ] First priority references **reviewed** — metadata only so far; full-text review not started
-- [ ] Exact simulation epoch/frames/units specified — proposed in `CONVENTIONS.md`, awaiting sign-off
-- [ ] Physics acceptance plan signed off — drafted in `NUMERICAL_MISSION_DESIGN.md`, awaiting sign-off
+- [x] Exact simulation epoch/frames/units specified — `CONVENTIONS.md`, approved 2026-11-03
+- [x] Physics acceptance plan signed off — `NUMERICAL_MISSION_DESIGN.md` Part B, approved 2026-11-03

@@ -8,7 +8,7 @@ description: >-
 scenario_type: toy_heartbeat
 
 time:
-  epoch_utc: "2025-06-01T00:00:00Z"   # PROPOSED Phase 1 reference epoch (docs/CONVENTIONS.md)
+  epoch_utc: "2025-06-01T00:00:00Z"   # approved reference epoch (docs/CONVENTIONS.md §2.3)
   duration_s: 600
   time_step_s: 10
 

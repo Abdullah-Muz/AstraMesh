@@ -1,12 +1,12 @@
 # Units, Time, Frames, and Software Conventions
 
-> **Owner:** Abdullah Muzher · **Status:** PROPOSED — requires sign-off for Gate P0 · **Spec:** §3.2, §4.4, §10.3, §10.4, §13 (Gate P0) · **Last updated:** 2026-11-03
+> **Owner:** Abdullah Muzher · **Status:** APPROVED (signed off 2026-11-03) · **Spec:** §3.2, §4.4, §10.3, §10.4, §13 (Gate P0) · **Last updated:** 2026-11-03
 
-Gate P0 requires the "exact simulation epoch/frames/units" to be specified. This document proposes them. Items marked **IMPLEMENTED** already exist in code; items marked **PROPOSED** take effect only after sign-off and are implemented in Phase 1.
+Gate P0 requires the "exact simulation epoch/frames/units" to be specified. This document specifies them. Items marked **IMPLEMENTED** already exist in code; items marked **APPROVED** were signed off on 2026-11-03 and are implemented in Phase 1. Changes require a new [DECISION_LOG.md](DECISION_LOG.md) entry.
 
 ---
 
-## 1. Units — PROPOSED (naming rule IMPLEMENTED)
+## 1. Units — APPROVED (naming rule IMPLEMENTED)
 
 - **Internal computation uses SI base/derived units only:** metres, seconds, kilograms, radians, watts, joules, newtons, metres per second.
 - **Angles** are radians internally. Degrees are allowed only at input/output boundaries (configs, plots, reports).
@@ -38,19 +38,19 @@ Gate P0 requires the "exact simulation epoch/frames/units" to be specified. This
 - The epoch is given as ISO 8601 UTC with an explicit `Z` (or `+00:00`) designator. Naive or non-UTC timestamps are rejected.
 - `t_s` in outputs is derived from `t_ns` for readability; `t_ns` is authoritative.
 
-### 2.2 Calendar conversion — PROPOSED (Phase 1)
+### 2.2 Calendar conversion — APPROVED (Phase 1)
 
 - Converting `epoch + elapsed SI seconds` to a UTC calendar time requires a leap-second table. Phase 0 code intentionally provides **no** such conversion.
 - Phase 1 will use **Astropy `Time`** for all time-scale conversions (UTC ↔ TAI ↔ TT ↔ UT1). The scenario epoch is interpreted as UTC and converted to TT for dynamics; Earth-rotation conversions use UT1 with Astropy's IERS data, whose version must be recorded in the run manifest.
 
-### 2.3 Reference epoch — PROPOSED
+### 2.3 Reference epoch — APPROVED
 
 - **Phase 1 nominal reference epoch: `2025-06-01T00:00:00Z`.**
   - Inside the 2025+ operational period of NOAA GloTEC (spec §4.3, §8.1), so later scenarios can use it without changing the epoch.
   - Leap seconds can only be inserted at the end of June or December, so no leap-second boundary can fall within a 24 h scenario starting at this epoch.
 - Historical replays (e.g. the May 10–13 2024 storm, scenario S11) use their own epochs, set in their scenario configs.
 
-## 3. Reference frames — PROPOSED (Phase 1)
+## 3. Reference frames — APPROVED (Phase 1)
 
 | Role | Frame | Notes |
 |---|---|---|
@@ -90,7 +90,7 @@ Gate P0 requires the "exact simulation epoch/frames/units" to be specified. This
 
 | Item | Decision | Date |
 |---|---|---|
-| Units (§1) | ☐ approved | |
-| Time scale and calendar handling (§2.2) | ☐ approved | |
-| Reference epoch `2025-06-01T00:00:00Z` (§2.3) | ☐ approved | |
-| Frames GCRS / ITRS / RIC (§3) | ☐ approved | |
+| Units (§1) | ☑ approved — Abdullah Muzher | 2026-11-03 |
+| Time scale and calendar handling (§2.2) | ☑ approved — Abdullah Muzher | 2026-11-03 |
+| Reference epoch `2025-06-01T00:00:00Z` (§2.3) | ☑ approved — Abdullah Muzher | 2026-11-03 |
+| Frames GCRS / ITRS / RIC (§3) | ☑ approved — Abdullah Muzher | 2026-11-03 |

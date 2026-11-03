@@ -1,6 +1,6 @@
 # Numerical Mission Design and Physics Acceptance Plan
 
-> **Owner:** Abdullah Muzher · **Status:** DRAFT — physics acceptance plan requires sign-off for Gate P0 · **Spec:** §3.2–§3.3, §4.1, §4.4, §14.3, §18 · **Last updated:** 2026-11-03
+> **Owner:** Abdullah Muzher · **Status:** Part B (physics acceptance plan) APPROVED 2026-11-03; Part A not started · **Spec:** §3.2–§3.3, §4.1, §4.4, §14.3, §18 · **Last updated:** 2026-11-03
 
 ## Purpose
 
@@ -45,5 +45,5 @@ Not started. To be filled in Phase 1, answering open validation questions 1, 2, 
 
 | Item | Decision | Date |
 |---|---|---|
-| Test list PA-01 … PA-10 | ☐ approved | |
-| Tolerance policy (set only from reference studies) | ☐ approved | |
+| Test list PA-01 … PA-10 | ☑ approved — Abdullah Muzher | 2026-11-03 |
+| Tolerance policy (set only from reference studies) | ☑ approved — Abdullah Muzher | 2026-11-03 |
