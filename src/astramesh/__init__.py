@@ -1,8 +1,9 @@
 """AstraMesh: research platform for fault-tolerant decentralized spacecraft autonomy.
 
-Phase 0 provides reproducibility infrastructure only (clock, random streams,
-event log, configuration schema, run manifests). No spacecraft physics,
-autonomy, or science models are implemented yet.
+Phase 0 provides reproducibility infrastructure (clock, random streams, event
+log, configuration schema, run manifests). Phase 1 adds validated truth
+dynamics in ``astramesh.dynamics`` (currently D0 two-body only). No autonomy
+or science models are implemented yet.
 """
 
 from importlib.metadata import PackageNotFoundError, version

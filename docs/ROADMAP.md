@@ -7,7 +7,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | Phase | Focus | Status |
 |---|---|---|
 | 0 | Research and reproducibility foundation | **Complete except** Priority A full-text review (proceeding in parallel, DL-016) |
-| 1 | Validated four-spacecraft dynamics and mission geometry | Approved to start (DL-016) |
+| 1 | Validated four-spacecraft dynamics and mission geometry | **In progress** (DL-016). Increment 1 (D0 two-body core) implemented |
 | 2 | Decentralized nominal science operations | Not started |
 | 3 | Deterministic faults and protection supervisor | Not started |
 | 4 | External data and probabilistic/ML experiments | Not started |
@@ -26,6 +26,17 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 6 | Tiny deterministic scenario proving same-seed replay; basic CI | Done — replay verified on Windows, WSL2, and GitHub Actions |
 | 7 | First literature-matrix entries; initial physics-test design | Priority A metadata entered; physics test plan approved 2026-11-03 |
 | 8 | License/terms documentation for external data; no large downloads | Registry started; 2 of 7 licenses checked; nothing downloaded |
+
+## Phase 1 increments
+
+| # | Increment | Status |
+|---|---|---|
+| 1 | D0 core: frame-tagged states, WGS 84 constants, Kepler elements, universal-variable analytic reference, fixed-step RK4 multi-spacecraft propagator, RIC frame; reference-error studies; PA-01/02/03, PA-04 (RIC), PA-05 (constructors), PA-09 (gravity-only), PA-10 | Implemented; derived tolerances pending owner review |
+| 2 | Astropy time scales (UTC→TT/UT1) and GCRS↔ITRS with IERS version in manifest; PA-04 (ITRS) | Not started |
+| 3 | Formation initialization from consistent elements (~20 km along-track); PA-06; CW cross-check PA-07 | Not started |
+| 4 | J2 (D1) and secular nodal-precession check PA-08; Part A SSO question | Not started |
+| 5 | Dynamics scenario config (unit-suffixed schema), 24 h baseline run with manifest `dynamics_model`, basic plots | Not started |
+| 6 | Synthetic science opportunities from modeled geometry; finite resource accounting (energy, storage, Δv) | Not started |
 
 ## Gate P0 checklist (spec §13)
 

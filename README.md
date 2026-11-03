@@ -4,8 +4,8 @@
 
 AstraMesh is an independent, public-methods computational research project. It is a Python-first, CPU-feasible simulation platform for a **simulated four-spacecraft, decentralized low-Earth-orbit mission** that cooperatively schedules ionospheric observations, coordinates over constrained inter-satellite links, assesses its own health and environmental risk, and tries to preserve scientific value when spacecraft become unavailable or space-weather conditions worsen.
 
-> **Project status: Phase 0 (reproducibility foundation) in progress.**
-> The repository contains infrastructure only — a deterministic clock, named random streams, an event log, a validated configuration schema, run manifests, and a toy replay scenario. There is **no** spacecraft physics, autonomy, or science model yet, and no research results. Nothing here should be read as a validated or published finding.
+> **Project status: Phase 1 (validated four-spacecraft dynamics) in progress.**
+> The repository contains reproducibility infrastructure and a first two-body (D0) dynamics core with its physics acceptance tests. It contains **no** autonomy or science model yet, and no research results. Nothing here should be read as a validated or published finding.
 
 The authoritative design document is **[`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md)** (v1.0). Where this README and the specification differ, the specification governs.
 
