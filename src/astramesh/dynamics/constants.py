@@ -17,6 +17,18 @@ GM_EARTH_M3PS2: Final[float] = 3.986004418e14
 #: Earth's equatorial radius (WGS 84 semi-major axis) [m].
 R_EARTH_EQ_M: Final[float] = 6_378_137.0
 
+#: WGS 84 inverse flattening 1/f (defining parameter) [dimensionless].
+WGS84_INV_FLATTENING: Final[float] = 298.257223563
+
+#: WGS 84 flattening f.
+WGS84_FLATTENING: Final[float] = 1.0 / WGS84_INV_FLATTENING
+
+#: WGS 84 first eccentricity squared e^2 = f (2 - f).
+WGS84_E2: Final[float] = WGS84_FLATTENING * (2.0 - WGS84_FLATTENING)
+
+#: Astronomical unit (IAU 2012 Resolution B2, exact) [m].
+AU_M: Final[float] = 149_597_870_700.0
+
 #: Earth's normalized degree-2 zonal coefficient C-bar(2,0), EGM2008 (tide-free).
 #: Source: Pavlis et al., EGM2008 coefficient file (NGA). Entered from the
 #: published value; verification against the source file is pending (DL-024).

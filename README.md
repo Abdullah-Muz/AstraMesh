@@ -82,16 +82,20 @@ uv run astramesh run configs/experiments/toy_heartbeat.yaml --out results/toy
 # Phase 1 dynamics baseline: 4 spacecraft, 20 km in-train, 24 h, point mass + J2
 uv run astramesh run configs/experiments/formation_24h_j2.yaml --out results/formation
 uv run astramesh plot results/formation          # diagnostic figures in results/formation/figures
+
+# Phase 1 mission geometry: the same formation + illumination + science opportunities
+uv run astramesh run configs/experiments/mission_geometry_24h.yaml --out results/mission
+uv run astramesh plot results/mission
 ```
 
-A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a provenance `manifest.json` (git commit, config hash, seeds, lockfile hash, artifact hashes). The dynamics scenario also writes `trajectory.csv` (sampled truth states). See [`docs/EXPERIMENT_PROTOCOL.md`](docs/EXPERIMENT_PROTOCOL.md).
+A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a provenance `manifest.json` (git commit, config hash, seeds, lockfile hash, artifact hashes). The formation scenarios also write `trajectory.csv` (sampled truth states), and the mission-geometry scenario writes `opportunities.json` (geometry-only science task records). See [`docs/EXPERIMENT_PROTOCOL.md`](docs/EXPERIMENT_PROTOCOL.md).
 
 ## Roadmap
 
 | Phase | Focus | Status |
 |---|---|---|
 | 0 | Research and reproducibility foundation | Complete except the Priority A full-text literature review (in parallel; see [`docs/ROADMAP.md`](docs/ROADMAP.md)) |
-| 1 | Validated four-spacecraft dynamics and mission geometry | In progress (dynamics baseline done; science opportunities and resources next) |
+| 1 | Validated four-spacecraft dynamics and mission geometry | In progress (dynamics baseline done; mission geometry and science opportunities implemented; resource accounting next) |
 | 2 | Decentralized nominal science operations | Not started |
 | 3 | Deterministic faults and protection supervisor | Not started |
 | 4 | External data and probabilistic/ML experiments | Not started |
@@ -110,13 +114,13 @@ AstraMesh is a **simulation and research project**. It is **not** a real satelli
 |---|---|
 | [`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md) | Authoritative research and engineering specification (v1.0) |
 | [`docs/`](docs/) | Supporting documents: conventions, physics test plan, literature matrix, dataset registry, decision log, roadmap |
-| [`src/astramesh/`](src/astramesh/) | Python package (`core/` clock, RNG, events, config; `dynamics/` validated truth dynamics, frames, time scales; `evaluation/` runner and manifests; `scenarios/` runnable scenarios; `visualization/` diagnostic plots) |
+| [`src/astramesh/`](src/astramesh/) | Python package (`core/` clock, RNG, events, config; `dynamics/` validated truth dynamics, frames, time scales; `evaluation/` runner and manifests; `science/` region access and science opportunities; `scenarios/` runnable scenarios; `visualization/` diagnostic plots) |
 | [`scripts/studies/`](scripts/studies/) | Reference-error studies behind every physics test tolerance |
 | [`configs/`](configs/) | Scenario configuration files (YAML) |
 | [`tests/`](tests/) | Unit, integration, and regression tests |
 | `data/` | Local, Git-ignored dataset area (no data committed) |
 | `pyproject.toml`, `uv.lock`, `.python-version` | Project metadata and locked dependencies |
-| `.github/workflows/ci.yml` | Continuous integration: lint, type check, tests, toy run |
+| `.github/workflows/ci.yml` | Continuous integration: lint, type check, tests, baseline smoke runs |
 | [`LICENSE`](LICENSE) | MIT License — applies to source code |
 | [`LICENSE-DOCS`](LICENSE-DOCS) | Creative Commons Attribution 4.0 International — applies to documentation |
 

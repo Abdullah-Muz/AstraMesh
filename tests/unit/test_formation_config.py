@@ -10,6 +10,7 @@ import pytest
 from astramesh.core.config import (
     ConfigError,
     FormationDynamicsScenario,
+    MissionGeometryScenario,
     parse_scenario,
     scenario_json_schema,
 )
@@ -17,7 +18,7 @@ from astramesh.core.config import (
 UNIT_SUFFIXES = ("_s", "_ns", "_m", "_km", "_mps", "_kg", "_w", "_wh", "_j", "_n", "_mn",
                  "_rad", "_deg", "_mb", "_gb", "_probability")  # fmt: skip
 # Non-physical (dimensionless, identifiers, or explicitly unit-less) fields.
-UNITLESS_OK = {"schema_version", "seed", "n_spacecraft", "n_nodes"}
+UNITLESS_OK = {"schema_version", "seed", "n_spacecraft", "n_nodes", "priority"}
 
 
 def _with(base: dict[str, Any], path: str, value: Any) -> dict[str, Any]:
@@ -77,3 +78,49 @@ def test_unknown_and_unitless_keys_rejected(formation_config_dict: dict[str, Any
     bad["toy_heartbeat"] = {"n_nodes": 2}
     with pytest.raises(ConfigError, match="Extra inputs"):
         parse_scenario(bad)
+
+
+def test_mission_geometry_config_is_valid(mission_config_dict: dict[str, Any]) -> None:
+    cfg = parse_scenario(mission_config_dict)
+    assert isinstance(cfg, MissionGeometryScenario)
+    assert len(cfg.science.regions) == 16
+    assert cfg.science.min_elevation_deg == 20.0
+
+
+@pytest.mark.parametrize(
+    ("path", "value"),
+    [
+        ("science.min_elevation_deg", 90.0),
+        ("science.min_elevation_deg", -1.0),
+        ("science.regions", []),
+        ("science.unknown_key", 1),
+    ],
+)
+def test_mission_geometry_rejects_invalid_science(
+    mission_config_dict: dict[str, Any], path: str, value: Any
+) -> None:
+    with pytest.raises(ConfigError):
+        parse_scenario(_with(mission_config_dict, path, value))
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [("latitude_deg", 90.5), ("longitude_deg", 181.0), ("priority", 0), ("priority", 6),
+     ("region_id", "bad id")],
+)  # fmt: skip
+def test_mission_geometry_rejects_invalid_region(
+    mission_config_dict: dict[str, Any], field: str, value: Any
+) -> None:
+    cfg = copy.deepcopy(mission_config_dict)
+    cfg["science"]["regions"][0][field] = value
+    with pytest.raises(ConfigError):
+        parse_scenario(cfg)
+
+
+def test_mission_geometry_rejects_duplicate_region_ids(
+    mission_config_dict: dict[str, Any],
+) -> None:
+    cfg = copy.deepcopy(mission_config_dict)
+    cfg["science"]["regions"][1]["region_id"] = cfg["science"]["regions"][0]["region_id"]
+    with pytest.raises(ConfigError, match="unique"):
+        parse_scenario(cfg)

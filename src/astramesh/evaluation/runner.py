@@ -5,7 +5,8 @@ Each run directory contains:
 * ``events.jsonl`` - canonical event log (deterministic)
 * ``summary.json`` - scenario bookkeeping counts (deterministic)
 * ``config.resolved.json`` - the validated configuration (deterministic)
-* ``trajectory.csv`` - sampled truth states (formation_dynamics only; deterministic)
+* ``trajectory.csv`` - sampled truth states (formation scenarios; deterministic)
+* ``opportunities.json`` - science task records (mission_geometry only; deterministic)
 * ``manifest.json`` - provenance; lists the SHA-256 of the files above
 """
 
@@ -16,11 +17,17 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from astramesh.core.config import FormationDynamicsScenario, ToyHeartbeatScenario, load_scenario
+from astramesh.core.config import (
+    AnyScenarioConfig,
+    FormationDynamicsScenario,
+    MissionGeometryScenario,
+    ToyHeartbeatScenario,
+    load_scenario,
+)
 from astramesh.core.events import EventLog, canonical_json
 from astramesh.core.rng import RandomStreams
 from astramesh.evaluation.manifest import build_manifest, find_project_root, sha256_file
-from astramesh.scenarios import formation_dynamics, toy_heartbeat
+from astramesh.scenarios import formation_dynamics, mission_geometry, toy_heartbeat
 
 EVENTS_FILE = "events.jsonl"
 SUMMARY_FILE = "summary.json"
@@ -42,7 +49,7 @@ def _write_canonical(path: Path, obj: Any) -> str:
     return sha256_file(path)
 
 
-AnyScenario = ToyHeartbeatScenario | FormationDynamicsScenario
+AnyScenario = AnyScenarioConfig
 
 
 def default_experiment_id(config: AnyScenario) -> str:
@@ -94,6 +101,17 @@ def run_config(
         traj_path = output_dir / formation_dynamics.TRAJECTORY_FILE
         formation_dynamics.write_trajectory_csv(run, traj_path)
         extra_artifacts[formation_dynamics.TRAJECTORY_FILE] = sha256_file(traj_path)
+    elif isinstance(config, MissionGeometryScenario):
+        mg = mission_geometry.run_mission_geometry(config, log)
+        summary = mg.summary
+        algorithm = mission_geometry.ALGORITHM_NAME
+        dynamics_model = mg.formation.trajectory.model_id
+        traj_path = output_dir / formation_dynamics.TRAJECTORY_FILE
+        formation_dynamics.write_trajectory_csv(mg.formation, traj_path)
+        extra_artifacts[formation_dynamics.TRAJECTORY_FILE] = sha256_file(traj_path)
+        extra_artifacts[mission_geometry.OPPORTUNITIES_FILE] = _write_canonical(
+            output_dir / mission_geometry.OPPORTUNITIES_FILE, mg.records
+        )
     else:  # pragma: no cover - guarded by the schema's discriminated union
         raise ValueError(f"unsupported scenario_type {config.scenario_type!r}")
 

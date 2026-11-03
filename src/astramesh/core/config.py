@@ -157,17 +157,16 @@ class OutputConfig(_Model):
     )
 
 
-class FormationDynamicsScenario(_ScenarioBase):
-    """Phase 1 truth-dynamics scenario: formation initialization and propagation."""
+class FormationScenarioBase(_ScenarioBase):
+    """Fields shared by the formation scenario types."""
 
-    scenario_type: Literal["formation_dynamics"]
     dynamics: DynamicsConfig
     reference_orbit: ReferenceOrbitConfig
     formation: FormationConfig
     output: OutputConfig
 
     @model_validator(mode="after")
-    def _sampling_on_grid(self) -> FormationDynamicsScenario:
+    def _sampling_on_grid(self) -> FormationScenarioBase:
         self._require_on_grid(
             self.output.trajectory_sample_interval_s, "output.trajectory_sample_interval_s"
         )
@@ -180,19 +179,58 @@ class FormationDynamicsScenario(_ScenarioBase):
         return self
 
 
-ScenarioConfig = Annotated[
-    ToyHeartbeatScenario | FormationDynamicsScenario, Field(discriminator="scenario_type")
-]
-_ADAPTER: TypeAdapter[ToyHeartbeatScenario | FormationDynamicsScenario] = TypeAdapter(
-    ScenarioConfig
-)
+class FormationDynamicsScenario(FormationScenarioBase):
+    """Phase 1 truth-dynamics scenario: formation initialization and propagation."""
+
+    scenario_type: Literal["formation_dynamics"]
+
+
+class RegionConfig(_Model):
+    """A synthetic science region, represented by its centre on the WGS 84 ellipsoid."""
+
+    region_id: Identifier
+    latitude_deg: float = Field(ge=-90.0, le=90.0, allow_inf_nan=False, description="Geodetic")
+    longitude_deg: float = Field(ge=-180.0, le=180.0, allow_inf_nan=False)
+    priority: int = Field(ge=1, le=5, description="Fixed task value w_j (spec §3.4)")
+
+
+class ScienceConfig(_Model):
+    """Geometry-only science opportunities (spec §3.4; a scheduling abstraction)."""
+
+    min_elevation_deg: float = Field(
+        ge=0.0, lt=90.0, allow_inf_nan=False,
+        description="Minimum spacecraft elevation above the region centre's horizon [deg]",
+    )  # fmt: skip
+    regions: list[RegionConfig] = Field(min_length=1, max_length=256)
+
+    @field_validator("regions")
+    @classmethod
+    def _unique_ids(cls, v: list[RegionConfig]) -> list[RegionConfig]:
+        ids = [r.region_id for r in v]
+        if len(set(ids)) != len(ids):
+            raise ValueError("region_id values must be unique")
+        return v
+
+
+class MissionGeometryScenario(FormationScenarioBase):
+    """Phase 1 mission geometry: formation dynamics + illumination + science opportunities."""
+
+    scenario_type: Literal["mission_geometry"]
+    science: ScienceConfig
+
+
+AnyScenarioConfig = ToyHeartbeatScenario | FormationDynamicsScenario | MissionGeometryScenario
+
+
+ScenarioConfig = Annotated[AnyScenarioConfig, Field(discriminator="scenario_type")]
+_ADAPTER: TypeAdapter[AnyScenarioConfig] = TypeAdapter(ScenarioConfig)
 
 
 class ConfigError(ValueError):
     """Raised when a configuration file cannot be read or fails validation."""
 
 
-def load_scenario(path: Path) -> ToyHeartbeatScenario | FormationDynamicsScenario:
+def load_scenario(path: Path) -> AnyScenarioConfig:
     """Load and validate a scenario configuration file."""
     try:
         text = path.read_text(encoding="utf-8")
@@ -207,9 +245,7 @@ def load_scenario(path: Path) -> ToyHeartbeatScenario | FormationDynamicsScenari
     return parse_scenario(raw, source=str(path))
 
 
-def parse_scenario(
-    raw: dict[str, Any], *, source: str = "<dict>"
-) -> ToyHeartbeatScenario | FormationDynamicsScenario:
+def parse_scenario(raw: dict[str, Any], *, source: str = "<dict>") -> AnyScenarioConfig:
     try:
         return _ADAPTER.validate_python(raw)
     except ValidationError as exc:

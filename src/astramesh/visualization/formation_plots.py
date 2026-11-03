@@ -5,7 +5,10 @@ Reads ``trajectory.csv`` and ``config.resolved.json`` and writes PNG figures:
 * ``adjacent_separation.png`` - distance between neighbouring spacecraft vs time
 * ``radius_minus_req.png`` - |r| - R_eq per spacecraft vs time (not geodetic altitude)
 * ``relative_ric.png`` - followers in the leader's RIC frame (radial vs in-track)
-* ``ground_track_sc00.png`` - leader's geocentric latitude/longitude (ITRS)
+* ``ground_track_sc00.png`` - leader's geocentric latitude/longitude (ITRS), with
+  science regions when the run has them
+* ``opportunities_timeline.png`` - science opportunities per region vs time
+  (``mission_geometry`` runs only)
 
 Figures are for inspection only. They are not listed in the run manifest
 (PNG encoding is not byte-reproducible), and they plot simulated truth, not
@@ -34,6 +37,7 @@ FIGURE_FILES = (
     "relative_ric.png",
     "ground_track_sc00.png",
 )
+OPPORTUNITY_FIGURE = "opportunities_timeline.png"
 
 
 def load_trajectory(run_dir: Path) -> tuple[np.ndarray, list[str], np.ndarray]:
@@ -127,6 +131,14 @@ def plot_run(run_dir: Path, out_dir: Path | None = None) -> list[Path]:
     fig = Figure(figsize=(9, 4.5))
     ax = fig.add_subplot()
     ax.plot(lon_plot, lat, lw=0.8)
+    regions = config.get("science", {}).get("regions", [])
+    if regions:
+        ax.scatter(
+            [r["longitude_deg"] for r in regions],
+            [r["latitude_deg"] for r in regions],
+            marker="^", color="tab:red", zorder=3, label="science regions (geodetic)",
+        )  # fmt: skip
+        ax.legend(loc="lower left")
     ax.set(
         xlim=(-180, 180),
         ylim=(-90, 90),
@@ -136,4 +148,26 @@ def plot_run(run_dir: Path, out_dir: Path | None = None) -> list[Path]:
     )
     ax.grid(alpha=0.3)
     save(fig, FIGURE_FILES[3])
+
+    opp_path = run_dir / "opportunities.json"
+    if opp_path.exists():
+        records = json.loads(opp_path.read_text(encoding="ascii"))
+        names = sorted(
+            {r["region_or_path_id"] for r in records} | {r["region_id"] for r in regions}
+        )
+        row = {name: k for k, name in enumerate(names)}
+        fig = Figure(figsize=(9, 0.3 * len(names) + 1.5))
+        ax = fig.add_subplot()
+        for r in records:
+            t0, t1 = r["start_t_ns"] / 3.6e12, r["end_t_ns"] / 3.6e12
+            width = max(t1 - t0, 0.02)
+            ax.barh(row[r["region_or_path_id"]], width, left=t0, height=0.6, color="tab:blue")
+        ax.set_yticks(range(len(names)), names)
+        ax.set(
+            xlabel="time since epoch [h]",
+            title=f"{title}: {len(records)} opportunities (geometry only)",
+            xlim=(0, hours[-1]),
+        )
+        ax.grid(alpha=0.3, axis="x")
+        save(fig, OPPORTUNITY_FIGURE)
     return written

@@ -7,7 +7,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | Phase | Focus | Status |
 |---|---|---|
 | 0 | Research and reproducibility foundation | **Complete except** Priority A full-text review (proceeding in parallel, DL-016) |
-| 1 | Validated four-spacecraft dynamics and mission geometry | **In progress** (DL-016). Increments 1–5 done or implemented; increment 6 (science opportunities, resources) remains for Gate P1 |
+| 1 | Validated four-spacecraft dynamics and mission geometry | **In progress** (DL-016). Increments 1–5 done; 6a (mission geometry, science opportunities) implemented; 6b (resource accounting) remains |
 | 2 | Decentralized nominal science operations | Not started |
 | 3 | Deterministic faults and protection supervisor | Not started |
 | 4 | External data and probabilistic/ML experiments | Not started |
@@ -36,15 +36,16 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 3 | Formation initialization from consistent elements (~20 km along-track); PA-06; CW cross-check PA-07 | **Done**: commit `abc50c2`, CI passing; tolerances approved 2026-11-03 |
 | 4 | J2 (D1) and secular nodal-precession check PA-08; Part A SSO question | **Done**: commit `7cad3da`, CI passing; tolerances approved |
 | 4b | Mean-element initialization (DL-026/027): reference orbit as mean elements; mean-matched formation | **Done**: commit `7c8f7dd`, CI passing; tolerances approved 2026-11-03 |
-| 5 | Dynamics scenario config (unit-suffixed schema), 24 h baseline run with manifest `dynamics_model`, basic plots | Implemented (`configs/experiments/formation_24h_j2.yaml`, `astramesh plot`) |
-| 6 | Synthetic science opportunities from modeled geometry; finite resource accounting (energy, storage, Δv) | Not started |
+| 5 | Dynamics scenario config (unit-suffixed schema), 24 h baseline run with manifest `dynamics_model`, basic plots | **Done**: commits `a700f54` and `428fb65` (DL-031 CPU-independence fix), CI passing |
+| 6a | Mission geometry: per-tick ERFA Earth rotation, Sun and cylindrical shadow, WGS 84 region access, geometry-only opportunities (spec §3.4), `mission_geometry` scenario, plots; Part A Q4 eclipse fraction | Implemented (`configs/experiments/mission_geometry_24h.yaml`); §B.7 tolerances, DL-032 and DL-033 awaiting approval |
+| 6b | Finite resource accounting (energy with eclipse, storage, Δv); Part A Q4 power balance and Q5 propulsion feasibility | Not started |
 
 ## Gate P1 checklist (spec §13)
 
 - [x] Independent propagation and convergence checks pass (PA-01–PA-04, PA-08; `NUMERICAL_MISSION_DESIGN.md` §B.2–§B.5)
 - [x] Four initial orbits are consistent (PA-06; mean-element initialization §B.6)
 - [x] 24 h baseline completes (`formation_24h_j2.yaml`; regression test and CI smoke run)
-- [ ] Science eligibility can be explained by modeled geometry (increment 6)
+- [ ] Science eligibility can be explained by modeled geometry (6a: implemented and independently checked against Astropy AltAz, `tests/physics_validation/test_mission_geometry.py`; ticks once §B.7 is approved)
 - [x] Fixed seeds replay identically (scenario replay test, pinned digests; scope DL-029)
 
 ## Gate P0 checklist (spec §13)

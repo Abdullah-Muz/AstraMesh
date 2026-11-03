@@ -25,7 +25,7 @@ from typing import Any
 import numpy as np
 
 from astramesh.core.clock import NS_PER_S, seconds_to_ns
-from astramesh.core.config import FormationDynamicsScenario
+from astramesh.core.config import FormationScenarioBase
 from astramesh.core.events import EventLog
 from astramesh.dynamics.constants import GM_EARTH_M3PS2, J2_EARTH, R_EARTH_EQ_M
 from astramesh.dynamics.earth_frames import earth_pole_gcrs
@@ -53,7 +53,7 @@ class FormationRun:
 
 
 def _initial_states(
-    config: FormationDynamicsScenario, forces: ForceModel, log: EventLog
+    config: FormationScenarioBase, forces: ForceModel, log: EventLog
 ) -> list[CartesianState]:
     ref = config.reference_orbit
     mean_a = R_EARTH_EQ_M + ref.mean_altitude_km * 1e3
@@ -117,9 +117,7 @@ def _initial_states(
     return states
 
 
-def _summary(
-    config: FormationDynamicsScenario, traj: Trajectory, forces: ForceModel
-) -> dict[str, Any]:
+def _summary(config: FormationScenarioBase, traj: Trajectory, forces: ForceModel) -> dict[str, Any]:
     y = traj.y
     radius_minus_req_km = (np.linalg.norm(y[:, :, :3], axis=2) - R_EARTH_EQ_M) / 1e3
     out: dict[str, Any] = {
@@ -145,7 +143,14 @@ def _summary(
     return out
 
 
-def run_formation_dynamics(config: FormationDynamicsScenario, log: EventLog) -> FormationRun:
+def run_formation_dynamics(
+    config: FormationScenarioBase, log: EventLog, *, end_event: bool = True
+) -> FormationRun:
+    """Initialize and propagate the formation.
+
+    With ``end_event=False`` the caller records ``scenario_end`` itself (after
+    its own events, which must not precede earlier ticks).
+    """
     epoch = config.time.epoch_utc
     spec = config.time.clock_spec()
     pole = earth_pole_gcrs(epoch)
@@ -171,6 +176,13 @@ def run_formation_dynamics(config: FormationDynamicsScenario, log: EventLog) -> 
     traj = propagate(initial, step_ns=spec.step_ns, n_steps=spec.n_steps, forces=forces)
     stride = seconds_to_ns(config.output.trajectory_sample_interval_s) // spec.step_ns
     summary = _summary(config, traj, forces)
+    if end_event:
+        record_scenario_end(config, log)
+    return FormationRun(traj, int(stride), summary)
+
+
+def record_scenario_end(config: FormationScenarioBase, log: EventLog) -> None:
+    spec = config.time.clock_spec()
     log.record(
         tick=spec.n_steps,
         time_ns=spec.duration_ns,
@@ -178,7 +190,6 @@ def run_formation_dynamics(config: FormationDynamicsScenario, log: EventLog) -> 
         kind="scenario_end",
         data={"duration_s": spec.duration_ns / NS_PER_S},
     )
-    return FormationRun(traj, int(stride), summary)
 
 
 def write_trajectory_csv(run: FormationRun, path: Any) -> None:

@@ -103,25 +103,53 @@ def state_to_gcrs(state: CartesianState) -> CartesianState:
     return CartesianState(Frame.GCRS, state.epoch_utc, state.t_ns, r, v)
 
 
-def earth_pole_gcrs(epoch_utc: datetime, t_ns: int = 0) -> tuple[float, float, float]:
-    """Unit vector of the ITRS z-axis (Earth's figure axis, for J2) in GCRS.
+def gcrs_to_itrs_matrices(epoch_utc: datetime, t_ns: ArrayLike) -> FloatArray:
+    """GCRS-to-ITRS rotation matrices, shape (n, 3, 3), for integer times ``t_ns``.
 
-    The ITRS z-axis differs from the Celestial Intermediate Pole only by polar
-    motion (< ~0.5 arcsec). The GCRS-to-ITRS matrix is built exactly as Astropy
-    builds it (``c2i06a``, ``era00``, ``pom00`` with IERS polar motion and
-    ``sp00``) but combined by ERFA's ``c2tcio`` in C. The pole is the matrix's
-    third row, so no NumPy ``@`` (BLAS, whose last bit depends on the CPU) is
-    involved (DL-031). The result can still differ between C math libraries;
-    it is recorded with every run.
+    Built exactly as Astropy builds them (``c2i06a``, then ``era00`` and
+    ``pom00`` with IERS polar motion and ``sp00``) but combined by ERFA's
+    ``c2tcio`` in C, so no NumPy ``@`` (BLAS, whose last bit depends on the CPU)
+    is involved (DL-031). Apply them with :func:`rotate`. Results can still
+    differ between C math libraries (DL-029).
     """
-    obstime = scenario_time(epoch_utc, t_ns)
+    t = np.atleast_1d(np.asarray(t_ns))
+    if t.ndim != 1:
+        raise ValueError(f"t_ns must be a scalar or a 1-D array, got shape {t.shape}")
+    obstime = scenario_time(epoch_utc, t)
     require_eop_coverage(obstime)
     tt1, tt2 = get_jd12(obstime, "tt")
     ut1, ut2 = get_jd12(obstime, "ut1")
     xp, yp = get_polar_motion(obstime)
     rc2i = erfa.c2i06a(tt1, tt2)
     pom = erfa.pom00(xp, yp, erfa.sp00(tt1, tt2))
-    rc2t = np.asarray(erfa.c2tcio(rc2i, erfa.era00(ut1, ut2), pom), dtype=np.float64)
-    x, y, z = (float(c) for c in rc2t[2])
+    out = np.asarray(erfa.c2tcio(rc2i, erfa.era00(ut1, ut2), pom), dtype=np.float64)
+    return out.reshape(t.shape[0], 3, 3)
+
+
+def rotate(m: FloatArray, v: FloatArray, *, transpose: bool = False) -> FloatArray:
+    """Apply rotation matrices ``m`` (n, 3, 3) to vectors ``v`` (n, ..., 3) elementwise.
+
+    ``v`` may have extra axes between the time axis and the vector axis (e.g.
+    one per spacecraft). ``transpose=True`` applies ``m.T`` (ITRS to GCRS).
+    Fixed evaluation order, no BLAS.
+    """
+    mm = np.swapaxes(m, -1, -2) if transpose else m
+    mm = mm.reshape(mm.shape[0], *([1] * (v.ndim - 2)), 3, 3)
+    out: FloatArray = (
+        mm[..., :, 0] * v[..., 0:1] + mm[..., :, 1] * v[..., 1:2] + mm[..., :, 2] * v[..., 2:3]
+    )
+    return out
+
+
+def earth_pole_gcrs(epoch_utc: datetime, t_ns: int = 0) -> tuple[float, float, float]:
+    """Unit vector of the ITRS z-axis (Earth's figure axis, for J2) in GCRS.
+
+    The ITRS z-axis differs from the Celestial Intermediate Pole only by polar
+    motion (< ~0.5 arcsec). It is the third row of the GCRS-to-ITRS matrix from
+    :func:`gcrs_to_itrs_matrices`, so no BLAS is involved (DL-031). It is
+    recorded with every run.
+    """
+    row = gcrs_to_itrs_matrices(epoch_utc, t_ns)[0, 2]
+    x, y, z = (float(c) for c in row)
     n = math.sqrt(x * x + y * y + z * z)
     return (x / n, y / n, z / n)

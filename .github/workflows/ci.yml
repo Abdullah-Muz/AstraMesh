@@ -51,3 +51,8 @@ jobs:
         run: |
           uv run --locked astramesh run configs/experiments/formation_24h_j2.yaml --out "$RUNNER_TEMP/formation"
           uv run --locked astramesh plot "$RUNNER_TEMP/formation"
+
+      - name: Mission geometry baseline (24 h) smoke run and plots
+        run: |
+          uv run --locked astramesh run configs/experiments/mission_geometry_24h.yaml --out "$RUNNER_TEMP/mission"
+          uv run --locked astramesh plot "$RUNNER_TEMP/mission"

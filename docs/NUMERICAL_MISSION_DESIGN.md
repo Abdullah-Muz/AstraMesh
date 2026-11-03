@@ -32,7 +32,7 @@ Not started. To be filled in Phase 1, answering open validation questions 1, 2, 
 - secular drift ≤ 0.03 m per orbit;
 - in-orbit separation swing ≈ 18 m;
 - mean spacing 20.009–20.018 km.
-- [ ] Eclipse fraction and eclipse-aware power balance for the 25 W / 100 Wh candidate.
+- [ ] Eclipse fraction and eclipse-aware power balance for the 25 W / 100 Wh candidate. **Eclipse fraction answered (§B.7, G6):** 0–28% over a year for the baseline's 07:25 node (13.7% on 2025-06-01), 32–37.5% for 09:00–13:30 nodes, 0–23% for dawn-dusk. The power balance is increment 6b.
 - [ ] Feasibility of the 0.5 mN / 5 m/s propulsion candidate (spec §3.3 notes ~33.3 h of accumulated thrust for 5 m/s).
 
 ## Part B — Phase 1 physics acceptance test design
@@ -330,6 +330,57 @@ The previous method (equal osculating elements, §B.5.4) gave 107 m – 7.7 km o
 - **Mean spacing is 9–18 m above 20 km.** The offsets are set in osculating u, so this is a 0.05–0.09% spacing bias. That is acceptable for the "~20 km" provisional spacing.
 - **A residual drift of ≤ 0.03 m per orbit (≤ 0.45 m/day) at intermediate start angles.** It is likely due to the small mean-inclination differences between followers, since only the leader's mean i is iterated.
 
+## B.7 Mission geometry: Earth rotation, Sun, shadow, region access (2026-11-03; increment 6a)
+
+**Reproduce:** `uv run python scripts/studies/geometry_reference_errors.py`. It takes about 3 min.
+
+**Implementation:**
+- `dynamics/earth_frames.py`: `gcrs_to_itrs_matrices` and `rotate`;
+- `dynamics/sun.py`: the Sun direction and the cylindrical shadow;
+- `science/access.py` and `science/opportunities.py`: region access and opportunities;
+- `scenarios/mission_geometry.py`: the scenario.
+
+The baseline is `configs/experiments/mission_geometry_24h.yaml`. It has the same dynamics as `formation_24h_j2.yaml`, and its trajectory is byte-identical to that run's.
+
+| Check | Independent reference | Observed | Tolerance |
+|---|---|---|---|
+| G1 ERFA GCRS→ITRS matrices (no BLAS), 24 h baseline | Astropy `GCRS→ITRS` | 3.8e-9 m | 2e-8 m (round-off, ~5×) |
+| G2 Sun direction (ERFA `epv00`), weekly over a year | Astropy `get_body("sun")` in GCRS (apparent) | 1.01e-4 rad (20.8″) | 3e-4 rad |
+| G3 Cylindrical shadow, β = 0–65°, 200 000 samples/orbit | Analytic f = arccos(√(h² + 2Rh) / (r cos β)) / π | 4.9e-6 | 1e-5 |
+| G4 Elevation, every tick × spacecraft × region above −5° (553 k samples) | Astropy `EarthLocation` (WGS 84) + topocentric ITRS → `AltAz`, pressure 0 | 2.5e-13° | 2e-12° (round-off, ~8×) |
+| G4 Access decision at every tick | same | 0 disagreements; nearest sample to the 20° mask is 3.9e-4° away | exact agreement outside ±2e-12° |
+
+- **G2:** the difference is the annual aberration and the light time, which are deliberately not modelled (DL-032).
+- **G4 pitfall:** pass Astropy a *topocentric* ITRS coordinate. That means subtracting the site's ITRS position and setting `location`, which is Astropy's documented recipe for satellites. Given a *geocentric* ITRS coordinate, `transform_to(AltAz)` first re-centres it through the astrometric frames. For a satellite 100 km away that shifts the elevation by up to 0.16°, which is not the geometry modelled here. The first study run had this mistake and showed a 0.058° "difference".
+
+**G5, shadow-model error.** Each eclipse edge of the cylinder model is compared with a conical umbra/penumbra model (Sun radius 695 700 km) on a 0.1 s circular orbit.
+
+| β | Cylinder | Umbra | Umbra + penumbra | Per edge: cylinder − umbra | Per edge: penumbra − cylinder |
+|---|---|---|---|---|---|
+| 0° | 2 140.9 s | 2 132.5 s | 2 149.3 s | 4.2 s | 4.2 s |
+| 65° (baseline) | 802.9 s | 759.1 s | 845.5 s | 21.9 s | 21.3 s |
+
+At high β the shadow is crossed obliquely, so the penumbra lasts longer. The cylinder sits near the middle of the penumbra; DL-032 accepts this for Phase 1.
+
+**Baseline (2025-06-01, RAAN 0°):**
+- The local time of the ascending node is 07:25 and β is −65.0°. Eclipse is impossible above 67.5°, so this is near the edge.
+- The eclipse fraction is 13.7% for sc00 (13.73% for followers), with 15 eclipses in 24 h.
+- The analytic value at the epoch's β is 14.1%. β changes during the day and |r| is not constant, so the two need not match exactly.
+- There are **43 opportunities** on the 16-region grid with a 20° mask (66 at 10°, 30 at 30°). For each eligible spacecraft and window, the physics test re-checks the elevation with Astropy at the first, peak and last ticks and at the ticks just outside. It also checks that no Astropy-visible sample is missing from a window.
+
+**G6, eclipse fraction by local time of the ascending node (LTAN).** Mean 525 km / 97.5° sun-synchronous orbit, mid-month from 2025-06 to 2026-05, analytic formula validated by G3.
+
+| LTAN | Min | Max | Note |
+|---|---|---|---|
+| 06:00 (dawn-dusk) | 0% | 23% | eclipses only around the December solstice (Dec–Feb) |
+| 07:25 (baseline RAAN 0°) | 0% | 28% | two eclipse-free seasons (Aug–Sep, Mar–Apr) |
+| 09:00 | 32% | 34% | |
+| 10:30 | 36% | 37% | |
+| 12:00 (noon) | 37.5% | 37.5% | the maximum, β ≈ 0 |
+| 13:30 | 36% | 37% | |
+
+**Part A question 4 (eclipse fraction):** answered above. The power balance, meaning whether 25 W of generation and 100 Wh of battery cover an eclipse fraction of up to 37.5%, is increment 6b.
+
 ### Sign-off
 
 | Item | Decision | Date |
@@ -341,3 +392,4 @@ The previous method (equal osculating elements, §B.5.4) gave 107 m – 7.7 km o
 | Formation (PA-06) and CW (PA-07) tolerances and bands (§B.4) | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | J2 (PA-08 and D1 checks) tolerances (§B.5) | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | Mean-element initialization tolerances (§B.6), including mean-eccentricity matching | ☑ approved — Abdullah Muzher | 2026-11-03 |
+| Mission-geometry tolerances (§B.7), illumination model (DL-032), opportunity definition and 20° mask (DL-033) | ☐ pending owner approval | |
