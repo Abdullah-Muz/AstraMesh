@@ -1,0 +1,7 @@
+# Normalize line endings so file hashes (e.g. uv.lock in run manifests) and
+# generated artifacts are identical on Windows, WSL2/Linux, and CI.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.pdf binary

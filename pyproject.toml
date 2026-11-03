@@ -1,0 +1,82 @@
+[project]
+name = "astramesh"
+version = "0.1.0.dev0"
+description = "Research platform for fault-tolerant decentralized spacecraft autonomy, intelligent mission planning, and space-weather resilience."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Abdullah Muzher" }]
+requires-python = ">=3.12"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+# Phase 0 runtime dependencies only. Add new ones per phase, and only when a
+# tested requirement needs them (ASTRAMESH_MASTER_SPEC.md §11).
+dependencies = [
+    "numpy>=2.1",
+    "pydantic>=2.9",
+    "pyyaml>=6.0.2",
+]
+
+[project.urls]
+Repository = "https://github.com/Abdullah-Muz/AstraMesh"
+
+[project.scripts]
+astramesh = "astramesh.cli:main"
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.112",
+    "mypy>=1.13",
+    "pytest>=8.3",
+    "ruff>=0.8",
+    "types-pyyaml>=6.0.12",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.13,<0.13"]
+build-backend = "uv_build"
+
+# ---------------------------------------------------------------- pytest ----
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers", "--strict-config", "--import-mode=importlib"]
+xfail_strict = true
+filterwarnings = ["error"]
+
+# ------------------------------------------------------------------ ruff ----
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes
+    "I",        # isort
+    "B",        # bugbear
+    "UP",       # pyupgrade
+    "SIM",      # simplify
+    "NPY",      # numpy-specific
+    "RUF",      # ruff-specific
+    "PT",       # pytest style
+]
+
+# ------------------------------------------------------------------ mypy ----
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src", "tests"]
+plugins = ["pydantic.mypy"]
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = ["hypothesis.*"]
+follow_untyped_imports = true

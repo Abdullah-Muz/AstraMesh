@@ -4,8 +4,8 @@
 
 AstraMesh is an independent, public-methods computational research project. It is a Python-first, CPU-feasible simulation platform for a **simulated four-spacecraft, decentralized low-Earth-orbit mission** that cooperatively schedules ionospheric observations, coordinates over constrained inter-satellite links, assesses its own health and environmental risk, and tries to preserve scientific value when spacecraft become unavailable or space-weather conditions worsen.
 
-> **Project status: design baseline approved — implementation not started.**
-> No simulator code, experiments, or research results exist yet. Nothing in this repository should be read as a validated or published finding.
+> **Project status: Phase 0 (reproducibility foundation) in progress.**
+> The repository contains infrastructure only — a deterministic clock, named random streams, an event log, a validated configuration schema, run manifests, and a toy replay scenario. There is **no** spacecraft physics, autonomy, or science model yet, and no research results. Nothing here should be read as a validated or published finding.
 
 The authoritative design document is **[`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md)** (v1.0). Where this README and the specification differ, the specification governs.
 
@@ -48,6 +48,7 @@ All physical and numerical parameters are starting points that must be validated
 |---|---|
 | Language & environment | Python on Ubuntu 24.04 (WSL2), Git |
 | Dependency management | `uv`, `pyproject.toml`, `uv.lock` |
+| Configuration | YAML validated with pydantic (unknown keys rejected) |
 | Numerics & physics | NumPy, SciPy; Astropy for time, frames, and units |
 | Networking & discrete events | NetworkX, SimPy |
 | Data | pandas, PyArrow, Xarray |
@@ -62,11 +63,30 @@ Dependencies will be added incrementally, phase by phase, only when a tested req
 
 ESA Anomaly Dataset (ESA-ADB), ESA OPS-SAT-AD, NOAA GloTEC, CelesTrak GP/OMM, UCAR COSMIC-2, NASA OMNI/SPDF, and NOAA SWPC/NCEI. **No datasets are included in this repository**; large raw data is kept out of Git, and every source will be recorded with version, hash, license, and caveats in a dataset registry (specification §8).
 
+## Getting started
+
+Requires [uv](https://docs.astral.sh/uv/). uv installs the pinned Python version (3.12) automatically.
+
+```bash
+git clone https://github.com/Abdullah-Muz/AstraMesh.git
+cd AstraMesh
+uv sync --locked                     # create the environment from uv.lock
+
+uv run pytest                        # tests
+uv run ruff check . && uv run mypy   # lint and type checks
+
+# Phase 0 toy scenario: proves same-seed replay (not a mission model)
+uv run astramesh validate configs/experiments/toy_heartbeat.yaml
+uv run astramesh run configs/experiments/toy_heartbeat.yaml --out results/toy
+```
+
+A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a provenance `manifest.json` (git commit, config hash, seeds, lockfile hash, artifact hashes). See [`docs/EXPERIMENT_PROTOCOL.md`](docs/EXPERIMENT_PROTOCOL.md).
+
 ## Roadmap
 
 | Phase | Focus | Status |
 |---|---|---|
-| 0 | Research and reproducibility foundation | Not started |
+| 0 | Research and reproducibility foundation | In progress — see [`docs/ROADMAP.md`](docs/ROADMAP.md) |
 | 1 | Validated four-spacecraft dynamics and mission geometry | Not started |
 | 2 | Decentralized nominal science operations | Not started |
 | 3 | Deterministic faults and protection supervisor | Not started |
@@ -82,11 +102,16 @@ AstraMesh is a **simulation and research project**. It is **not** a real satelli
 
 ## Repository contents
 
-| File | Purpose |
+| Path | Purpose |
 |---|---|
 | [`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md) | Authoritative research and engineering specification (v1.0) |
-| `README.md` | This overview |
-| `.gitignore` | Keeps datasets, experiment outputs, environments, and credentials out of version control |
+| [`docs/`](docs/) | Supporting documents: conventions, physics test plan, literature matrix, dataset registry, decision log, roadmap |
+| [`src/astramesh/`](src/astramesh/) | Python package (`core/` clock, RNG, events, config; `evaluation/` runner and manifests; `scenarios/` toy scenario) |
+| [`configs/`](configs/) | Scenario configuration files (YAML) |
+| [`tests/`](tests/) | Unit, integration, and regression tests |
+| `data/` | Local, Git-ignored dataset area (no data committed) |
+| `pyproject.toml`, `uv.lock`, `.python-version` | Project metadata and locked dependencies |
+| `.github/workflows/ci.yml` | Continuous integration: lint, type check, tests, toy run |
 | [`LICENSE`](LICENSE) | MIT License — applies to source code |
 | [`LICENSE-DOCS`](LICENSE-DOCS) | Creative Commons Attribution 4.0 International — applies to documentation |
 

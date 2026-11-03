@@ -1,0 +1,32 @@
+# Experiment Protocol
+
+> **Owner:** Abdullah Muzher · **Status:** PARTIAL — run artifacts implemented; statistical protocol not started · **Spec:** §10 · **Last updated:** 2026-11-03
+
+## 1. Run artifacts — IMPLEMENTED (Phase 0)
+
+```bash
+uv run astramesh validate configs/experiments/<scenario>.yaml
+uv run astramesh run configs/experiments/<scenario>.yaml --out results/<run_dir>
+```
+
+Each run directory contains:
+
+| File | Deterministic? | Content |
+|---|---|---|
+| `events.jsonl` | Yes | Canonical event log (simulation time only) |
+| `summary.json` | Yes | Scenario bookkeeping counts |
+| `config.resolved.json` | Yes | The validated configuration, canonical JSON |
+| `manifest.json` | No (contains wall-clock `run_timestamp_utc`) | Provenance record listing the SHA-256 of the three files above |
+
+`manifest.json` fields: `experiment_id`, `scenario_id`, `run_timestamp_utc`, `git_commit`, `git_dirty`, `config_hash`, `seed`, `stream_seeds`, `dynamics_model`, `science_data_version`, `telemetry_data_version`, `algorithm`, `software_lockfile_hash`, `software` (Python, platform, package versions), `artifacts`.
+
+**Rule:** a result may be reported only if its manifest has `git_dirty: false` (run from a committed tree) and every data version it depends on is recorded. `results/` is Git-ignored; archive reported runs separately (to be decided, spec §11 mentions DVC/MLflow as later options).
+
+## 2. Replay verification — IMPLEMENTED
+
+- `tests/integration/test_toy_replay.py`: same config + seeds ⇒ byte-identical deterministic artifacts; different seed ⇒ different events.
+- `tests/regression/test_toy_golden.py`: pinned SHA-256 of the toy event log, checked on Windows, WSL2/Ubuntu 24.04, and CI.
+
+## 3. Scenarios, metrics, statistical design — NOT STARTED
+
+To be written before any comparative experiment (spec §10.1–§10.3), including: frozen reference scenarios S00–S11, paired-run design, per-stream seeds, sample counts, confidence intervals, ablations, and rules for reporting negative results and solver failures.

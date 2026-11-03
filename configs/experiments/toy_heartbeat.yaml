@@ -1,0 +1,22 @@
+# Phase 0 infrastructure scenario: proves same-seed replay of the clock,
+# random streams, event log, and run manifest. NOT a mission or comms model.
+schema_version: 1
+scenario_id: TOY_HEARTBEAT
+description: >-
+  Phase 0 determinism check. Abstract nodes broadcast heartbeats with random
+  per-delivery loss. No orbital, link, or spacecraft physics.
+scenario_type: toy_heartbeat
+
+time:
+  epoch_utc: "2025-06-01T00:00:00Z"   # PROPOSED Phase 1 reference epoch (docs/CONVENTIONS.md)
+  duration_s: 600
+  time_step_s: 10
+
+random:
+  seed: 1
+  stream_seeds: {}                     # e.g. {faults: 7} to vary one stream only
+
+toy_heartbeat:
+  n_nodes: 4
+  heartbeat_interval_s: 30
+  packet_loss_probability: 0.1
