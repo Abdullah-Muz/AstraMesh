@@ -1,6 +1,6 @@
 # Numerical Mission Design and Physics Acceptance Plan
 
-> **Owner:** Abdullah Muzher · **Status:** Part B (physics acceptance plan) APPROVED 2026-11-03; §B.2 D0 reference studies recorded, derived tolerances PROPOSED (owner review); Part A not started · **Spec:** §3.2–§3.3, §4.1, §4.4, §14.3, §18 · **Last updated:** 2026-11-03
+> **Owner:** Abdullah Muzher · **Status:** Part B (physics acceptance plan) APPROVED 2026-11-03; §B.2 D0 reference studies recorded, derived tolerances APPROVED 2026-11-03; §B.3 ITRS study recorded, tolerances PROPOSED; Part A not started · **Spec:** §3.2–§3.3, §4.1, §4.4, §14.3, §18 · **Last updated:** 2026-11-03
 
 ## Purpose
 
@@ -24,10 +24,10 @@ Not started. To be filled in Phase 1, answering open validation questions 1, 2, 
 
 | ID | Test | Method | Independent reference | Tolerance | Test location |
 |---|---|---|---|---|---|
-| PA-01 | Two-body propagation accuracy | Propagate each spacecraft over the defined horizon (24 h nominal) and compare positions/velocities | Analytic Kepler solution (universal-variable or eccentric-anomaly form), independently implemented; optionally a high-accuracy integrator at tight tolerances | **Proposed** §B.2.4 (0.9 m / 1e-3 m/s circular; 0.5 m / 4e-4 m/s e = 0.1) | `tests/physics_validation/test_two_body.py` |
-| PA-02 | Conservation in the unperturbed model | Track specific orbital energy and specific angular-momentum vector over the horizon | Exact invariants of the two-body problem | **Proposed** §B.2.4 | `tests/physics_validation/test_two_body.py` |
-| PA-03 | Step-size convergence | Repeat a fixed scenario at Δt, Δt/2, Δt/4; check that the error decreases at the integrator's expected order | Richardson-style comparison against the finest run and PA-01 analytic reference | **Proposed** observed order in [3.9, 5.1] at 20/10/5 s (§B.2.3) | `tests/physics_validation/test_two_body.py` |
-| PA-04 | Frame round trips | ECI → ITRS → ECI and ECI → RIC → ECI for randomized states (Hypothesis) | Identity; Astropy transforms as an external check | RIC: **Proposed** 0.5 ε‖x_chief‖ (§B.2.5). ITRS: not implemented yet | `tests/physics_validation/test_frames_ric.py` |
+| PA-01 | Two-body propagation accuracy | Propagate each spacecraft over the defined horizon (24 h nominal) and compare positions/velocities | Analytic Kepler solution (universal-variable or eccentric-anomaly form), independently implemented; optionally a high-accuracy integrator at tight tolerances | **Approved** §B.2.4 (0.9 m / 1e-3 m/s circular; 0.5 m / 4e-4 m/s e = 0.1) | `tests/physics_validation/test_two_body.py` |
+| PA-02 | Conservation in the unperturbed model | Track specific orbital energy and specific angular-momentum vector over the horizon | Exact invariants of the two-body problem | **Approved** §B.2.4 | `tests/physics_validation/test_two_body.py` |
+| PA-03 | Step-size convergence | Repeat a fixed scenario at Δt, Δt/2, Δt/4; check that the error decreases at the integrator's expected order | Richardson-style comparison against the finest run and PA-01 analytic reference | **Approved** observed order in [3.9, 5.1] at 20/10/5 s (§B.2.3) | `tests/physics_validation/test_two_body.py` |
+| PA-04 | Frame round trips | ECI → ITRS → ECI and ECI → RIC → ECI for randomized states (Hypothesis) | Identity; Astropy transforms as an external check | RIC: **Approved** 0.5 ε‖x_chief‖ (§B.2.5). ITRS: **Proposed** §B.3 | `tests/physics_validation/test_frames_ric.py`, `test_frames_itrs.py`, `tests/unit/test_timescales.py` |
 | PA-05 | Units are explicit | Constructors reject ambiguous inputs; configs reject unit-less physical fields | Code inspection + schema tests | Pass/fail. Constructors done; dynamics config schema pending | `tests/unit/test_dynamics_inputs.py` |
 | PA-06 | Formation initialization | Four initial states from consistent orbital elements reproduce the intended along-track spacing and phasing | Independent element → state → element round trip; geometric check of the spacing | TBD | `tests/physics_validation/` |
 | PA-07 | Relative-motion cross-check | Compare relative motion against Clohessy–Wiltshire/Hill **only** within its assumptions (circular reference, small separation, short horizon) | CW closed-form solution | TBD — must reflect known CW linearization error at ~20 km | `tests/physics_validation/` |
@@ -40,7 +40,7 @@ Not started. To be filled in Phase 1, answering open validation questions 1, 2, 
 - [x] Characterize float64 round-off for the analytic Kepler reference over 24 h (PA-01, PA-02). See §B.2.1.
 - [x] Characterize the chosen integrator's error constant and order (PA-03). See §B.2.2–§B.2.3.
 - [x] Float64 round-off of the RIC round trip (PA-04, RIC part). See §B.2.5.
-- [ ] Float64 round-off of the ITRS round trip (PA-04, ITRS part). Needs Astropy (next increment).
+- [x] Float64 round-off of the ITRS round trip (PA-04, ITRS part), plus independent checks of Astropy's transform. See §B.3.
 - [ ] Quantify CW linearization error at 20 km separation over the test horizon (PA-07).
 
 ## B.2 D0 reference-error studies (2026-11-03)
@@ -97,13 +97,13 @@ Observed order is p = log₂(e(2h)/e(h)), computed from the final position error
 
 **Interpretation.** RK4's per-step phase error is O(h⁵), which gives an O(h⁴) along-track error. Its per-step energy (amplitude) error is O(h⁶), which gives O(h⁵) energy drift; the measured energy order is 5.00. Energy drift changes the mean motion, so it adds an along-track error that grows ∝ t²·h⁵. Over 15 revolutions this term is significant at large steps. The observed position order therefore lies between 4 and 5 and falls toward 4 as h → 0, which is consistent with the circular case. At 1.25 s the e = 0.1 case reaches the round-off and reference-uncertainty floor: its energy drift is ~100 ε and its position error is ~10× the reference uncertainty. The orders there are not meaningful.
 
-**PA-03 criterion (proposed):**
+**PA-03 criterion (approved 2026-11-03):**
 
 - Use steps of 20, 10, and 5 s, all well above the floors.
 - Errors must decrease strictly.
 - Each observed position order must lie in **[3.9, 5.1]**. That is the theoretical band [4, 5] with a ±0.1 margin. The measured values were 4.32–4.58.
 
-### B.2.4 Tolerance-derivation rule and PA-01/PA-02 tolerances (proposed)
+### B.2.4 Tolerance-derivation rule and PA-01/PA-02 tolerances (approved 2026-11-03)
 
 **Rule:**
 
@@ -123,7 +123,33 @@ The study used 20 000 random chiefs and deputies:
 - **Chiefs:** a ∈ R⊕ + [200, 2000] km, e ∈ [0, 0.02], with any orientation.
 - **Deputies:** within ±100 km and ±100 m/s of the chief.
 
-The worst ECI→RIC→ECI round-trip errors were 1.2e-10 m and 1.1e-13 m/s. That is **0.077 ε‖r_c‖** and **0.074 ε‖v_c‖** (ε = 2.2e-16). The proposed tolerance is **0.5 ε‖x_c‖**, about 6.5× the observed worst case. A wider margin than the 2× rule is used because Hypothesis searches inputs adversarially beyond the study sample.
+The worst ECI→RIC→ECI round-trip errors were 1.2e-10 m and 1.1e-13 m/s. That is **0.077 ε‖r_c‖** and **0.074 ε‖v_c‖** (ε = 2.2e-16). The approved tolerance is **0.5 ε‖x_c‖**, about 6.5× the observed worst case. A wider margin than the 2× rule is used because Hypothesis searches inputs adversarially beyond the study sample.
+
+## B.3 GCRS ↔ ITRS reference-error study (2026-11-03)
+
+**Reproduce:** `uv run python scripts/studies/itrs_reference_errors.py`. It is deterministic and takes about 40 s.
+
+**Data:** `astropy-iers-data==0.2026.11.2.0.34.55; pyerfa==2.0.1.5` (Astropy 8.0.2), offline.
+
+**Samples:** two epochs, the reference 2025-06-01 and the candidate storm epoch 2024-05-10. Each has 2 000 random LEO states (a ∈ R⊕ + [200, 2000] km, e ≤ 0.02, any orientation) at random times within +30 days.
+
+The transform is Astropy's, so a round trip alone would only test self-consistency. The checks therefore also compare against **independent formulas** that share no code with Astropy:
+
+| Check | Independent reference | Expected agreement (analytic) | Observed worst (both epochs) | Tolerance (DL-019) |
+|---|---|---|---|---|
+| Round trip, position | identity | float64 round-off | 3.8 ε‖r‖ (5.6e-9 m) | **20 ε‖r‖**: ~5× margin, because Hypothesis searches adversarially |
+| Round trip, velocity | identity | round-off of Astropy's finite-difference velocity transform | 9.6e-9 m/s | **5e-8 m/s**: ~5× margin, same reason |
+| Earth rotation | ITRS longitude of the GCRS x-axis = −ERA(UT1), using ERA from IERS Conventions 2010 eq. 5.15 | second order in the ~0.14° pole offset, plus polar motion; ≲ 3e-6 rad | 9.4e-8 rad | **2e-7 rad**. This catches using UTC instead of UT1, which would give ~2e-6 rad |
+| Pole offset | angle between the GCRS and ITRS z-axes vs the IAU 2006 CIP X, Y polynomial (eq. 5.16), with nutation and polar motion omitted | nutation (≈ 17.2″·sin ε + 9.2″) and polar motion (≲ 0.6″), so ≲ 8″ | 2.39″ (the measured pole angle is 486–513″) | **5″**. This catches using a frame without precession (e.g. CIRS/TETE confusion), which would be off by ~500″ |
+| ITRS velocity | central finite difference (h = 0.1 s) of ITRS positions, with states at t ± h from the analytic Kepler reference | finite-difference truncation, about h²·‖jerk‖/6 ≈ 1.5e-5 m/s | 2.3e-5 m/s | **5e-5 m/s** |
+
+**Time-scale checks** (`tests/unit/test_timescales.py`) use exact or defining values rather than studied tolerances:
+
+- TT − UTC = 69.184 s at the reference epoch.
+- |UT1 − UTC| < 0.9 s.
+- Crossing the leap second at 2016-12-31T23:59:60Z works correctly.
+- 1 ns resolution is kept after 24 h (Astropy's precision is about 10 ps).
+- Times outside the bundled table raise an error.
 
 ### Sign-off
 
@@ -131,4 +157,5 @@ The worst ECI→RIC→ECI round-trip errors were 1.2e-10 m and 1.1e-13 m/s. That
 |---|---|---|
 | Test list PA-01 … PA-10 | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | Tolerance policy (set only from reference studies) | ☑ approved — Abdullah Muzher | 2026-11-03 |
-| D0 derived tolerances, PA-03 order band, and derivation rule (§B.2.3–§B.2.5) | ☐ pending owner review | — |
+| D0 derived tolerances, PA-03 order band, and derivation rule (§B.2.3–§B.2.5) | ☑ approved — Abdullah Muzher | 2026-11-03 |
+| ITRS (PA-04) tolerances and independent checks (§B.3) | ☐ pending owner review | — |

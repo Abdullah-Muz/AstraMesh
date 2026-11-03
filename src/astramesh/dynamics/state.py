@@ -24,7 +24,7 @@ class Frame(StrEnum):
     """Reference frames (``docs/CONVENTIONS.md`` §3)."""
 
     GCRS = "GCRS"  # inertial (ECI)
-    ITRS = "ITRS"  # Earth-fixed (not implemented yet)
+    ITRS = "ITRS"  # Earth-fixed (see astramesh.dynamics.earth_frames)
     RIC = "RIC"  # local orbital frame of a chief spacecraft; states are relative
 
 

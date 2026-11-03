@@ -15,9 +15,11 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Astronomy",
     "Topic :: Scientific/Engineering :: Physics",
 ]
-# Phase 0 runtime dependencies only. Add new ones per phase, and only when a
-# tested requirement needs them (ASTRAMESH_MASTER_SPEC.md §11).
+# Runtime dependencies. Add new ones per phase, and only when a tested
+# requirement needs them (ASTRAMESH_MASTER_SPEC.md §11). Phase 1 adds Astropy
+# (time scales, GCRS/ITRS; DL-020).
 dependencies = [
+    "astropy>=7.0",
     "numpy>=2.1",
     "pydantic>=2.9",
     "pyyaml>=6.0.2",
@@ -80,3 +82,9 @@ warn_unreachable = true
 [[tool.mypy.overrides]]
 module = ["hypothesis.*"]
 follow_untyped_imports = true
+
+# Astropy ships no py.typed marker; treat it as untyped (Any) rather than
+# analysing its sources. Our wrappers convert its outputs to typed NumPy arrays.
+[[tool.mypy.overrides]]
+module = ["astropy", "astropy.*"]
+ignore_missing_imports = true

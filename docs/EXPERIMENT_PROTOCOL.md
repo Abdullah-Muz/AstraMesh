@@ -18,7 +18,7 @@ Each run directory contains:
 | `config.resolved.json` | Yes | The validated configuration, canonical JSON |
 | `manifest.json` | No (contains wall-clock `run_timestamp_utc`) | Provenance record listing the SHA-256 of the three files above |
 
-`manifest.json` fields: `experiment_id`, `scenario_id`, `run_timestamp_utc`, `git_commit`, `git_dirty`, `config_hash`, `seed`, `stream_seeds`, `dynamics_model`, `science_data_version`, `telemetry_data_version`, `algorithm`, `software_lockfile_hash`, `software` (Python, platform, package versions), `artifacts`.
+`manifest.json` fields: `experiment_id`, `scenario_id`, `run_timestamp_utc`, `git_commit`, `git_dirty`, `config_hash`, `seed`, `stream_seeds`, `dynamics_model`, `science_data_version`, `telemetry_data_version`, `algorithm`, `software_lockfile_hash`, `software` (Python, platform, package versions — `astropy-iers-data` is the Earth-orientation/IERS data version), `artifacts`.
 
 **Rule:** a result may be reported only if its manifest has `git_dirty: false` (run from a committed tree) and every data version it depends on is recorded. `results/` is Git-ignored; archive reported runs separately (to be decided, spec §11 mentions DVC/MLflow as later options).
 

@@ -1,7 +1,6 @@
 """Truth dynamics: physical constants, frame-tagged states, orbital elements,
 the analytic two-body (Kepler) reference, the numerical two-body propagator,
-and local-orbital (RIC) frame transforms.
+local-orbital (RIC) frame transforms, time scales, and GCRS <-> ITRS transforms.
 
-Phase 1, dynamics level D0 (spec §4.1). J2, drag, and Earth-fixed (ITRS)
-transforms are not implemented yet.
+Phase 1, dynamics level D0 (spec §4.1). J2 and drag are not implemented yet.
 """

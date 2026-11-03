@@ -11,8 +11,8 @@ two-body motion):
     rho     = A (r_d - r_c)
     rho_dot = A ((v_d - v_c) - omega x (r_d - r_c))
 
-where ``A`` has rows R, I, C. Earth-fixed (ITRS) transforms are not
-implemented yet (they need Astropy, per ``docs/CONVENTIONS.md`` §2.2).
+where ``A`` has rows R, I, C. Earth-fixed (ITRS) transforms are in
+:mod:`astramesh.dynamics.earth_frames`.
 """
 
 from __future__ import annotations

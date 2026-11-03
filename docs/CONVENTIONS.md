@@ -38,10 +38,15 @@ Gate P0 requires the "exact simulation epoch/frames/units" to be specified. This
 - The epoch is given as ISO 8601 UTC with an explicit `Z` (or `+00:00`) designator. Naive or non-UTC timestamps are rejected.
 - `t_s` in outputs is derived from `t_ns` for readability; `t_ns` is authoritative.
 
-### 2.2 Calendar conversion — APPROVED (Phase 1)
+### 2.2 Calendar conversion — APPROVED; IMPLEMENTED (`astramesh.dynamics.timescales`, Phase 1 increment 2)
 
 - Converting `epoch + elapsed SI seconds` to a UTC calendar time requires a leap-second table. Phase 0 code intentionally provides **no** such conversion.
 - Phase 1 will use **Astropy `Time`** for all time-scale conversions (UTC ↔ TAI ↔ TT ↔ UT1). The scenario epoch is interpreted as UTC and converted to TT for dynamics; Earth-rotation conversions use UT1 with Astropy's IERS data, whose version must be recorded in the run manifest.
+- *Implementation notes:*
+  - `scenario_time(epoch_utc, t_ns)` adds elapsed SI seconds to the UTC epoch through TAI, so leap seconds are handled; this is tested across 2016-12-31T23:59:60Z.
+  - Earth-orientation and leap-second data come only from the locked `astropy-iers-data` and `pyerfa` packages; downloads are disabled.
+  - The manifest's `software.packages` records `astropy-iers-data`; its version is the IERS data version.
+  - Beyond the end of its bundled table, Astropy silently reuses the last UT1−UTC value. To prevent that, `require_eop_coverage` raises for any time outside the table. IERS-A *predictions* are accepted (DL-020).
 
 ### 2.3 Reference epoch — APPROVED
 

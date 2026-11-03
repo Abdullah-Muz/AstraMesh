@@ -19,7 +19,15 @@ from pathlib import Path
 from typing import Any
 
 MANIFEST_VERSION = 1
-_TRACKED_PACKAGES = ("astramesh", "numpy", "pydantic", "pyyaml")
+_TRACKED_PACKAGES = (
+    "astramesh",
+    "numpy",
+    "pydantic",
+    "pyyaml",
+    "astropy",
+    "astropy-iers-data",
+    "pyerfa",
+)
 
 
 def sha256_file(path: Path) -> str:
