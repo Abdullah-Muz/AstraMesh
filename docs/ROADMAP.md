@@ -6,8 +6,8 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 
 | Phase | Focus | Status |
 |---|---|---|
-| 0 | Research and reproducibility foundation | **In progress** |
-| 1 | Validated four-spacecraft dynamics and mission geometry | Not started |
+| 0 | Research and reproducibility foundation | **Complete except** Priority A full-text review (proceeding in parallel, DL-016) |
+| 1 | Validated four-spacecraft dynamics and mission geometry | Approved to start (DL-016) |
 | 2 | Decentralized nominal science operations | Not started |
 | 3 | Deterministic faults and protection supervisor | Not started |
 | 4 | External data and probabilistic/ML experiments | Not started |
