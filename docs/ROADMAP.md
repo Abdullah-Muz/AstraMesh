@@ -9,7 +9,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 0 | Research and reproducibility foundation | **Complete except** Priority A full-text review (8 of 10 items drafted from full text, owner verification pending; P01 unavailable, P21 paywalled; see `LITERATURE_REVIEW.md`) |
 | 1 | Validated four-spacecraft dynamics and mission geometry | **Complete**: Gate P1 signed off 2026-11-03 (DL-037); open follow-ups listed there |
 | 2 | Decentralized nominal science operations | **Complete**: Gate P2 signed off 2026-11-03 (DL-049); open follow-ups listed there |
-| 3 | Deterministic faults and protection supervisor | **In progress** (DL-050) |
+| 3 | Deterministic faults and protection supervisor | **Complete**: Gate P3 signed off 2026-11-04 (DL-061); open follow-ups listed there |
 | 4 | External data and probabilistic/ML experiments | Not started |
 | 5 | Storm-aware distributed recovery | Not started |
 | 6 | Research conclusion and public demonstration | Not started |
@@ -58,15 +58,15 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 2 | Health beliefs (§5.4), timeout baseline, B4 fault-aware redistribution, B3 + timeout | **Done**: commit `362d648`, CI passing |
 | 3 | Supervisor NOMINAL/PROTECTIVE/SAFE, command filtering, planner cannot override | **Done**: commit `85b8cff`, CI passing |
 | 4 | Full five-mode machine: STORM_WATCH, RECOVERY, three risk dimensions, hysteresis, dwell, invalid-input policy | **Done**: commit `e3c675f`, CI passing |
-| 5 | Fault-scenario comparison (S01–S10; S06 deferred) | **Done**: script `bb2ea8e`, B4 fix `311477a` (DL-059), 600-run results in [`docs/results/FAULT_COMPARISON.md`](results/FAULT_COMPARISON.md) (DL-060); awaiting review |
+| 5 | Fault-scenario comparison (S01–S10; S06 deferred) | **Done**: script `bb2ea8e`, B4 fix `311477a` (DL-059), 600-run results in [`docs/results/FAULT_COMPARISON.md`](results/FAULT_COMPARISON.md) (DL-060); reviewed and approved 2026-11-04 |
 
 ## Gate P3 checklist (spec §13)
 
-- [ ] SAFE always overrides (increment 3: SAFE checked first; property test + override tests from every mode; ticks at sign-off)
-- [ ] Invalid forecast behaviour defined (DL-056: never releases a protected mode, never triggers PROTECTIVE alone, NOMINAL → STORM_WATCH after 10 min; tested)
-- [ ] No mode chatter under brief noise (five-mode machine: hysteresis on both watch and protect, 30 min release dwells, 5 min minimum recovery; 3 h jitter test gives one entry and no release)
-- [ ] False outage does not count as confirmed fatal failure (increment 2: CONFIRMED_FAILED only from ground notices; property test and 0 confirmations while available in all 600 fault-comparison runs, including the S04 false outage and the S05/S09 partitions; ticks at phase sign-off)
-- [ ] Distributed task replanning cannot defeat protection (increment 3: supervisor gates every payload command; property test with arbitrary messages and plan uplinks; payload steps in protected modes = 0 in all 600 fault-comparison runs, including S07–S10 with CBBA, B4 and B3 + timeout reallocating; S10 shows SAFE overriding PROTECTIVE)
+- [x] SAFE always overrides (increment 3: SAFE checked first; property test + override tests from every mode)
+- [x] Invalid forecast behaviour defined (DL-056: never releases a protected mode, never triggers PROTECTIVE alone, NOMINAL → STORM_WATCH after 10 min; tested)
+- [x] No mode chatter under brief noise (five-mode machine: hysteresis on both watch and protect, 30 min release dwells, 5 min minimum recovery; 3 h jitter test gives one entry and no release)
+- [x] False outage does not count as confirmed fatal failure (increment 2: CONFIRMED_FAILED only from ground notices; property test and 0 confirmations while available in all 600 fault-comparison runs, including the S04 false outage and the S05/S09 partitions)
+- [x] Distributed task replanning cannot defeat protection (increment 3: supervisor gates every payload command; property test with arbitrary messages and plan uplinks; payload steps in protected modes = 0 in all 600 fault-comparison runs, including S07–S10 with CBBA, B4 and B3 + timeout reallocating; S10 shows SAFE overriding PROTECTIVE)
 
 ## Gate P2 checklist (spec §13)
 
