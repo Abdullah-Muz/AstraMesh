@@ -45,8 +45,8 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | # | Increment | Status |
 |---|---|---|
 | 1 | Isolated `SpacecraftAgent`s, message schema, NetworkX G(t) crosslinks, SimPy kernel, acceptance rules, isolation tests (`agent_network` scenario) | **Done**: commit `414bf2d`, CI passing; values and acceptance rules (DL-040) approved 2026-11-03 |
-| 2a | Task catalogue and utility (DL-041), live battery/storage truth, agent plan execution with resource checks, truth scoring, B0 static scheduler, S00 scenario (`nominal_operations`) | Implemented (`configs/experiments/nominal_ops_b0_24h.yaml`); DL-043 awaiting approval |
-| 2b | B1 centralized reference (SciPy `milp`, DL-042) | Not started |
+| 2a | Task catalogue and utility (DL-041), live battery/storage truth, agent plan execution with resource checks, truth scoring, B0 static scheduler, S00 scenario (`nominal_operations`) | **Done**: commit `a48de98`, CI passing; DL-043 approved 2026-11-03 |
+| 2b | B1 centralized reference (SciPy `milp`, DL-042, DL-044) | Implemented (`configs/experiments/nominal_ops_b1_24h.yaml`) |
 | 3 | B2 auction, B3 CBBA | Unblocked: P06 (CBBA) read and specified (`literature/P06.md` §3); starts after increment 2 |
 | 4 | Nominal S00 comparison on identical tasks and resources | Not started |
 
@@ -54,7 +54,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 
 - [ ] Each agent acts only on local state/delivered messages (increment 1: static and dynamic isolation tests in `tests/agent_isolation/`)
 - [ ] No privileged leakage (increment 1 tests; to be extended to task and plan data)
-- [ ] Baseline comparisons operate on identical tasks/resources (increment 4)
+- [ ] Baseline comparisons operate on identical tasks/resources (B0 and B1 share the catalogue, slots, network and random streams, which a test checks; full comparison in increment 4)
 - [ ] Unhandled network messages cannot alter plans (increment 1: acceptance rules + property test; to be re-checked once plans exist)
 
 ## Gate P1 checklist (spec §13)

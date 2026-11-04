@@ -22,6 +22,7 @@ class Plan:
     assignments: tuple[Assignment, ...]
     unassigned: tuple[str, ...]  # task IDs no spacecraft could take
     privileged_information: bool  # True for references that use truth (B1)
+    excluded: tuple[str, ...] = ()  # (task@spacecraft) options a planner ruled out, e.g. energy
 
     def for_spacecraft(self, spacecraft: str) -> tuple[Assignment, ...]:
         return tuple(a for a in self.assignments if a.spacecraft == spacecraft)

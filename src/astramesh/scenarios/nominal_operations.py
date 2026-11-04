@@ -25,12 +25,16 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+import numpy as np
+from numpy.typing import NDArray
+
 from astramesh.agents.agent import AgentSettings, SpacecraftAgent
 from astramesh.agents.packets import Housekeeping, PlannedObservation, PlanUplink
 from astramesh.core.clock import seconds_to_ns
 from astramesh.core.config import NominalOperationsScenario
 from astramesh.core.events import EventLog
 from astramesh.core.rng import RandomStreams
+from astramesh.planning.centralized_b1 import EnergyModel, plan_centralized
 from astramesh.planning.plans import Plan
 from astramesh.planning.static_b0 import plan_static
 from astramesh.resources.ledgers import Battery, data_volume_mb
@@ -44,7 +48,6 @@ from astramesh.scenarios.formation_dynamics import (
 from astramesh.scenarios.mission_geometry import geometry_products
 from astramesh.science.tasks import Task, catalog_from_opportunities
 
-ALGORITHMS = {"static_b0": "B0-static-greedy"}
 PLAN_FILE = "plan.json"
 OBSERVATIONS_FILE = "observations.json"
 
@@ -82,14 +85,37 @@ class OperationsRun:
     agents: dict[str, SpacecraftAgent] = field(default_factory=dict)
 
 
-def _plan(config: NominalOperationsScenario, catalog: tuple[Task, ...], ids: list[str],
-          n_steps: int, n_ticks: int, mb_per_step: float) -> Plan:  # fmt: skip
+def _plan(
+    config: NominalOperationsScenario,
+    catalog: tuple[Task, ...],
+    ids: list[str],
+    sunlit: NDArray[np.bool_],
+    n_steps: int,
+    n_ticks: int,
+    mb_per_step: float,
+) -> Plan:
+    sc = config.spacecraft
+    common = {
+        "n_steps": n_steps,
+        "n_ticks": n_ticks,
+        "storage_capacity_mb": sc.storage_capacity_mb,
+        "data_mb_per_step": mb_per_step,
+    }
     if config.operations.algorithm == "static_b0":
-        return plan_static(
-            catalog, ids, n_steps=n_steps, n_ticks=n_ticks,
-            storage_capacity_mb=config.spacecraft.storage_capacity_mb,
-            data_mb_per_step=mb_per_step,
-        )  # fmt: skip
+        return plan_static(catalog, ids, **common)  # type: ignore[arg-type]
+    if config.operations.algorithm == "centralized_b1":
+        energy = EnergyModel(
+            sunlit=sunlit,
+            step_s=config.time.time_step_s,
+            capacity_wh=sc.battery_capacity_wh,
+            initial_fraction=sc.battery_initial_fraction,
+            charge_efficiency=sc.charge_efficiency_fraction,
+            generation_w=sc.solar_generation_w,
+            bus_w=sc.bus_power_w,
+            payload_w=sc.payload_power_w,
+            reserve_fraction=config.operations.battery_reserve_fraction,
+        )
+        return plan_centralized(catalog, ids, energy=energy, **common)  # type: ignore[arg-type]
     raise ValueError(f"unknown algorithm {config.operations.algorithm!r}")  # pragma: no cover
 
 
@@ -108,6 +134,7 @@ def plan_to_dict(plan: Plan, step_ns: int) -> dict[str, Any]:
             for a in plan.assignments
         ],
         "unassigned": list(plan.unassigned),
+        "excluded": list(plan.excluded),
     }
 
 
@@ -127,12 +154,13 @@ def run_nominal_operations(
     catalog = catalog_from_opportunities(geo.opportunities)
     by_id = {t.task_id: t for t in catalog}
 
-    plan = _plan(config, catalog, ids, n_steps, n_ticks, mb_per_step)
+    plan = _plan(config, catalog, ids, geo.sunlit, n_steps, n_ticks, mb_per_step)
     log.record(tick=0, time_ns=0, source="planner", kind="plan_made",
                data={"algorithm": plan.algorithm, "version": plan.version,
                      "privileged_information": plan.privileged_information,
                      "n_tasks": len(catalog), "n_assigned": len(plan.assignments),
-                     "unassigned": list(plan.unassigned)})  # fmt: skip
+                     "unassigned": list(plan.unassigned),
+                     "excluded": list(plan.excluded)})  # fmt: skip
 
     settings = AgentSettings(
         status_interval_ns=seconds_to_ns(config.agents.status_interval_s),

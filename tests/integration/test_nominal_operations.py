@@ -122,3 +122,23 @@ def test_operations_agents_stay_isolated(ops_config_dict: dict[str, Any]) -> Non
             assert not isinstance(obj, SpacecraftAgent) or obj is agent
     summary = json.dumps(run.summary)
     assert "privileged_information" in summary
+
+
+def test_b1_reference_never_aborts_for_power_and_matches_or_beats_b0(
+    ops_config_dict: dict[str, Any],
+) -> None:
+    """With truth illumination B1 excludes observations the battery cannot support,
+    so none aborts for power, and its utility is at least B0's on identical tasks."""
+    starved = {
+        "spacecraft__solar_generation_w": 0.0,
+        "spacecraft__battery_capacity_wh": 10.0,
+        "operations__battery_reserve_fraction": 0.2,
+    }
+    b1 = _run(_cfg(ops_config_dict, hours=12, operations__algorithm="centralized_b1", **starved))
+    b0 = _run(_cfg(ops_config_dict, hours=12, **starved))
+    assert b1.plan.privileged_information
+    assert b1.plan.excluded
+    assert not [s for s in b1.segments if s.aborted == "power"]
+    assert not any(b1.summary["operations"]["declined"].values())
+    assert b1.summary["operations"]["utility"] >= b0.summary["operations"]["utility"]
+    assert [t.task_id for t in b1.catalog] == [t.task_id for t in b0.catalog]

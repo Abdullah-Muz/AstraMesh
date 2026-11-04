@@ -82,6 +82,8 @@ New sensor packets (`agents/packets.py`):
 
 Each refusal is logged as `observation_declined` with a reason. The simulator applies the command to the **true** battery and storage, and scores the observations against truth (`scenarios/nominal_operations.py`).
 
+B0 and B1 are both *external* planners: the plan is made outside the agents and uplinked. B1 additionally uses truth illumination and is flagged `privileged_information` in `plan.json`, the events and the summary. Agents execute either plan with the same resource checks.
+
 ### 7. Not yet implemented
 
-B1–B3 allocation, inter-agent task messages, health beliefs (§5.4), estimators beyond the latest fix, safety supervisor. Each will be added behind the same boundary.
+B2–B3 allocation, inter-agent task messages, health beliefs (§5.4), estimators beyond the latest fix, safety supervisor. Each will be added behind the same boundary.

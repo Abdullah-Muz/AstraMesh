@@ -290,7 +290,9 @@ class AgentNetworkScenario(FormationScenarioBase):
 class OperationsConfig(_Model):
     """Nominal science operations (Phase 2 increment 2; DL-041, DL-043)."""
 
-    algorithm: Literal["static_b0"] = Field(description="Allocation method (B1-B3 added later)")
+    algorithm: Literal["static_b0", "centralized_b1"] = Field(
+        description="static_b0 = B0 static greedy; centralized_b1 = B1 MILP reference (privileged)"
+    )
     min_observation_s: PositiveSeconds = Field(
         description="Continuous observation needed to complete a task [s] (DL-041: 60 s)"
     )
