@@ -11,13 +11,13 @@ from hypothesis import strategies as st
 from astramesh.agents.agent import AgentSettings, SpacecraftAgent
 from astramesh.agents.packets import (
     CatalogUplink,
-    ExposureForecast,
     Housekeeping,
     OwnTask,
     PlannedObservation,
     PlanUplink,
     PublicSlot,
     PublicTask,
+    RiskForecast,
 )
 from astramesh.communications.messages import Delivery, Message, MessageType
 
@@ -35,10 +35,10 @@ def test_protective_mode_blocks_planned_observation_and_stops_running_one() -> N
     a = SpacecraftAgent("sc00", ("sc01",), SET)
     a.observe(PlanUplink(0, "B0-static-greedy", 1, (PlannedObservation("T1", 0, 60 * S),)))
     a.observe(_hk(0))
-    a.observe(ExposureForecast(0, 0.1))
+    a.observe(RiskForecast(0, 0.1, 0.1, 0.1))
     assert a.payload_command(0, STEP, 0.1) == "T1"
     a.observe(_hk(STEP))
-    a.observe(ExposureForecast(STEP, 1.3))
+    a.observe(RiskForecast(STEP, 1.3, 0.1, 0.1))
     assert a.payload_command(STEP, STEP, 0.1) is None
     assert a.mode == "PROTECTIVE"
     assert a.execution_view()["declined"] == {"T1": "protection_protective"}
@@ -51,7 +51,7 @@ def test_cbba_agent_releases_claims_and_stops_bidding_when_protected() -> None:
     a.step(0)
     assert [o.task_id for o in a.planned_observations()] == ["T1"]
     a.observe(_hk(STEP))
-    a.observe(ExposureForecast(STEP, 2.0))
+    a.observe(RiskForecast(STEP, 2.0, 0.1, 0.1))
     a.payload_command(STEP, STEP, 0.1)
     assert a.planned_observations() == ()
     msgs = a.step(2 * STEP)
@@ -87,7 +87,7 @@ def test_no_message_or_plan_can_reactivate_a_protected_payload(
     a = SpacecraftAgent("sc00", ("sc01", "sc02"), SET)
     a.observe(CatalogUplink(0, "B3-cbba", ("T1",), (OwnTask("T1", 3, 0, 600 * S, 0.1),), 10.0))
     a.observe(_hk(0, flags=("F1",)))  # critical flag: SAFE
-    a.observe(ExposureForecast(0, 0.0))
+    a.observe(RiskForecast(0, 0.0, 0.1, 0.1))
     assert a.payload_command(0, STEP, 0.1) is None
     a.receive_messages(batch)
     a.observe(PlanUplink(STEP, "B0-static-greedy", version + 100,

@@ -41,15 +41,21 @@ from astramesh.agents.health import (
 )
 from astramesh.agents.packets import (
     CatalogUplink,
-    ExposureForecast,
     GroundNotice,
     Housekeeping,
     NavigationFix,
     PlannedObservation,
     PlanUplink,
     PublicTask,
+    RiskForecast,
 )
-from astramesh.agents.supervisor import NOMINAL, Supervisor, SupervisorSettings
+from astramesh.agents.supervisor import (
+    NOMINAL,
+    STORM_WATCH,
+    TASKING_MODES,
+    Supervisor,
+    SupervisorSettings,
+)
 from astramesh.communications.messages import Delivery, Message, MessageType
 
 REJECT_REASONS = (
@@ -82,6 +88,9 @@ class AgentSettings:
     auction_deadline_ns: int = 5_000_000_000  # B2 decides at the first round at/after this
     health: HealthSettings = DEFAULT_HEALTH
     supervisor: SupervisorSettings = DEFAULT_SUPERVISOR
+    watch_status_interval_ns: int = 10 * 10**9  # STORM_WATCH monitoring (DL-056)
+    recovery_nav_max_age_ns: int = 60 * 10**9
+    recovery_peer_heard_ns: int = 90 * 10**9
 
     def __post_init__(self) -> None:
         if self.status_interval_ns <= 0 or self.status_lifetime_ns <= 0:
@@ -125,7 +134,7 @@ class SpacecraftAgent:
     _health: HealthTracker | None = None
     _sup: Supervisor | None = None
     _sup_seen: int = 0
-    _forecast: ExposureForecast | None = None
+    _forecast: RiskForecast | None = None
     _history_seen: int = 0
     _public: dict[str, PublicTask] = field(default_factory=dict)
     _reassigned: set[str] = field(default_factory=set)
@@ -147,7 +156,7 @@ class SpacecraftAgent:
         | PlanUplink
         | CatalogUplink
         | GroundNotice
-        | ExposureForecast,
+        | RiskForecast,
     ) -> None:
         if isinstance(packet, NavigationFix):
             if self._nav is None or packet.t_ns >= self._nav.t_ns:
@@ -189,7 +198,7 @@ class SpacecraftAgent:
                     "n_observations": len(self._plan),
                 }
             )
-        elif isinstance(packet, ExposureForecast):
+        elif isinstance(packet, RiskForecast):
             if self._forecast is None or packet.t_ns >= self._forecast.t_ns:
                 self._forecast = packet
         elif isinstance(packet, GroundNotice):
@@ -210,7 +219,8 @@ class SpacecraftAgent:
         started it continues until the planned stop unless housekeeping shows an
         empty battery or full storage. It never acts on another agent's state.
 
-        The protection supervisor is consulted first (DL-054): outside NOMINAL the
+        The protection supervisor is consulted first (DL-054/056): outside NOMINAL and
+        STORM_WATCH the
         payload stays off and any running observation stops, whatever the plan says.
         """
         if not self._supervise(now_ns):  # protection first: the planner cannot override it
@@ -262,13 +272,15 @@ class SpacecraftAgent:
             now_ns,
             battery_fraction=frac,
             critical_flags=hk.critical_flags if hk else (),
-            exposure_ratio=self._forecast.exposure_ratio if self._forecast else None,
+            risks=self._forecast.as_mapping() if self._forecast else {},
             forecast_enabled=self._forecast is not None,
+            recovery_checks_ok=self._recovery_checks_ok(now_ns),
         )
         for t, old, new, why in sup.history[self._sup_seen :]:
             self._log.append({"kind": "mode_changed", "from": old, "to": new, "reason": why,
                               "t_ns": t})  # fmt: skip
-            if old == NOMINAL and isinstance(self._alloc, CbbaState):
+            leaving = old in TASKING_MODES and new not in TASKING_MODES
+            if leaving and isinstance(self._alloc, CbbaState):
                 self._alloc.release_all()  # stop claiming; peers re-auction (DL-054)
                 self._refresh_plan(now_ns)
         self._sup_seen = len(sup.history)
@@ -276,6 +288,27 @@ class SpacecraftAgent:
             self._log.append({"kind": "supervisor_note", "note": note, "t_ns": t})
         sup.notes.clear()
         return sup.allows_payload()
+
+    def _recovery_checks_ok(self, now_ns: int) -> bool:
+        """RECOVERY -> NOMINAL checks from own state (DL-056): battery above the science
+        reserve, a fresh navigation fix, and contact with a peer if any is believed up."""
+        st = self.settings
+        hk = self._hk
+        if hk is None or hk.battery_wh < st.battery_reserve_fraction * hk.battery_capacity_wh:
+            return False
+        if self._nav is None or now_ns - self._nav.t_ns > st.recovery_nav_max_age_ns:
+            return False
+        if self._health is None:
+            return True
+        up = [p for p, b in self._health.beliefs().items()
+              if b in ("HEALTHY", "DEGRADED", "RECOVERING")]  # fmt: skip
+        if not up:
+            return True
+        return any(
+            (h := self._peer_table[p].last_heard_ns) is not None
+            and now_ns - h <= st.recovery_peer_heard_ns
+            for p in up
+        )
 
     def _decline(self, obs: PlannedObservation, reason: str) -> str | None:
         """Record that a planned observation will not be made; always returns None."""
@@ -354,7 +387,7 @@ class SpacecraftAgent:
             if isinstance(mode, str):
                 was = rec.reported_mode
                 rec.reported_mode = mode
-                if (mode != NOMINAL and was in (None, NOMINAL)
+                if (mode not in TASKING_MODES and was in (None, *TASKING_MODES)
                         and self._plan_algorithm == "B4-rule-redistribution"):  # fmt: skip
                     self._respond_to_loss(m.sender, d.delivered_ns)
 
@@ -366,7 +399,9 @@ class SpacecraftAgent:
             self._after_health_change(now_ns)
         if now_ns >= self._next_status_ns:
             self._outbox.append(self._status(now_ns))
-            self._next_status_ns = now_ns + self.settings.status_interval_ns
+            interval = (self.settings.watch_status_interval_ns if self.mode == STORM_WATCH
+                        else self.settings.status_interval_ns)  # fmt: skip
+            self._next_status_ns = now_ns + interval
         self._allocation_round(now_ns)
         out, self._outbox = self._outbox, []
         return out
@@ -374,7 +409,7 @@ class SpacecraftAgent:
     def _allocation_round(self, now_ns: int) -> None:
         alloc = self._alloc
         if isinstance(alloc, CbbaState):
-            if self.mode == NOMINAL:  # a protected or safe spacecraft does not bid
+            if self.mode in TASKING_MODES:  # protected, recovering or safe: no bids
                 alloc.build_bundle(now_ns)
             self._refresh_plan(now_ns)
             self._outbox.append(self._message(now_ns, MessageType.PLAN_SYNC,
@@ -470,9 +505,9 @@ class SpacecraftAgent:
     def _can_take(self, sc: str, beliefs: dict[str, str]) -> bool:
         """B4: believed available for new tasks (health and reported mode)."""
         if sc == self.agent_id:
-            return self.mode == NOMINAL
+            return self.mode in TASKING_MODES
         rec = self._peer_table.get(sc)
-        mode_ok = rec is None or rec.reported_mode in (None, NOMINAL)
+        mode_ok = rec is None or rec.reported_mode in (None, *TASKING_MODES)
         return beliefs.get(sc) in AVAILABLE_BELIEFS and mode_ok
 
     def mode_history(self) -> list[tuple[int, str, str, str]]:

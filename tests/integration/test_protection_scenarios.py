@@ -4,6 +4,7 @@ SAFE and exit, invalid forecasts held; the payload is never on outside NOMINAL."
 from __future__ import annotations
 
 import copy
+import itertools
 from pathlib import Path
 from typing import Any
 
@@ -40,9 +41,12 @@ HAZARD: dict[str, Any] = {"environment": {"background_exposure_ratio": 0.1, "for
 def test_hazard_makes_sc00_protective_and_payload_never_runs_outside_nominal(algo: str) -> None:
     run, events = _run(algo, **HAZARD)
     p = run.summary["protection"]
-    assert sum(p["payload_steps_outside_nominal"].values()) == 0
+    assert sum(p["payload_steps_in_protected_modes"].values()) == 0
     tr = [(x["to"], x["t_s"]) for x in p["transitions"]["sc00"]]
-    assert tr == [("PROTECTIVE", 0.0), ("NOMINAL", 2 * H + 1800.0)]  # 30 min release dwell
+    # DL-056: watch and protect in one step; RECOVERY after the 30 min release dwell;
+    # NOMINAL after the 5 min minimum recovery once the checks pass.
+    assert tr == [("STORM_WATCH", 0.0), ("PROTECTIVE", 0.0), ("RECOVERY", 2 * H + 1800.0),
+                  ("NOMINAL", 2 * H + 2100.0)]  # fmt: skip
     assert not [s for s in run.segments if s.spacecraft == "sc00" and s.start_tick * 10 < 2.5 * H]
     assert any(e.kind == "mode_changed" and e.source == "sc00" for e in events)
 
@@ -63,10 +67,11 @@ def test_invalid_forecast_is_held_not_zero() -> None:
          "exposure_ratio": None}]}}  # fmt: skip
     run, events = _run("static_b0", hours=4, **env)
     tr = [(x["to"], x["t_s"]) for x in run.summary["protection"]["transitions"]["sc00"]]
-    # Invalid data from 1 h to 3 h: stays PROTECTIVE; release only 30 min after valid data.
-    assert tr == [("PROTECTIVE", 0.0), ("NOMINAL", 3 * H + 1800.0)]
+    # Invalid data from 1 h to 3 h: stays PROTECTIVE; RECOVERY only 30 min after valid data.
+    assert tr == [("STORM_WATCH", 0.0), ("PROTECTIVE", 0.0), ("RECOVERY", 3 * H + 1800.0),
+                  ("NOMINAL", 3 * H + 2100.0)]  # fmt: skip
     notes = [e for e in events if e.kind == "supervisor_note" and e.source == "sc00"]
-    assert [e.data["note"] for e in notes] == ["forecast_invalid_hold"]
+    assert [e.data["note"] for e in notes] == ["forecast_invalid:radiation"]
 
 
 def test_critical_fault_forces_safe_and_exit_waits_for_dwell() -> None:
@@ -79,6 +84,22 @@ def test_critical_fault_forces_safe_and_exit_waits_for_dwell() -> None:
     ]
     assert tr == [
         ("SAFE", H, "critical_flag:F1"),
-        ("NOMINAL", 2 * H + 600.0, "safe_exit_conditions_met"),
+        ("RECOVERY", 2 * H + 600.0, "safe_exit_conditions_met"),
+        ("NOMINAL", 2 * H + 900.0, "recovery_checks_passed"),
     ]
-    assert sum(run.summary["protection"]["payload_steps_outside_nominal"].values()) == 0
+    assert sum(run.summary["protection"]["payload_steps_in_protected_modes"].values()) == 0
+
+
+def test_navcomms_risk_gives_storm_watch_with_science_and_faster_status() -> None:
+    env = {"environment": {"background_exposure_ratio": 0.1, "forecasts": [
+        {"forecast_id": "NC", "dimension": "navcomms", "spacecraft": ["sc00"], "start_s": 0,
+         "end_s": H, "exposure_ratio": 0.9}]}}  # fmt: skip
+    run, _ = _run("static_b0", hours=3, **env)
+    tr = [(x["to"], x["t_s"]) for x in run.summary["protection"]["transitions"]["sc00"]]
+    assert tr == [("STORM_WATCH", 0.0), ("NOMINAL", H + 1800.0)]  # never PROTECTIVE
+    sends = [e["t_ns"] for e in run.trace if e["event"] == "send" and e["sender"] == "sc00"
+             and e["type"] == "status"]  # fmt: skip
+    in_watch = [t for t in sends if t < H * 10**9]
+    gaps = {b - a for a, b in itertools.pairwise(in_watch)}
+    assert gaps == {10 * 10**9}  # STORM_WATCH status every 10 s (DL-056)
+    assert sum(run.summary["protection"]["payload_steps_in_protected_modes"].values()) == 0

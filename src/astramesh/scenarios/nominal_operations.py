@@ -33,7 +33,6 @@ from astramesh.agents.agent import AgentSettings, SpacecraftAgent
 from astramesh.agents.health import AVAILABLE_BELIEFS, CONFIRMED, UNAVAILABLE_BELIEFS
 from astramesh.agents.packets import (
     CatalogUplink,
-    ExposureForecast,
     GroundNotice,
     Housekeeping,
     OwnTask,
@@ -41,8 +40,9 @@ from astramesh.agents.packets import (
     PlanUplink,
     PublicSlot,
     PublicTask,
+    RiskForecast,
 )
-from astramesh.agents.supervisor import MODES, NOMINAL, SupervisorSettings
+from astramesh.agents.supervisor import MODES, NOMINAL, SCIENCE_MODES, SupervisorSettings
 from astramesh.core.clock import seconds_to_ns
 from astramesh.core.config import NominalOperationsScenario
 from astramesh.core.events import EventLog
@@ -196,16 +196,22 @@ def supervisor_settings(config: NominalOperationsScenario) -> SupervisorSettings
         protect_ratio=sv.protect_exposure_ratio,
         release_ratio=sv.release_exposure_ratio,
         release_dwell_ns=seconds_to_ns(sv.release_dwell_s),
+        watch_ratio=sv.watch_enter_ratio,
+        watch_release_ratio=sv.watch_release_ratio,
+        watch_release_dwell_ns=seconds_to_ns(sv.watch_release_dwell_s),
+        invalid_to_watch_ns=seconds_to_ns(sv.invalid_to_watch_s),
+        recovery_min_dwell_ns=seconds_to_ns(sv.recovery_min_dwell_s),
     )
 
 
-def exposure_ratio(config: NominalOperationsScenario, sc: str, t_ns: int) -> float | None:
-    """Truth-side forecast service: scheduled exposure ratio for ``sc`` at ``t_ns``."""
+def risk_ratio(config: NominalOperationsScenario, sc: str, dim: str, t_ns: int) -> float | None:
+    """Truth-side forecast service: scheduled ratio for ``sc``, dimension ``dim``, at ``t_ns``."""
     env = config.environment
     assert env is not None
     t_s = t_ns / 1e9
     for fc in env.forecasts:  # first matching interval wins (config order)
-        if (not fc.spacecraft or sc in fc.spacecraft) and fc.start_s <= t_s < fc.end_s:
+        if (fc.dimension == dim and (not fc.spacecraft or sc in fc.spacecraft)
+                and fc.start_s <= t_s < fc.end_s):  # fmt: skip
             return fc.exposure_ratio
     return env.background_exposure_ratio
 
@@ -251,6 +257,9 @@ def run_nominal_operations(
         battery_reserve_fraction=config.operations.battery_reserve_fraction,
         health=health_settings(config),
         supervisor=supervisor_settings(config),
+        watch_status_interval_ns=seconds_to_ns(config.supervisor.watch_status_interval_s),
+        recovery_nav_max_age_ns=seconds_to_ns(config.supervisor.recovery_nav_max_age_s),
+        recovery_peer_heard_ns=seconds_to_ns(config.supervisor.recovery_peer_heard_s),
     )
     agents = {a: SpacecraftAgent(a, tuple(p for p in ids if p != a), settings) for a in ids}
     for a in ids:
@@ -322,11 +331,12 @@ def run_nominal_operations(
                                   sc.storage_capacity_mb, flags)  # fmt: skip
                 agents[a].observe(hk)
                 if config.environment is not None:
-                    agents[a].observe(ExposureForecast(t, exposure_ratio(config, a, t)))
+                    dims = ("radiation", "navcomms", "orbital")
+                    agents[a].observe(RiskForecast(t, *(risk_ratio(config, a, d, t) for d in dims)))
             if k == n_ticks - 1:
                 continue  # no step after the final tick
             cmd = None if down else agents[a].payload_command(t, step_ns, mb_per_step)
-            if cmd is not None and agents[a].mode != NOMINAL:  # truth check (Gate P3)
+            if cmd is not None and agents[a].mode not in SCIENCE_MODES:  # truth check (Gate P3)
                 protection_violations[a] += 1
             if a in active and active[a].task_id != cmd:
                 close(a, k)
@@ -494,8 +504,8 @@ def _health_metrics(
 
 def _protection_summary(agents: dict[str, SpacecraftAgent], ids: list[str], end_ns: int,
                         violations: dict[str, int]) -> dict[str, Any]:  # fmt: skip
-    """Time per mode and transitions per spacecraft; payload-on steps outside NOMINAL
-    (must be 0: the planner cannot defeat protection, Gate P3)."""
+    """Time per mode and transitions per spacecraft; payload-on steps in PROTECTIVE,
+    RECOVERY or SAFE (must be 0: the planner cannot defeat protection, Gate P3)."""
     time_s: dict[str, dict[str, float]] = {}
     transitions: dict[str, list[dict[str, Any]]] = {}
     for a in ids:
@@ -508,4 +518,4 @@ def _protection_summary(agents: dict[str, SpacecraftAgent], ids: list[str], end_
         time_s[a] = acc
         transitions[a] = [{"t_s": t / 1e9, "from": o, "to": n, "reason": w} for t, o, n, w in hist]
     return {"time_in_mode_s": time_s, "transitions": transitions,
-            "payload_steps_outside_nominal": violations}  # fmt: skip
+            "payload_steps_in_protected_modes": violations}  # fmt: skip

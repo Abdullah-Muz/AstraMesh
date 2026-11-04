@@ -1,6 +1,6 @@
 # Protection Modes and Safety Supervisor
 
-> **Owner:** Abdullah Muzher · **Status:** IN PROGRESS — NOMINAL / PROTECTIVE / SAFE implemented (Phase 3 increment 3); STORM_WATCH and RECOVERY in increment 4 · **Spec:** §6, §14.1 · **Target phase:** 3 · **Last updated:** 2026-11-04
+> **Owner:** Abdullah Muzher · **Status:** IMPLEMENTED — five-mode machine (Phase 3 increments 3–4) · **Spec:** §6, §14.1 · **Target phase:** 3 · **Last updated:** 2026-11-04
 
 ## Purpose
 
@@ -16,28 +16,40 @@ Specify the five-mode local supervisor (`NOMINAL`, `STORM_WATCH`, `PROTECTIVE`, 
 
 ## Content
 
-### Implemented (Phase 3 increment 3, DL-054, DL-055): `agents/supervisor.py`
+### Implemented: five-mode machine (`agents/supervisor.py`; DL-054–DL-057)
 
-The supervisor runs inside each agent, at the start of every `payload_command`. The science payload may run only in NOMINAL. Plans, catalogues and messages cannot change the mode; only the agent's own housekeeping and forecast can.
+The supervisor runs inside each agent, at the start of every `payload_command`. Science may run only in **NOMINAL** and **STORM_WATCH**. Plans, catalogues and messages cannot change the mode; only the agent's own housekeeping and risk forecast can.
 
-| From → To | Guard (PROVISIONAL values) | Effect |
-|---|---|---|
-| any → SAFE | own battery ≤ 10% of capacity, or any critical flag in own housekeeping (checked first) | payload off; a running observation stops; CBBA claims released |
-| SAFE → NOMINAL | no critical flag **and** battery ≥ 50%, held 10 min; a better forecast never clears SAFE | science may resume |
-| NOMINAL → PROTECTIVE | valid forecast exposure ratio ≥ 1.0 (exposure ÷ modelled payload tolerance) | payload suspended; nav, comms and health continue; claims released |
-| PROTECTIVE → NOMINAL | valid ratio < 0.8, held 30 min (hysteresis + dwell) | science may resume |
-| invalid forecast | hold the current mode; restart the release dwell; logged once per episode (never zero risk) | — |
+**Inputs:**
+- own battery and critical flags;
+- three separate risk ratios, never averaged: radiation/electronics, navigation/communications, orbital disturbance. Each is the predicted risk divided by that subsystem's modelled tolerance, and `null` means invalid;
+- recovery checks from the agent's own state.
 
-Mode goes in every status message. B4 and CBBA treat a non-NOMINAL peer as unavailable for new tasks, which is separate from its health belief.
+| From → To | Guard (PROVISIONAL defaults) |
+|---|---|
+| any → SAFE | battery ≤ 10% or any critical flag (checked first) |
+| SAFE → RECOVERY | no flag and battery ≥ 50%, held 10 min; never on forecast improvement |
+| NOMINAL → STORM_WATCH | any valid risk ≥ 0.6, or invalid forecast for more than 10 min |
+| STORM_WATCH → PROTECTIVE | valid **radiation** ≥ 1.0 (only radiation has a modelled vulnerable function) |
+| STORM_WATCH → NOMINAL | all risks valid and < 0.5, held 30 min |
+| PROTECTIVE → RECOVERY | valid radiation < 0.8, held 30 min |
+| RECOVERY → PROTECTIVE | valid radiation ≥ 1.0 |
+| RECOVERY → NOMINAL | ≥ 5 min in RECOVERY and checks pass: battery ≥ 20% reserve, navigation fix < 60 s old, a peer heard < 90 s ago (if any is believed up) |
+
+**Invalid inputs:** never release a protected mode (the dwell restarts), never trigger PROTECTIVE alone, and are logged once per episode.
+
+**Side effects:**
+- STORM_WATCH sends status every 10 s; science continues.
+- PROTECTIVE, RECOVERY and SAFE keep the payload off and release CBBA claims. Peers, told by the `mode` field in status messages, treat the spacecraft as unavailable for new tasks.
 
 **Tests:**
-- override from every mode and SAFE-exit conditions;
-- hysteresis and dwell, including restarts after spikes and invalid data;
-- no chatter under 2 h of jitter;
-- property tests: SAFE always wins, and the payload runs only in NOMINAL;
+- every guard;
+- property tests: SAFE always wins; SAFE and PROTECTIVE exit only via RECOVERY; PROTECTIVE is never entered straight from NOMINAL; the payload runs only in science modes;
+- no chatter under 3 h of jitter;
 - arbitrary messages and plan uplinks cannot reactivate a protected payload;
-- scenario truth check: payload steps outside NOMINAL = 0.
+- scenario truth check `payload_steps_in_protected_modes` = 0.
 
-### Still to do (increment 4)
+### Not modelled yet
 
-STORM_WATCH and RECOVERY, three separate risk dimensions, a full invalid-input policy, and the SAFE → RECOVERY path.
+- Effects of the navigation/comms and orbital risks on links and drag (Phase 5).
+- Real space-weather inputs (Phase 4).

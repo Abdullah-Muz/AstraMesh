@@ -56,15 +56,15 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 |---|---|---|
 | 1 | Fault schema and deterministic injection: unavailable, comms outage, partition, payload and power degradation; scenarios S01–S05 + power fault | **Done**: commit `9bcd8ee`, CI passing |
 | 2 | Health beliefs (§5.4), timeout baseline, B4 fault-aware redistribution, B3 + timeout | **Done**: commit `362d648`, CI passing |
-| 3 | Supervisor NOMINAL/PROTECTIVE/SAFE, command filtering, planner cannot override | Implemented (DL-054, DL-055) |
-| 4 | Full five-mode machine: STORM_WATCH, RECOVERY, hysteresis, dwell, invalid-input rules | Not started |
+| 3 | Supervisor NOMINAL/PROTECTIVE/SAFE, command filtering, planner cannot override | **Done**: commit `85b8cff`, CI passing |
+| 4 | Full five-mode machine: STORM_WATCH, RECOVERY, three risk dimensions, hysteresis, dwell, invalid-input policy | Implemented (DL-056, DL-057) |
 | 5 | Fault-scenario comparison (S01–S10) | Not started |
 
 ## Gate P3 checklist (spec §13)
 
 - [ ] SAFE always overrides (increment 3: SAFE checked first; property test + override tests from every mode; ticks at sign-off)
-- [ ] Invalid forecast behaviour defined (increment 3: hold mode, restart release dwell, log once per episode; full policy in increment 4)
-- [ ] No mode chatter under brief noise (increment 3: hysteresis + 30 min release dwell, tested; full five-mode machine in increment 4)
+- [ ] Invalid forecast behaviour defined (DL-056: never releases a protected mode, never triggers PROTECTIVE alone, NOMINAL → STORM_WATCH after 10 min; tested)
+- [ ] No mode chatter under brief noise (five-mode machine: hysteresis on both watch and protect, 30 min release dwells, 5 min minimum recovery; 3 h jitter test gives one entry and no release)
 - [ ] False outage does not count as confirmed fatal failure (increment 2: CONFIRMED_FAILED only from ground notices; property test and S04 runs show 0 confirmations while available; ticks at phase sign-off)
 - [ ] Distributed task replanning cannot defeat protection (increment 3: supervisor gates every payload command; property test with arbitrary messages and plan uplinks; payload steps outside NOMINAL = 0 in all runs)
 

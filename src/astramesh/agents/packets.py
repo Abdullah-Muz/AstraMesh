@@ -137,14 +137,20 @@ class PublicTask:
 
 
 @dataclass(frozen=True, slots=True)
-class ExposureForecast:
-    """Own predicted environmental exposure relative to the payload's modelled tolerance
-    (1.0 = at the limit); ``None`` = missing or invalid, which is never zero risk (DL-054)."""
+class RiskForecast:
+    """Own predicted risks, each a ratio to its subsystem's modelled tolerance (1.0 = at
+    the limit): radiation/electronics, navigation/communications, orbital disturbance.
+    ``None`` = missing or invalid, which is never zero risk (DL-054, DL-056)."""
 
     t_ns: int
-    exposure_ratio: float | None
+    radiation: float | None
+    navcomms: float | None
+    orbital: float | None
 
     def __post_init__(self) -> None:
-        r = self.exposure_ratio
-        if r is not None and not (math.isfinite(r) and r >= 0.0):
-            raise ValueError("exposure_ratio must be finite and >= 0, or None")
+        for r in (self.radiation, self.navcomms, self.orbital):
+            if r is not None and not (math.isfinite(r) and r >= 0.0):
+                raise ValueError("risk ratios must be finite and >= 0, or None")
+
+    def as_mapping(self) -> dict[str, float | None]:
+        return {"radiation": self.radiation, "navcomms": self.navcomms, "orbital": self.orbital}

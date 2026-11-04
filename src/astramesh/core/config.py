@@ -390,12 +390,15 @@ class ForecastConfig(_Model):
     """A scheduled interval of predicted exposure (synthetic, Phase 3; DL-054)."""
 
     forecast_id: Identifier
+    dimension: Literal["radiation", "navcomms", "orbital"] = Field(
+        default="radiation", description="Risk dimension (spec §6.3); never averaged"
+    )
     spacecraft: list[Identifier] = Field(default_factory=list, description="Empty = all")
     start_s: NonNegativeFloat
     end_s: PositiveFloat
     exposure_ratio: float | None = Field(
         ge=0.0, allow_inf_nan=False,
-        description="Predicted exposure / modelled payload tolerance; null = invalid forecast",
+        description="Predicted risk / modelled tolerance of that subsystem; null = invalid",
     )  # fmt: skip
 
     @model_validator(mode="after")
@@ -423,6 +426,16 @@ class SupervisorConfig(_Model):
     protect_exposure_ratio: PositiveFloat = 1.0
     release_exposure_ratio: PositiveFloat = 0.8
     release_dwell_s: NonNegativeFloat = 1800.0
+    watch_enter_ratio: PositiveFloat = 0.6
+    watch_release_ratio: PositiveFloat = 0.5
+    watch_release_dwell_s: NonNegativeFloat = 1800.0
+    invalid_to_watch_s: NonNegativeFloat = 600.0
+    recovery_min_dwell_s: NonNegativeFloat = 300.0
+    recovery_nav_max_age_s: PositiveSeconds = 60.0
+    recovery_peer_heard_s: PositiveSeconds = 90.0
+    watch_status_interval_s: PositiveSeconds = Field(
+        default=10.0, description="Status period in STORM_WATCH (on the step grid; DL-056)"
+    )
 
     @model_validator(mode="after")
     def _ordered(self) -> SupervisorConfig:
@@ -430,6 +443,8 @@ class SupervisorConfig(_Model):
             raise ValueError("safe_battery_fraction must be < safe_exit_battery_fraction")
         if not self.release_exposure_ratio < self.protect_exposure_ratio:
             raise ValueError("release_exposure_ratio must be < protect_exposure_ratio")
+        if not self.watch_release_ratio < self.watch_enter_ratio <= self.protect_exposure_ratio:
+            raise ValueError("need watch_release_ratio < watch_enter_ratio <= protect")
         return self
 
 
@@ -464,6 +479,9 @@ class NominalOperationsScenario(MissionScenarioBase):
                 self._require_on_grid(
                     f.ground_confirmation_s, f"faults[{f.fault_id}].ground_confirmation_s"
                 )
+        self._require_on_grid(
+            self.supervisor.watch_status_interval_s, "supervisor.watch_status_interval_s"
+        )
         if self.environment is not None:
             for fc in self.environment.forecasts:
                 if set(fc.spacecraft) - ids:
