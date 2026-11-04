@@ -137,7 +137,6 @@ class SpacecraftAgent:
     _forecast: RiskForecast | None = None
     _history_seen: int = 0
     _public: dict[str, PublicTask] = field(default_factory=dict)
-    _reassigned: set[str] = field(default_factory=set)
     _finished: set[str] = field(default_factory=set)
     _declined: dict[str, str] = field(default_factory=dict)
 
@@ -476,13 +475,12 @@ class SpacecraftAgent:
         mine = {o.task_id for o in self._plan}
         taken: list[PlannedObservation] = []
         for tid, t in sorted(self._public.items()):
-            if t.owner != peer or tid in self._reassigned:
+            if t.owner != peer:  # owner moves with each hand-off, so chains work
                 continue
             slots = {s.spacecraft: s for s in t.slots if s.start_ns > now_ns}
             ok = [sc for sc in sorted(slots) if self._can_take(sc, beliefs)]
             if not ok:
                 continue
-            self._reassigned.add(tid)
             winner = ok[0]
             self._public[tid] = PublicTask(t.task_id, t.priority, winner, t.slots, t.data_mb)
             if winner != self.agent_id or tid in mine:

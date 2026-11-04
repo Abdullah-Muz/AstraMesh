@@ -20,12 +20,16 @@ H = 3600
 BASE = {"cause": "test", "consequences": "test"}
 
 
-def _run(fault: dict[str, Any], algorithm: str, hours: float = 8) -> tuple[Any, list[Any]]:
+def _run(
+    fault: dict[str, Any] | list[dict[str, Any]], algorithm: str, hours: float = 8
+) -> tuple[Any, list[Any]]:
     raw = yaml.safe_load((ROOT / "configs/experiments/nominal_ops_b0_24h.yaml").read_text())
     cfg = copy.deepcopy(raw)
     cfg["time"]["duration_s"] = int(hours * H)
     cfg["operations"]["algorithm"] = algorithm
-    cfg["faults"] = [{"fault_id": "F1", "observability": "effects_only", **BASE, **fault}]
+    faults = fault if isinstance(fault, list) else [fault]
+    cfg["faults"] = [{"fault_id": f"F{i + 1}", "observability": "effects_only", **BASE, **f}
+                     for i, f in enumerate(faults)]  # fmt: skip
     parsed = parse_scenario(cfg)
     assert isinstance(parsed, NominalOperationsScenario)
     log = EventLog()
@@ -45,6 +49,18 @@ def test_detection_and_reassignment_recover_science(reactive: str, passive: str)
     assert lat
     assert all(v is not None and 270 <= v <= 330 for v in lat.values())  # ~300 s timeout
     assert good.summary["health"]["confirmed_while_available"] == 0
+
+
+def test_b4_passes_inherited_tasks_on_after_a_second_loss() -> None:
+    """sc00 is lost, sc01 inherits its tasks, then sc01 is lost: the inherited tasks
+    must move on again (DL-052 rule applies to whatever the lost peer owns)."""
+    second = {"type": "unavailable", "spacecraft": ["sc01"], "start_s": 4 * H}
+    run, events = _run([LOSS, second], "rule_b4", hours=12)
+    taken = [e.data for e in events if e.kind == "task_taken_over"]
+    from_sc00 = {d["task"] for d in taken if d["from"] == "sc00"}
+    from_sc01 = {d["task"] for d in taken if d["from"] == "sc01"}
+    assert from_sc00 & from_sc01  # some task changed hands twice
+    assert run.summary["operations"]["n_duplicates"] == 0
 
 
 def test_false_outage_is_never_confirmed_failure() -> None:
