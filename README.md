@@ -93,6 +93,8 @@ uv run astramesh run configs/experiments/agent_network_24h.yaml --out results/ne
 # Phase 2 S00: nominal science operations with B0 (static scheduler)
 uv run astramesh run configs/experiments/nominal_ops_b0_24h.yaml --out results/ops_b0
 uv run astramesh run configs/experiments/nominal_ops_b1_24h.yaml --out results/ops_b1   # B1 reference (privileged)
+uv run astramesh run configs/experiments/nominal_ops_b2_24h.yaml --out results/ops_b2   # B2 auction
+uv run astramesh run configs/experiments/nominal_ops_b3_24h.yaml --out results/ops_b3   # B3 CBBA
 ```
 
 A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a provenance `manifest.json` (git commit, config hash, seeds, lockfile hash, artifact hashes). The formation scenarios also write `trajectory.csv` (sampled truth states), and the mission-geometry scenario writes `opportunities.json` (geometry-only science task records with energy and data costs) and a resource summary (battery, storage, Δv) in `summary.json`. See [`docs/EXPERIMENT_PROTOCOL.md`](docs/EXPERIMENT_PROTOCOL.md).
@@ -103,7 +105,7 @@ A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a prove
 |---|---|---|
 | 0 | Research and reproducibility foundation | Complete except the Priority A full-text literature review (in parallel; see [`docs/ROADMAP.md`](docs/ROADMAP.md)) |
 | 1 | Validated four-spacecraft dynamics and mission geometry | Complete (Gate P1 signed off 2026-11-03) |
-| 2 | Decentralized nominal science operations | In progress (agents and crosslink network; allocation after the literature review) |
+| 2 | Decentralized nominal science operations | In progress (agents, crosslink network, B0–B3 allocation on the nominal scenario) |
 | 3 | Deterministic faults and protection supervisor | Not started |
 | 4 | External data and probabilistic/ML experiments | Not started |
 | 5 | Storm-aware distributed recovery | Not started |
@@ -121,7 +123,7 @@ AstraMesh is a **simulation and research project**. It is **not** a real satelli
 |---|---|
 | [`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md) | Authoritative research and engineering specification (v1.0) |
 | [`docs/`](docs/) | Supporting documents: conventions, physics test plan, literature matrix, dataset registry, decision log, roadmap |
-| [`src/astramesh/`](src/astramesh/) | Python package (`core/` clock, RNG, events, config; `dynamics/` validated truth dynamics, frames, time scales; `evaluation/` runner and manifests; `science/` region access and science opportunities; `resources/` energy, storage and Δv ledgers; `agents/` isolated spacecraft agents; `planning/` task allocation (B0 static, B1 centralized reference); `communications/` messages and crosslink network; `scenarios/` runnable scenarios; `visualization/` diagnostic plots) |
+| [`src/astramesh/`](src/astramesh/) | Python package (`core/` clock, RNG, events, config; `dynamics/` validated truth dynamics, frames, time scales; `evaluation/` runner and manifests; `science/` region access and science opportunities; `resources/` energy, storage and Δv ledgers; `agents/` isolated spacecraft agents; `planning/` external allocation (B0 static, B1 centralized reference); agent-side B2 auction and B3 CBBA in `agents/`; `communications/` messages and crosslink network; `scenarios/` runnable scenarios; `visualization/` diagnostic plots) |
 | [`scripts/studies/`](scripts/studies/) | Reference-error studies behind every physics test tolerance |
 | [`configs/`](configs/) | Scenario configuration files (YAML) |
 | [`tests/`](tests/) | Unit, integration, and regression tests |

@@ -65,3 +65,8 @@ jobs:
 
       - name: Nominal operations S00 with B1 (24 h) smoke run
         run: uv run --locked astramesh run configs/experiments/nominal_ops_b1_24h.yaml --out "$RUNNER_TEMP/ops_b1"
+
+      - name: Nominal operations S00 with B2 and B3 (24 h) smoke runs
+        run: |
+          uv run --locked astramesh run configs/experiments/nominal_ops_b2_24h.yaml --out "$RUNNER_TEMP/ops_b2"
+          uv run --locked astramesh run configs/experiments/nominal_ops_b3_24h.yaml --out "$RUNNER_TEMP/ops_b3"

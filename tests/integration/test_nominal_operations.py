@@ -142,3 +142,51 @@ def test_b1_reference_never_aborts_for_power_and_matches_or_beats_b0(
     assert not any(b1.summary["operations"]["declined"].values())
     assert b1.summary["operations"]["utility"] >= b0.summary["operations"]["utility"]
     assert [t.task_id for t in b1.catalog] == [t.task_id for t in b0.catalog]
+
+
+@pytest.mark.parametrize("algo", ["auction_b2", "cbba_b3"])
+def test_decentralized_runs_replay_and_are_conflict_free_nominally(
+    ops_config_dict: dict[str, Any], algo: str, tmp_path: Path
+) -> None:
+    cfg = _cfg(ops_config_dict, hours=3, operations__algorithm=algo)
+    run_config(cfg, tmp_path / "a")
+    run_config(cfg, tmp_path / "b")
+    for name in (EVENTS_FILE, SUMMARY_FILE, MESSAGES_FILE, PLAN_FILE, OBSERVATIONS_FILE):
+        assert (tmp_path / "a" / name).read_bytes() == (tmp_path / "b" / name).read_bytes(), name
+    s = json.loads((tmp_path / "a" / SUMMARY_FILE).read_text(encoding="utf-8"))
+    o = s["operations"]
+    assert o["decentralized"] is True
+    assert o["privileged_information"] is False
+    assert o["conflicting_final_claims"] == []
+    assert o["n_completed"] == o["n_tasks"]
+    assert set(s["rejected_total"].values()) == {0}
+
+
+def test_auction_loses_consistency_under_loss_where_cbba_does_not(
+    ops_config_dict: dict[str, Any],
+) -> None:
+    """Seed 4, 30% loss: sc01 misses sc00's bids, so B2 double-books; CBBA's repeated
+    consensus rounds repair the same losses (DL-045)."""
+    lossy = {"network__loss_probability": 0.3, "random__seed": 4}
+    b2 = _run(_cfg(ops_config_dict, hours=3, operations__algorithm="auction_b2", **lossy))
+    b3 = _run(_cfg(ops_config_dict, hours=3, operations__algorithm="cbba_b3", **lossy))
+    assert b2.summary["operations"]["n_duplicates"] > 0
+    assert b2.summary["operations"]["conflicting_final_claims"]
+    assert b3.summary["operations"]["n_duplicates"] == 0
+    assert b3.summary["operations"]["conflicting_final_claims"] == []
+    assert b3.summary["operations"]["utility"] == b2.summary["operations"]["utility"]
+
+
+def test_cbba_agents_stay_isolated(ops_config_dict: dict[str, Any]) -> None:
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "agent_isolation"))
+    from test_isolation import FORBIDDEN, _reachable
+
+    from astramesh.agents.agent import SpacecraftAgent
+
+    run = _run(_cfg(ops_config_dict, hours=1, operations__algorithm="cbba_b3"))
+    for agent in run.agents.values():
+        for obj in _reachable(agent):
+            assert not isinstance(obj, FORBIDDEN), type(obj).__name__
+            assert not isinstance(obj, SpacecraftAgent) or obj is agent

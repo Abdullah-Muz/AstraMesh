@@ -46,8 +46,8 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 |---|---|---|
 | 1 | Isolated `SpacecraftAgent`s, message schema, NetworkX G(t) crosslinks, SimPy kernel, acceptance rules, isolation tests (`agent_network` scenario) | **Done**: commit `414bf2d`, CI passing; values and acceptance rules (DL-040) approved 2026-11-03 |
 | 2a | Task catalogue and utility (DL-041), live battery/storage truth, agent plan execution with resource checks, truth scoring, B0 static scheduler, S00 scenario (`nominal_operations`) | **Done**: commit `a48de98`, CI passing; DL-043 approved 2026-11-03 |
-| 2b | B1 centralized reference (SciPy `milp`, DL-042, DL-044) | Implemented (`configs/experiments/nominal_ops_b1_24h.yaml`) |
-| 3 | B2 auction, B3 CBBA | Unblocked: P06 (CBBA) read and specified (`literature/P06.md` §3); starts after increment 2 |
+| 2b | B1 centralized reference (SciPy `milp`, DL-042, DL-044) | **Done**: commit `5fa618c`, CI passing |
+| 3 | B2 one-shot auction, B3 CBBA (DL-045, DL-046) | Implemented (`configs/experiments/nominal_ops_b2_24h.yaml`, `nominal_ops_b3_24h.yaml`) |
 | 4 | Nominal S00 comparison on identical tasks and resources | Not started |
 
 ## Gate P2 checklist (spec §13)

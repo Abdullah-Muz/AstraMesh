@@ -86,3 +86,29 @@ def test_messages_never_change_plan_or_commands(batch: list[tuple[int, Delivery]
         cmds.append(a.payload_command(t, STEP, 0.1))
     assert cmds == ref
     assert a.plan_version == 1
+
+
+def _cbba_agent() -> SpacecraftAgent:
+    from astramesh.agents.packets import CatalogUplink, OwnTask
+
+    a = SpacecraftAgent("sc01", ("sc00",), S)
+    a.observe(CatalogUplink(0, "B3-cbba", ("T1",), (OwnTask("T1", 3, 20, 60, 0.1),), 10.0))
+    return a
+
+
+def test_cbba_agent_rejects_malformed_and_unhandled_allocation_messages() -> None:
+    a = _cbba_agent()
+    a.step(0)
+    assert a.planned_observations()[0].task_id == "T1"
+    version = a.plan_version
+    bad = Message("sc00", 1, 0, 10**6, MessageType.PLAN_SYNC, 0, {"y": {"T1": "x"}})
+    bid = Message("sc00", 2, 0, 10**6, MessageType.TASK_BID, 0, {"bids": {"T1": 9.0}})
+    a.receive_messages([Delivery(bad, "sc01", 1), Delivery(bid, "sc01", 1)])
+    assert a.rejected_counts()["malformed_payload"] == 1
+    assert a.rejected_counts()["unhandled_type"] == 1  # B2 bids are not CBBA messages
+    assert a.plan_version == version
+    good = Message("sc00", 3, 0, 10**6, MessageType.PLAN_SYNC, 0,
+                   {"y": {"T1": 3.0}, "z": {"T1": "sc00"}, "s": {}})  # fmt: skip
+    a.receive_messages([Delivery(good, "sc01", 2)])
+    assert a.planned_observations() == ()  # sc00 wins the tie: the plan changes legitimately
+    assert a.plan_version == version + 1

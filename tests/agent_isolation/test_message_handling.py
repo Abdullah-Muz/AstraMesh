@@ -57,7 +57,10 @@ def test_each_rejection_reason() -> None:
         assert a.drain_log()[-1]["reason"] == reason
     counts = a.rejected_counts()
     assert counts["malformed"] == 2
-    assert all(counts[r] == 1 for r in REJECT_REASONS if r != "malformed")
+    assert all(
+        counts[r] == 1 for r in REJECT_REASONS if r not in ("malformed", "malformed_payload")
+    )
+    assert counts["malformed_payload"] == 0  # only agents running B2/B3 handle payload types
 
 
 def test_out_of_order_older_status_does_not_overwrite_newer() -> None:

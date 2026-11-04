@@ -71,3 +71,37 @@ class PlanUplink:
         for o in self.observations:
             if not (0 <= o.start_ns < o.stop_ns):
                 raise ValueError(f"invalid observation interval for {o.task_id}")
+
+
+@dataclass(frozen=True, slots=True)
+class OwnTask:
+    """A task this agent can observe, with its own predicted slot and data volume."""
+
+    task_id: str
+    priority: int
+    start_ns: int
+    stop_ns: int
+    data_mb: float
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogUplink:
+    """Predicted task catalogue for decentralized allocation (B2/B3), this agent's view.
+
+    ``task_order`` lists every task ID (shared order, used for tie-breaking and
+    message vectors); ``own`` holds only the tasks this agent can observe.
+    """
+
+    t_ns: int
+    algorithm: str
+    task_order: tuple[str, ...]
+    own: tuple[OwnTask, ...]
+    storage_capacity_mb: float
+
+    def __post_init__(self) -> None:
+        known = set(self.task_order)
+        if len(known) != len(self.task_order):
+            raise ValueError("task_order has duplicates")
+        for t in self.own:
+            if t.task_id not in known or not (0 <= t.start_ns < t.stop_ns):
+                raise ValueError(f"invalid own task {t.task_id!r}")

@@ -31,7 +31,15 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
-from astramesh.agents.packets import Housekeeping, NavigationFix, PlannedObservation, PlanUplink
+from astramesh.agents.auction import AuctionState
+from astramesh.agents.cbba import CbbaState
+from astramesh.agents.packets import (
+    CatalogUplink,
+    Housekeeping,
+    NavigationFix,
+    PlannedObservation,
+    PlanUplink,
+)
 from astramesh.communications.messages import Delivery, Message, MessageType
 
 REJECT_REASONS = (
@@ -42,8 +50,10 @@ REJECT_REASONS = (
     "duplicate",
     "unhandled_type",
     "stale",
+    "malformed_payload",
 )
 HANDLED_TYPES = frozenset({MessageType.STATUS})
+ALLOCATION_TYPES = {"B2-auction": MessageType.TASK_BID, "B3-cbba": MessageType.PLAN_SYNC}
 
 
 @dataclass(frozen=True, slots=True)
@@ -51,6 +61,8 @@ class AgentSettings:
     status_interval_ns: int
     status_lifetime_ns: int
     battery_reserve_fraction: float = 0.0  # do not start an observation below this charge
+    allocation_lifetime_ns: int = 20_000_000_000  # task_bid / plan_sync expiry (DL-045)
+    auction_deadline_ns: int = 5_000_000_000  # B2 decides at the first round at/after this
 
     def __post_init__(self) -> None:
         if self.status_interval_ns <= 0 or self.status_lifetime_ns <= 0:
@@ -87,7 +99,9 @@ class SpacecraftAgent:
     _hk: Housekeeping | None = None
     _plan: tuple[PlannedObservation, ...] = ()
     _plan_algorithm: str | None = None
-    _observing: str | None = None
+    _observing: PlannedObservation | None = None
+    _alloc: CbbaState | AuctionState | None = None
+    _last_plan_change_ns: int | None = None
     _finished: set[str] = field(default_factory=set)
     _declined: dict[str, str] = field(default_factory=dict)
 
@@ -97,13 +111,30 @@ class SpacecraftAgent:
         self._peer_table = {p: PeerRecord() for p in self.peers}
 
     # -- inputs -----------------------------------------------------------------
-    def observe(self, packet: NavigationFix | Housekeeping | PlanUplink) -> None:
+    def observe(self, packet: NavigationFix | Housekeeping | PlanUplink | CatalogUplink) -> None:
         if isinstance(packet, NavigationFix):
             if self._nav is None or packet.t_ns >= self._nav.t_ns:
                 self._nav = packet
         elif isinstance(packet, Housekeeping):
             if self._hk is None or packet.t_ns >= self._hk.t_ns:
                 self._hk = packet
+        elif isinstance(packet, CatalogUplink):
+            if self._alloc is not None or packet.algorithm not in ALLOCATION_TYPES:
+                self._log.append({"kind": "catalog_rejected", "algorithm": packet.algorithm})
+                return
+            if packet.algorithm == "B3-cbba":
+                self._alloc = CbbaState(self.agent_id, packet)
+            else:
+                self._alloc = AuctionState(self.agent_id, packet, self.settings.auction_deadline_ns)
+            self._plan_algorithm = packet.algorithm
+            self._log.append(
+                {
+                    "kind": "catalog_accepted",
+                    "algorithm": packet.algorithm,
+                    "n_tasks": len(packet.task_order),
+                    "n_own": len(packet.own),
+                }
+            )
         elif isinstance(packet, PlanUplink):
             if packet.version <= self.plan_version:
                 self._log.append({"kind": "plan_rejected", "reason": "not_newer",
@@ -132,10 +163,13 @@ class SpacecraftAgent:
         started it continues until the planned stop unless housekeeping shows an
         empty battery or full storage. It never acts on another agent's state.
         """
-        current = next((o for o in self._plan if o.start_ns <= now_ns < o.stop_ns), None)
-        if self._observing is not None and (current is None or current.task_id != self._observing):
-            self._finished.add(self._observing)
+        if self._observing is not None and now_ns >= self._observing.stop_ns:
+            self._finished.add(self._observing.task_id)
             self._observing = None
+        if self._observing is not None:  # committed: finish it even if the plan changed
+            current: PlannedObservation | None = self._observing
+        else:
+            current = next((o for o in self._plan if o.start_ns <= now_ns < o.stop_ns), None)
         if (
             current is None
             or current.task_id in self._finished
@@ -145,7 +179,7 @@ class SpacecraftAgent:
         hk = self._hk
         if hk is None:
             return self._decline(current, "no_housekeeping")
-        if self._observing == current.task_id:
+        if self._observing is current:
             if hk.battery_wh <= 0.0 or hk.storage_used_mb >= hk.storage_capacity_mb:
                 self._observing = None
                 return self._decline(current, "resources_exhausted")
@@ -155,7 +189,7 @@ class SpacecraftAgent:
             return self._decline(current, "battery_reserve")
         if hk.storage_used_mb + remaining_steps * data_mb_per_step > hk.storage_capacity_mb:
             return self._decline(current, "storage")
-        self._observing = current.task_id
+        self._observing = current
         return current.task_id
 
     def _decline(self, obs: PlannedObservation, reason: str) -> str | None:
@@ -195,11 +229,21 @@ class SpacecraftAgent:
             return "expired"
         if m.key in self._accepted:
             return "duplicate"
-        if m.msg_type not in HANDLED_TYPES:
+        if m.msg_type not in self._handled_types():
             return "unhandled_type"
         if m.seq < self._peer_table[m.sender].newest_seq:
             return "stale"
+        if m.msg_type is not MessageType.STATUS and not self._alloc_valid(m):
+            return "malformed_payload"
         return None
+
+    def _handled_types(self) -> frozenset[MessageType]:
+        if self._plan_algorithm in ALLOCATION_TYPES and self._alloc is not None:
+            return HANDLED_TYPES | {ALLOCATION_TYPES[self._plan_algorithm]}
+        return HANDLED_TYPES
+
+    def _alloc_valid(self, m: Message) -> bool:
+        return self._alloc is not None and self._alloc.valid_payload(m.payload)
 
     def _accept(self, d: Delivery) -> None:
         m = d.message
@@ -207,6 +251,9 @@ class SpacecraftAgent:
         rec = self._peer_table[m.sender]
         rec.newest_seq = m.seq
         rec.last_heard_ns = d.delivered_ns
+        if m.msg_type is not MessageType.STATUS and self._alloc is not None:
+            self._alloc.receive(m.sender, m.payload, d.delivered_ns)
+            self._refresh_plan(d.delivered_ns)
         if m.msg_type is MessageType.STATUS:
             rec.last_status_created_ns = m.created_ns
             rec.reported_plan_version = m.plan_version
@@ -219,8 +266,46 @@ class SpacecraftAgent:
         if now_ns >= self._next_status_ns:
             self._outbox.append(self._status(now_ns))
             self._next_status_ns = now_ns + self.settings.status_interval_ns
+        self._allocation_round(now_ns)
         out, self._outbox = self._outbox, []
         return out
+
+    def _allocation_round(self, now_ns: int) -> None:
+        alloc = self._alloc
+        if isinstance(alloc, CbbaState):
+            alloc.build_bundle(now_ns)
+            self._refresh_plan(now_ns)
+            self._outbox.append(self._message(now_ns, MessageType.PLAN_SYNC,
+                                              alloc.message_payload()))  # fmt: skip
+        elif isinstance(alloc, AuctionState):
+            if not alloc.sent:
+                self._outbox.append(self._message(now_ns, MessageType.TASK_BID,
+                                                  {"bids": alloc.own_bids()}))  # fmt: skip
+                alloc.sent = True
+            if not alloc.decided and now_ns >= alloc.deadline_ns:
+                alloc.decide()
+                self._refresh_plan(now_ns)
+
+    def _message(self, now_ns: int, mtype: MessageType, payload: dict[str, Any]) -> Message:
+        msg = Message(self.agent_id, self._seq, now_ns,
+                      now_ns + self.settings.allocation_lifetime_ns, mtype, self.plan_version,
+                      payload)  # fmt: skip
+        self._seq += 1
+        return msg
+
+    def _refresh_plan(self, now_ns: int) -> None:
+        """Rebuild the executable plan from the allocation state (B2/B3)."""
+        alloc = self._alloc
+        tasks = alloc.winning() if isinstance(alloc, CbbaState) else (
+            alloc.won if isinstance(alloc, AuctionState) else ())  # fmt: skip
+        plan = tuple(PlannedObservation(t.task_id, t.start_ns, t.stop_ns)
+                     for t in sorted(tasks, key=lambda t: t.start_ns))  # fmt: skip
+        if plan != self._plan:
+            self._plan = plan
+            self.plan_version += 1
+            self._last_plan_change_ns = now_ns
+            self._log.append({"kind": "plan_changed", "version": self.plan_version,
+                              "n_observations": len(plan)})  # fmt: skip
 
     def _status(self, now_ns: int) -> Message:
         payload: dict[str, Any] = {"nav_t_ns": None, "r_m": None, "sigma_r_m": None}
@@ -269,8 +354,11 @@ class SpacecraftAgent:
             "plan_algorithm": self._plan_algorithm,
             "plan_version": self.plan_version,
             "planned": len(self._plan),
-            "believed_finished": len(
-                self._finished | ({self._observing} if self._observing else set())
-            ),
+            "believed_finished": len(self._finished) + (1 if self._observing else 0),
             "declined": dict(sorted(self._declined.items())),
+            "last_plan_change_ns": self._last_plan_change_ns,
         }
+
+    def planned_observations(self) -> tuple[PlannedObservation, ...]:
+        """Read-only copy of the current plan (for evaluation after a run)."""
+        return self._plan

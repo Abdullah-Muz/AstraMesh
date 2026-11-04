@@ -29,13 +29,19 @@ import numpy as np
 from numpy.typing import NDArray
 
 from astramesh.agents.agent import AgentSettings, SpacecraftAgent
-from astramesh.agents.packets import Housekeeping, PlannedObservation, PlanUplink
+from astramesh.agents.packets import (
+    CatalogUplink,
+    Housekeeping,
+    OwnTask,
+    PlannedObservation,
+    PlanUplink,
+)
 from astramesh.core.clock import seconds_to_ns
 from astramesh.core.config import NominalOperationsScenario
 from astramesh.core.events import EventLog
 from astramesh.core.rng import RandomStreams
 from astramesh.planning.centralized_b1 import EnergyModel, plan_centralized
-from astramesh.planning.plans import Plan
+from astramesh.planning.plans import Assignment, Plan
 from astramesh.planning.static_b0 import plan_static
 from astramesh.resources.ledgers import Battery, data_volume_mb
 from astramesh.scenarios.agent_network import make_kernel
@@ -46,8 +52,9 @@ from astramesh.scenarios.formation_dynamics import (
     spacecraft_ids,
 )
 from astramesh.scenarios.mission_geometry import geometry_products
-from astramesh.science.tasks import Task, catalog_from_opportunities
+from astramesh.science.tasks import Task, catalog_from_opportunities, observation_slot
 
+DECENTRALIZED = {"auction_b2": "B2-auction", "cbba_b3": "B3-cbba"}
 PLAN_FILE = "plan.json"
 OBSERVATIONS_FILE = "observations.json"
 
@@ -154,13 +161,24 @@ def run_nominal_operations(
     catalog = catalog_from_opportunities(geo.opportunities)
     by_id = {t.task_id: t for t in catalog}
 
-    plan = _plan(config, catalog, ids, geo.sunlit, n_steps, n_ticks, mb_per_step)
-    log.record(tick=0, time_ns=0, source="planner", kind="plan_made",
+    algo = config.operations.algorithm
+    decentralized = algo in DECENTRALIZED
+    plan = (
+        Plan(DECENTRALIZED[algo], 0, (), (), False)
+        if decentralized
+        else _plan(config, catalog, ids, geo.sunlit, n_steps, n_ticks, mb_per_step)
+    )
+    if not decentralized:
+        log.record(tick=0, time_ns=0, source="planner", kind="plan_made",
                data={"algorithm": plan.algorithm, "version": plan.version,
                      "privileged_information": plan.privileged_information,
                      "n_tasks": len(catalog), "n_assigned": len(plan.assignments),
                      "unassigned": list(plan.unassigned),
                      "excluded": list(plan.excluded)})  # fmt: skip
+    else:
+        log.record(tick=0, time_ns=0, source="planner", kind="catalog_uplinked",
+                   data={"algorithm": plan.algorithm, "n_tasks": len(catalog),
+                         "note": "allocation decided by the agents"})  # fmt: skip
 
     settings = AgentSettings(
         status_interval_ns=seconds_to_ns(config.agents.status_interval_s),
@@ -169,6 +187,17 @@ def run_nominal_operations(
     )
     agents = {a: SpacecraftAgent(a, tuple(p for p in ids if p != a), settings) for a in ids}
     for a in ids:
+        if decentralized:
+            own = []
+            for t in catalog:
+                w = t.window_of(a)
+                slot = observation_slot(w, n_steps, n_ticks) if w is not None else None
+                if slot is not None:
+                    own.append(OwnTask(t.task_id, t.priority, slot[0] * step_ns,
+                                       slot[1] * step_ns, n_steps * mb_per_step))  # fmt: skip
+            agents[a].observe(CatalogUplink(0, plan.algorithm, tuple(t.task_id for t in catalog),
+                                            tuple(own), sc.storage_capacity_mb))  # fmt: skip
+            continue
         agents[a].observe(PlanUplink(
             t_ns=0, algorithm=plan.algorithm, version=plan.version,
             observations=tuple(PlannedObservation(x.task_id, x.start_tick * step_ns,
@@ -225,6 +254,21 @@ def run_nominal_operations(
         close(a, n_ticks - 1)
     record_scenario_end(config, log)
 
+    if decentralized:  # the plan on record is what each agent finally believed
+        final = [
+            Assignment(o.task_id, a, o.start_ns // step_ns, o.stop_ns // step_ns)
+            for a in ids
+            for o in agents[a].planned_observations()
+        ]
+        claimed = {x.task_id for x in final}
+        plan = Plan(
+            plan.algorithm,
+            max(agents[a].plan_version for a in ids),
+            tuple(sorted(final, key=lambda x: (x.start_tick, x.spacecraft, x.task_id))),
+            tuple(t.task_id for t in catalog if t.task_id not in claimed),
+            False,
+        )
+
     completed: dict[str, Segment] = {}
     for seg in sorted(segments, key=lambda s: (s.stop_tick, s.spacecraft)):
         w = by_id[seg.task_id].window_of(seg.spacecraft)
@@ -256,6 +300,16 @@ def run_nominal_operations(
             "n_invalid": sum(1 for s in segments if s.outcome == "invalid"),
             "n_assigned": len(plan.assignments),
             "unassigned": list(plan.unassigned),
+            "decentralized": decentralized,
+            "conflicting_final_claims": sorted(
+                t for t in {x.task_id for x in plan.assignments}
+                if sum(1 for x in plan.assignments if x.task_id == t) > 1
+            ),
+            "last_plan_change_s": {
+                a: (v / 1e9 if (v := agents[a].execution_view()["last_plan_change_ns"]) is not None
+                    else None)
+                for a in ids
+            },
             "declined": {a: agents[a].execution_view()["declined"] for a in ids},
             "min_battery_wh": min_wh,
             "final_battery_wh": {a: batteries[a].stored_wh for a in ids},

@@ -84,6 +84,15 @@ Each refusal is logged as `observation_declined` with a reason. The simulator ap
 
 B0 and B1 are both *external* planners: the plan is made outside the agents and uplinked. B1 additionally uses truth illumination and is flagged `privileged_information` in `plan.json`, the events and the summary. Agents execute either plan with the same resource checks.
 
-### 7. Not yet implemented
+### 7. Decentralized allocation (increment 3, DL-045, DL-046)
 
-B2–B3 allocation, inter-agent task messages, health beliefs (§5.4), estimators beyond the latest fix, safety supervisor. Each will be added behind the same boundary.
+For B2 and B3 there is no external plan. Each agent gets a **`CatalogUplink`** at t = 0: the shared task order, plus its own predicted slots and data volumes. The allocation state lives inside the agent:
+
+- **B3 CBBA** (`agents/cbba.py`, P06): every 10 s the agent builds its bundle and broadcasts `plan_sync` (y, z, s). On receipt it applies Table I, updates timestamps (Eq. 5) and releases tasks (Eq. 6).
+- **B2 auction** (`agents/auction.py`): one `task_bid` broadcast at t = 0. Each agent decides winners alone from the bids it received.
+
+An agent handles only its own algorithm's message type. Any other allocation type is `unhandled_type`, and a badly formed payload is `malformed_payload`; neither changes the plan. The executable plan is rebuilt from the allocation state after every round and receipt. Each change bumps `plan_version` and is logged as `plan_changed`. An observation is committed at slot start and finished even if the agent is outbid later.
+
+### 8. Not yet implemented
+
+Inter-agent re-planning after faults, health beliefs (§5.4), estimators beyond the latest fix, safety supervisor. Each will be added behind the same boundary.
