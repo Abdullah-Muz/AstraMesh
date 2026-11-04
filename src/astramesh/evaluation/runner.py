@@ -7,7 +7,8 @@ Each run directory contains:
 * ``config.resolved.json`` - the validated configuration (deterministic)
 * ``trajectory.csv`` - sampled truth states (formation scenarios; deterministic)
 * ``opportunities.json`` - science task records (mission_geometry only; deterministic)
-* ``messages.jsonl`` - message send/deliver trace (agent_network only; deterministic)
+* ``messages.jsonl`` - message send/deliver trace (agent scenarios; deterministic)
+* ``plan.json``, ``observations.json`` - plan and executed observations (nominal_operations)
 * ``manifest.json`` - provenance; lists the SHA-256 of the files above
 """
 
@@ -23,13 +24,20 @@ from astramesh.core.config import (
     AnyScenarioConfig,
     FormationDynamicsScenario,
     MissionGeometryScenario,
+    NominalOperationsScenario,
     ToyHeartbeatScenario,
     load_scenario,
 )
 from astramesh.core.events import EventLog, canonical_json
 from astramesh.core.rng import RandomStreams
 from astramesh.evaluation.manifest import build_manifest, find_project_root, sha256_file
-from astramesh.scenarios import agent_network, formation_dynamics, mission_geometry, toy_heartbeat
+from astramesh.scenarios import (
+    agent_network,
+    formation_dynamics,
+    mission_geometry,
+    nominal_operations,
+    toy_heartbeat,
+)
 
 EVENTS_FILE = "events.jsonl"
 SUMMARY_FILE = "summary.json"
@@ -127,6 +135,28 @@ def run_config(
             for line in an.trace:
                 fh.write(canonical_json(line) + "\n")
         extra_artifacts[agent_network.MESSAGES_FILE] = sha256_file(msg_path)
+    elif isinstance(config, NominalOperationsScenario):
+        ops = nominal_operations.run_nominal_operations(config, streams, log)
+        summary = ops.summary
+        algorithm = ops.plan.algorithm
+        dynamics_model = ops.formation.trajectory.model_id
+        step_ns = config.time.clock_spec().step_ns
+        traj_path = output_dir / formation_dynamics.TRAJECTORY_FILE
+        formation_dynamics.write_trajectory_csv(ops.formation, traj_path)
+        extra_artifacts[formation_dynamics.TRAJECTORY_FILE] = sha256_file(traj_path)
+        msg_path = output_dir / agent_network.MESSAGES_FILE
+        with msg_path.open("w", encoding="ascii", newline="\n") as fh:
+            for line in ops.trace:
+                fh.write(canonical_json(line) + "\n")
+        extra_artifacts[agent_network.MESSAGES_FILE] = sha256_file(msg_path)
+        extra_artifacts[nominal_operations.PLAN_FILE] = _write_canonical(
+            output_dir / nominal_operations.PLAN_FILE,
+            nominal_operations.plan_to_dict(ops.plan, step_ns),
+        )
+        extra_artifacts[nominal_operations.OBSERVATIONS_FILE] = _write_canonical(
+            output_dir / nominal_operations.OBSERVATIONS_FILE,
+            [seg.to_dict(step_ns) for seg in ops.segments],
+        )
     else:  # pragma: no cover - guarded by the schema's discriminated union
         raise ValueError(f"unsupported scenario_type {config.scenario_type!r}")
 

@@ -235,13 +235,18 @@ class SpacecraftConfig(_Model):
     delta_v_budget_mps: NonNegativeFloat = Field(description="Total delta-v budget [m/s]")
 
 
-class MissionGeometryScenario(FormationScenarioBase):
+class MissionScenarioBase(FormationScenarioBase):
+    """Formation + science regions + spacecraft resources (shared by mission scenarios)."""
+
+    science: ScienceConfig
+    spacecraft: SpacecraftConfig
+
+
+class MissionGeometryScenario(MissionScenarioBase):
     """Phase 1 mission geometry: formation dynamics + illumination + science opportunities
     + finite resource accounting."""
 
     scenario_type: Literal["mission_geometry"]
-    science: ScienceConfig
-    spacecraft: SpacecraftConfig
 
 
 class NetworkConfig(_Model):
@@ -282,11 +287,43 @@ class AgentNetworkScenario(FormationScenarioBase):
         return self
 
 
+class OperationsConfig(_Model):
+    """Nominal science operations (Phase 2 increment 2; DL-041, DL-043)."""
+
+    algorithm: Literal["static_b0"] = Field(description="Allocation method (B1-B3 added later)")
+    min_observation_s: PositiveSeconds = Field(
+        description="Continuous observation needed to complete a task [s] (DL-041: 60 s)"
+    )
+    battery_reserve_fraction: float = Field(
+        ge=0.0, lt=1.0, allow_inf_nan=False,
+        description="Agents do not start an observation below this state of charge",
+    )  # fmt: skip
+
+
+class NominalOperationsScenario(MissionScenarioBase):
+    """Phase 2 S00: isolated agents execute a science plan over the crosslink network."""
+
+    scenario_type: Literal["nominal_operations"]
+    network: NetworkConfig
+    agents: AgentsConfig
+    operations: OperationsConfig
+
+    @model_validator(mode="after")
+    def _ops_timing_on_grid(self) -> NominalOperationsScenario:
+        self._require_on_grid(self.agents.nav_fix_interval_s, "agents.nav_fix_interval_s")
+        self._require_on_grid(self.agents.status_interval_s, "agents.status_interval_s")
+        self._require_on_grid(self.operations.min_observation_s, "operations.min_observation_s")
+        seconds_to_ns(self.network.delay_s, name="network.delay_s")
+        seconds_to_ns(self.agents.status_lifetime_s, name="agents.status_lifetime_s")
+        return self
+
+
 AnyScenarioConfig = (
     ToyHeartbeatScenario
     | FormationDynamicsScenario
     | MissionGeometryScenario
     | AgentNetworkScenario
+    | NominalOperationsScenario
 )
 
 

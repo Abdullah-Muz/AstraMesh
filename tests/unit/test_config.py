@@ -102,6 +102,7 @@ def test_json_schema_exports() -> None:
         "formation_dynamics",
         "mission_geometry",
         "agent_network",
+        "nominal_operations",
     }
     for name in ("ToyHeartbeatScenario", "FormationDynamicsScenario"):
         assert "time" in schema["$defs"][name]["properties"]

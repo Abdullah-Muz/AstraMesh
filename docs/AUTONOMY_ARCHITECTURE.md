@@ -68,8 +68,20 @@ SimPy `Environment` with the **integer nanosecond** as its time unit, so every e
 - one process per agent, stepping every `status_interval_s`;
 - one process per delivery.
 
-Same-instant order is fixed: fixes, then agents in ID order, then deliveries in scheduling order. Same seed gives a byte-identical event log, message trace and summary (regression test, verified under two OpenBLAS/NumPy CPU code paths).
+Same-instant order is fixed by one per-tick driver (`scenarios/kernel.py`): navigation fixes, then any scenario hook (housekeeping and plan execution), then agent steps in ID order. Deliveries run at their own arrival times. (Increment 1 as first committed let SimPy's scheduling order put status steps before that instant's fix from t = 30 s onward, contradicting this text. The shared kernel fixed it, which changed only status message sizes: DL-043.) Same seed gives a byte-identical event log, message trace and summary (regression test, verified under two OpenBLAS/NumPy CPU code paths).
 
-### 6. Not yet implemented
+### 6. Plan execution (increment 2a, DL-041, DL-043)
 
-Allocation (B0–B3), task database and commitments, resource manager, health beliefs (§5.4), estimators beyond the latest fix, safety supervisor. Each will be added behind the same boundary.
+New sensor packets (`agents/packets.py`):
+- **`Housekeeping`**, every tick: the agent's **own** battery and storage. Values are exact in Phase 2; noise or faults come later.
+- **`PlanUplink`**, at t = 0: only that agent's planned observations, with algorithm and version. Older or equal versions are rejected and logged. Messages cannot change the plan: a property test interleaves arbitrary deliveries with execution and checks that the commands are unchanged.
+
+`payload_command(now)` returns the task to observe during the next step, or nothing:
+- **Before starting:** battery ≥ reserve, and enough storage for the rest of the slot.
+- **While observing:** stop if housekeeping shows an empty battery or full storage.
+
+Each refusal is logged as `observation_declined` with a reason. The simulator applies the command to the **true** battery and storage, and scores the observations against truth (`scenarios/nominal_operations.py`).
+
+### 7. Not yet implemented
+
+B1–B3 allocation, inter-agent task messages, health beliefs (§5.4), estimators beyond the latest fix, safety supervisor. Each will be added behind the same boundary.

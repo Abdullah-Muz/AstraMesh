@@ -59,3 +59,6 @@ jobs:
 
       - name: Agent network baseline (24 h) smoke run
         run: uv run --locked astramesh run configs/experiments/agent_network_24h.yaml --out "$RUNNER_TEMP/network"
+
+      - name: Nominal operations S00 with B0 (24 h) smoke run
+        run: uv run --locked astramesh run configs/experiments/nominal_ops_b0_24h.yaml --out "$RUNNER_TEMP/ops"

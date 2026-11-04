@@ -51,6 +51,52 @@ class EnergyResult:
     consumed_wh: float
 
 
+class Battery:
+    """Incremental battery ledger (one spacecraft). Accounting in joules (CONVENTIONS §1).
+
+    ``step`` applies one simulation step with constant generation and load; the
+    rules are the module docstring's. Used both by :func:`simulate_energy`
+    (post-hoc profiles) and by live scenarios, so both give identical numbers.
+    """
+
+    __slots__ = ("cap_j", "consumed_j", "curtailed_j", "deficit_j", "deficit_steps", "e_j",
+                 "eta", "generated_j")  # fmt: skip
+
+    def __init__(self, capacity_wh: float, initial_fraction: float, charge_efficiency: float):
+        if not (0.0 < initial_fraction <= 1.0 and 0.0 < charge_efficiency <= 1.0):
+            raise ValueError("initial_fraction and charge_efficiency must be in (0, 1]")
+        if capacity_wh <= 0.0:
+            raise ValueError("capacity_wh must be positive")
+        self.cap_j = capacity_wh * S_PER_H
+        self.e_j = self.cap_j * initial_fraction
+        self.eta = charge_efficiency
+        self.curtailed_j = self.deficit_j = self.generated_j = self.consumed_j = 0.0
+        self.deficit_steps = 0
+
+    def step(self, generation_w: float, load_w: float, step_s: float) -> bool:
+        """Advance one step; return False if the load could not be fully supplied."""
+        self.generated_j += generation_w * step_s
+        self.consumed_j += load_w * step_s
+        net_j = (generation_w - load_w) * step_s
+        if net_j >= 0.0:
+            self.e_j += self.eta * net_j
+            if self.e_j > self.cap_j:
+                self.curtailed_j += (self.e_j - self.cap_j) / self.eta
+                self.e_j = self.cap_j
+            return True
+        self.e_j += net_j
+        if self.e_j < 0.0:
+            self.deficit_j += -self.e_j
+            self.deficit_steps += 1
+            self.e_j = 0.0
+            return False
+        return True
+
+    @property
+    def stored_wh(self) -> float:
+        return self.e_j / S_PER_H
+
+
 def simulate_energy(
     *,
     sunlit: NDArray[np.bool_],
@@ -69,37 +115,21 @@ def simulate_energy(
     n = len(sunlit)
     if payload_on.shape != (n,) or (thruster_on is not None and thruster_on.shape != (n,)):
         raise ValueError("sunlit, payload_on and thruster_on must have the same length")
-    if not (0.0 < initial_fraction <= 1.0 and 0.0 < charge_efficiency <= 1.0):
-        raise ValueError("initial_fraction and charge_efficiency must be in (0, 1]")
-    if capacity_wh <= 0.0 or step_s <= 0.0:
+    if step_s <= 0.0:
         raise ValueError("capacity_wh and step_s must be positive")
-    cap_j = capacity_wh * S_PER_H
-    e = cap_j * initial_fraction
+    if capacity_wh <= 0.0:
+        raise ValueError("capacity_wh and step_s must be positive")
+    bat = Battery(capacity_wh, initial_fraction, charge_efficiency)
     out = np.empty(n)
-    out[0] = e
-    curtailed = deficit = generated = consumed = 0.0
-    deficit_steps = 0
+    out[0] = bat.e_j
     sun = sunlit.tolist()
     pay = payload_on.tolist()
     thr = thruster_on.tolist() if thruster_on is not None else [False] * n
     for k in range(n - 1):
         gen = generation_w if sun[k] else 0.0
         load = bus_w + (payload_w if pay[k] else 0.0) + (thruster_w if thr[k] else 0.0)
-        generated += gen * step_s
-        consumed += load * step_s
-        net_j = (gen - load) * step_s
-        if net_j >= 0.0:
-            e += charge_efficiency * net_j
-            if e > cap_j:
-                curtailed += (e - cap_j) / charge_efficiency
-                e = cap_j
-        else:
-            e += net_j
-            if e < 0.0:
-                deficit += -e
-                deficit_steps += 1
-                e = 0.0
-        out[k + 1] = e
+        bat.step(gen, load, step_s)
+        out[k + 1] = bat.e_j
     out /= S_PER_H  # J -> Wh
     k_min = int(np.argmin(out))
     drawdown = float(np.max(np.maximum.accumulate(out) - out))
@@ -109,11 +139,11 @@ def simulate_energy(
         min_tick=k_min,
         max_drawdown_wh=drawdown,
         final_wh=float(out[-1]),
-        curtailed_wh=curtailed / S_PER_H,
-        deficit_wh=deficit / S_PER_H,
-        deficit_steps=deficit_steps,
-        generated_wh=generated / S_PER_H,
-        consumed_wh=consumed / S_PER_H,
+        curtailed_wh=bat.curtailed_j / S_PER_H,
+        deficit_wh=bat.deficit_j / S_PER_H,
+        deficit_steps=bat.deficit_steps,
+        generated_wh=bat.generated_j / S_PER_H,
+        consumed_wh=bat.consumed_j / S_PER_H,
     )
 
 

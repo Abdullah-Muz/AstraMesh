@@ -31,7 +31,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
-from astramesh.agents.packets import NavigationFix
+from astramesh.agents.packets import Housekeeping, NavigationFix, PlannedObservation, PlanUplink
 from astramesh.communications.messages import Delivery, Message, MessageType
 
 REJECT_REASONS = (
@@ -50,10 +50,13 @@ HANDLED_TYPES = frozenset({MessageType.STATUS})
 class AgentSettings:
     status_interval_ns: int
     status_lifetime_ns: int
+    battery_reserve_fraction: float = 0.0  # do not start an observation below this charge
 
     def __post_init__(self) -> None:
         if self.status_interval_ns <= 0 or self.status_lifetime_ns <= 0:
             raise ValueError("intervals must be positive")
+        if not 0.0 <= self.battery_reserve_fraction < 1.0:
+            raise ValueError("battery_reserve_fraction must be in [0, 1)")
 
 
 @dataclass(slots=True)
@@ -81,6 +84,12 @@ class SpacecraftAgent:
     _rejected: Counter[str] = field(default_factory=Counter)
     _outbox: list[Message] = field(default_factory=list)
     _log: list[dict[str, Any]] = field(default_factory=list)
+    _hk: Housekeeping | None = None
+    _plan: tuple[PlannedObservation, ...] = ()
+    _plan_algorithm: str | None = None
+    _observing: str | None = None
+    _finished: set[str] = field(default_factory=set)
+    _declined: dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.agent_id in self.peers:
@@ -88,11 +97,72 @@ class SpacecraftAgent:
         self._peer_table = {p: PeerRecord() for p in self.peers}
 
     # -- inputs -----------------------------------------------------------------
-    def observe(self, fix: NavigationFix) -> None:
-        if not isinstance(fix, NavigationFix):
-            raise TypeError(f"unsupported sensor packet {type(fix).__name__}")
-        if self._nav is None or fix.t_ns >= self._nav.t_ns:
-            self._nav = fix
+    def observe(self, packet: NavigationFix | Housekeeping | PlanUplink) -> None:
+        if isinstance(packet, NavigationFix):
+            if self._nav is None or packet.t_ns >= self._nav.t_ns:
+                self._nav = packet
+        elif isinstance(packet, Housekeeping):
+            if self._hk is None or packet.t_ns >= self._hk.t_ns:
+                self._hk = packet
+        elif isinstance(packet, PlanUplink):
+            if packet.version <= self.plan_version:
+                self._log.append({"kind": "plan_rejected", "reason": "not_newer",
+                                  "version": packet.version})  # fmt: skip
+                return
+            self._plan = tuple(sorted(packet.observations, key=lambda o: o.start_ns))
+            self._plan_algorithm = packet.algorithm
+            self.plan_version = packet.version
+            self._log.append(
+                {
+                    "kind": "plan_accepted",
+                    "algorithm": packet.algorithm,
+                    "version": packet.version,
+                    "n_observations": len(self._plan),
+                }
+            )
+        else:
+            raise TypeError(f"unsupported sensor packet {type(packet).__name__}")
+
+    # -- plan execution (spec §5.2 validate_plan_against_resources) ---------------
+    def payload_command(self, now_ns: int, step_ns: int, data_mb_per_step: float) -> str | None:
+        """Task to observe during the step starting at ``now_ns``, or None (payload off).
+
+        Before *starting* an observation the agent checks its own housekeeping:
+        battery at or above the reserve and room for the remaining data. Once
+        started it continues until the planned stop unless housekeeping shows an
+        empty battery or full storage. It never acts on another agent's state.
+        """
+        current = next((o for o in self._plan if o.start_ns <= now_ns < o.stop_ns), None)
+        if self._observing is not None and (current is None or current.task_id != self._observing):
+            self._finished.add(self._observing)
+            self._observing = None
+        if (
+            current is None
+            or current.task_id in self._finished
+            or current.task_id in self._declined
+        ):
+            return None
+        hk = self._hk
+        if hk is None:
+            return self._decline(current, "no_housekeeping")
+        if self._observing == current.task_id:
+            if hk.battery_wh <= 0.0 or hk.storage_used_mb >= hk.storage_capacity_mb:
+                self._observing = None
+                return self._decline(current, "resources_exhausted")
+            return current.task_id
+        remaining_steps = -(-(current.stop_ns - now_ns) // step_ns)
+        if hk.battery_wh < self.settings.battery_reserve_fraction * hk.battery_capacity_wh:
+            return self._decline(current, "battery_reserve")
+        if hk.storage_used_mb + remaining_steps * data_mb_per_step > hk.storage_capacity_mb:
+            return self._decline(current, "storage")
+        self._observing = current.task_id
+        return current.task_id
+
+    def _decline(self, obs: PlannedObservation, reason: str) -> str | None:
+        """Record that a planned observation will not be made; always returns None."""
+        self._declined[obs.task_id] = reason
+        self._log.append({"kind": "observation_declined", "task": obs.task_id, "reason": reason})
+        return None
 
     def receive_messages(self, deliveries: list[Delivery]) -> None:
         for d in deliveries:
@@ -193,3 +263,14 @@ class SpacecraftAgent:
     @property
     def n_accepted(self) -> int:
         return len(self._accepted)
+
+    def execution_view(self) -> dict[str, Any]:
+        return {
+            "plan_algorithm": self._plan_algorithm,
+            "plan_version": self.plan_version,
+            "planned": len(self._plan),
+            "believed_finished": len(
+                self._finished | ({self._observing} if self._observing else set())
+            ),
+            "declined": dict(sorted(self._declined.items())),
+        }

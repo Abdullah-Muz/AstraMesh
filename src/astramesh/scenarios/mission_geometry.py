@@ -28,7 +28,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from astramesh.core.config import MissionGeometryScenario
+from astramesh.core.config import MissionGeometryScenario, MissionScenarioBase
 from astramesh.core.events import EventLog
 from astramesh.dynamics.earth_frames import gcrs_to_itrs_matrices, rotate
 from astramesh.dynamics.forces import equatorial_basis
@@ -87,11 +87,18 @@ def _orbit_orientation(
     return {"beta_angle_deg": beta, "ltan_h": ltan_h}
 
 
-def run_mission_geometry(config: MissionGeometryScenario, log: EventLog) -> MissionGeometryRun:
-    formation = run_formation_dynamics(config, log, end_event=False)
+@dataclass(frozen=True, slots=True)
+class GeometryProducts:
+    sun: NDArray[np.float64]  # (n_t, 3) unit vectors
+    sunlit: NDArray[np.bool_]  # (n_t, n_sc)
+    regions: list[Region]
+    opportunities: list[Opportunity]
+
+
+def geometry_products(config: MissionScenarioBase, formation: FormationRun) -> GeometryProducts:
+    """Illumination and science opportunities on the tick grid (no events logged)."""
     traj = formation.trajectory
     epoch = config.time.epoch_utc
-    step_ns = config.time.clock_spec().step_ns
     ids = spacecraft_ids(traj.n_spacecraft)
     r_gcrs = np.ascontiguousarray(traj.y[:, :, :3])
     sun = sun_direction_gcrs(epoch, traj.t_ns)
@@ -104,6 +111,16 @@ def run_mission_geometry(config: MissionGeometryScenario, log: EventLog) -> Miss
     opportunities = find_opportunities(
         regions, ids, r_itrs, sunlit, config.science.min_elevation_deg
     )
+    return GeometryProducts(sun, sunlit, regions, opportunities)
+
+
+def run_mission_geometry(config: MissionGeometryScenario, log: EventLog) -> MissionGeometryRun:
+    formation = run_formation_dynamics(config, log, end_event=False)
+    traj = formation.trajectory
+    step_ns = config.time.clock_spec().step_ns
+    ids = spacecraft_ids(traj.n_spacecraft)
+    geo = geometry_products(config, formation)
+    sun, sunlit, regions, opportunities = geo.sun, geo.sunlit, geo.regions, geo.opportunities
     records = [o.to_record(traj.t_ns, step_ns) for o in opportunities]
     resources = _account_resources(config, ids, sunlit, opportunities, records)
 
@@ -164,7 +181,7 @@ def _on_steps(first: int, last: int, n_t: int) -> int:
 
 
 def _account_resources(
-    config: MissionGeometryScenario,
+    config: MissionScenarioBase,
     ids: list[str],
     sunlit: NDArray[np.bool_],
     opportunities: list[Opportunity],

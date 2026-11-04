@@ -89,6 +89,9 @@ uv run astramesh plot results/mission
 
 # Phase 2 increment 1: isolated agents exchanging status over the crosslink network
 uv run astramesh run configs/experiments/agent_network_24h.yaml --out results/network
+
+# Phase 2 S00: nominal science operations with B0 (static scheduler)
+uv run astramesh run configs/experiments/nominal_ops_b0_24h.yaml --out results/ops_b0
 ```
 
 A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a provenance `manifest.json` (git commit, config hash, seeds, lockfile hash, artifact hashes). The formation scenarios also write `trajectory.csv` (sampled truth states), and the mission-geometry scenario writes `opportunities.json` (geometry-only science task records with energy and data costs) and a resource summary (battery, storage, Δv) in `summary.json`. See [`docs/EXPERIMENT_PROTOCOL.md`](docs/EXPERIMENT_PROTOCOL.md).
@@ -117,7 +120,7 @@ AstraMesh is a **simulation and research project**. It is **not** a real satelli
 |---|---|
 | [`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md) | Authoritative research and engineering specification (v1.0) |
 | [`docs/`](docs/) | Supporting documents: conventions, physics test plan, literature matrix, dataset registry, decision log, roadmap |
-| [`src/astramesh/`](src/astramesh/) | Python package (`core/` clock, RNG, events, config; `dynamics/` validated truth dynamics, frames, time scales; `evaluation/` runner and manifests; `science/` region access and science opportunities; `resources/` energy, storage and Δv ledgers; `agents/` isolated spacecraft agents; `communications/` messages and crosslink network; `scenarios/` runnable scenarios; `visualization/` diagnostic plots) |
+| [`src/astramesh/`](src/astramesh/) | Python package (`core/` clock, RNG, events, config; `dynamics/` validated truth dynamics, frames, time scales; `evaluation/` runner and manifests; `science/` region access and science opportunities; `resources/` energy, storage and Δv ledgers; `agents/` isolated spacecraft agents; `planning/` task allocation (B0 so far); `communications/` messages and crosslink network; `scenarios/` runnable scenarios; `visualization/` diagnostic plots) |
 | [`scripts/studies/`](scripts/studies/) | Reference-error studies behind every physics test tolerance |
 | [`configs/`](configs/) | Scenario configuration files (YAML) |
 | [`tests/`](tests/) | Unit, integration, and regression tests |
