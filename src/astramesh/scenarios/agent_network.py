@@ -29,6 +29,7 @@ from astramesh.core.clock import seconds_to_ns
 from astramesh.core.config import AgentNetworkScenario
 from astramesh.core.events import EventLog
 from astramesh.core.rng import RandomStreams
+from astramesh.faults.schedule import FaultSchedule
 from astramesh.scenarios.formation_dynamics import (
     FormationRun,
     record_scenario_end,
@@ -66,6 +67,7 @@ def make_kernel(
     agents: dict[str, SpacecraftAgent],
     streams: RandomStreams,
     log: EventLog,
+    faults: FaultSchedule | None = None,
 ) -> AgentKernel:
     spec = config.time.clock_spec()
     ag = config.agents
@@ -82,6 +84,7 @@ def make_kernel(
         nav_interval_ns=seconds_to_ns(ag.nav_fix_interval_s),
         nav_sigma_r_m=ag.nav_position_sigma_m,
         nav_sigma_v_mps=ag.nav_velocity_sigma_mps,
+        faults=faults,
     )
 
 

@@ -40,6 +40,7 @@ from astramesh.core.clock import seconds_to_ns
 from astramesh.core.config import NominalOperationsScenario
 from astramesh.core.events import EventLog
 from astramesh.core.rng import RandomStreams
+from astramesh.faults.schedule import Fault, FaultSchedule
 from astramesh.planning.centralized_b1 import EnergyModel, plan_centralized
 from astramesh.planning.plans import Assignment, Plan
 from astramesh.planning.static_b0 import plan_static
@@ -66,6 +67,7 @@ class Segment:
     start_tick: int
     stop_tick: int = -1  # exclusive
     aborted: str | None = None  # "power" | "storage"
+    payload_invalid: bool = False  # a payload_degraded fault was active during a step
     valid: bool = False
     outcome: str = "open"
 
@@ -145,6 +147,31 @@ def plan_to_dict(plan: Plan, step_ns: int) -> dict[str, Any]:
     }
 
 
+def fault_schedule(config: NominalOperationsScenario, ids: list[str]) -> FaultSchedule:
+    def ns(s: float) -> int:
+        return seconds_to_ns(s)
+
+    return FaultSchedule(
+        [
+            Fault(
+                fault_id=f.fault_id,
+                fault_type=f.type,
+                spacecraft=tuple(f.spacecraft) or tuple(m for g in f.groups for m in g),
+                groups=tuple(tuple(g) for g in f.groups),
+                start_ns=ns(f.start_s),
+                end_ns=None if f.end_s is None else ns(f.end_s),
+                severity_fraction=f.severity_fraction,
+                cause=f.cause,
+                observability=f.observability,
+                recoverable=f.recoverable,
+                consequences=f.consequences,
+            )
+            for f in config.faults
+        ],
+        ids,
+    )
+
+
 def run_nominal_operations(
     config: NominalOperationsScenario, streams: RandomStreams, log: EventLog
 ) -> OperationsRun:
@@ -211,7 +238,9 @@ def run_nominal_operations(
     min_wh = {a: batteries[a].stored_wh for a in ids}
     active: dict[str, Segment] = {}
     segments: list[Segment] = []
-    kernel = make_kernel(config, formation, agents, streams, log)
+    faults = fault_schedule(config, ids)
+    transitions = faults.transitions(spec.duration_ns)
+    kernel = make_kernel(config, formation, agents, streams, log, faults)
 
     def close(a: str, k: int) -> None:
         seg = active.pop(a)
@@ -222,13 +251,18 @@ def run_nominal_operations(
                        "aborted": seg.aborted})  # fmt: skip
 
     def hook(k: int, t: int) -> None:
+        for when, kind, f in transitions:  # truth events, never seen by agents
+            if when == t:
+                kernel.record(t, "faults", kind, f.record())
         for j, a in enumerate(ids):
             bat = batteries[a]
-            agents[a].observe(Housekeeping(t, bat.stored_wh, sc.battery_capacity_wh,
-                                           storage[a], sc.storage_capacity_mb))  # fmt: skip
+            down = bool(faults) and faults.unavailable(a, t)
+            if not down:
+                agents[a].observe(Housekeeping(t, bat.stored_wh, sc.battery_capacity_wh,
+                                               storage[a], sc.storage_capacity_mb))  # fmt: skip
             if k == n_ticks - 1:
                 continue  # no step after the final tick
-            cmd = agents[a].payload_command(t, step_ns, mb_per_step)
+            cmd = None if down else agents[a].payload_command(t, step_ns, mb_per_step)
             if a in active and active[a].task_id != cmd:
                 close(a, k)
             if cmd is not None and a not in active:
@@ -237,6 +271,8 @@ def run_nominal_operations(
                 active[a] = Segment(a, cmd, k)
                 kernel.record(t, "sim", "observation_started", {"spacecraft": a, "task": cmd})
             gen = sc.solar_generation_w if bool(geo.sunlit[k, j]) else 0.0
+            if faults:
+                gen *= faults.generation_factor(a, t)
             load = sc.bus_power_w + (sc.payload_power_w if cmd is not None else 0.0)
             supplied = bat.step(gen, load, step_s)
             min_wh[a] = min(min_wh[a], bat.stored_wh)
@@ -248,6 +284,8 @@ def run_nominal_operations(
                     seg.aborted = seg.aborted or "storage"
                 if not supplied:
                     seg.aborted = seg.aborted or "power"
+                if faults and not faults.payload_valid(a, t):
+                    seg.payload_invalid = True
 
     kernel.run(tick_hook=hook)
     for a in sorted(active):
@@ -276,7 +314,10 @@ def run_nominal_operations(
             w is not None and w.first_tick <= seg.start_tick and seg.stop_tick - 1 <= w.last_tick
         )
         seg.valid = seg.aborted is None and inside and seg.stop_tick - seg.start_tick >= n_steps
-        if not seg.valid:
+        if seg.valid and seg.payload_invalid:
+            seg.valid = False
+            seg.outcome = "invalid_payload"
+        elif not seg.valid:
             seg.outcome = "invalid" if seg.aborted is None else f"aborted_{seg.aborted}"
         elif seg.task_id in completed:
             seg.outcome = "duplicate"
@@ -298,6 +339,8 @@ def run_nominal_operations(
             "n_duplicates": sum(1 for s in segments if s.outcome == "duplicate"),
             "n_aborted": sum(1 for s in segments if s.aborted is not None),
             "n_invalid": sum(1 for s in segments if s.outcome == "invalid"),
+            **({"n_invalid_payload": sum(1 for s in segments if s.outcome == "invalid_payload"),
+                "faults": [f.record() for f in faults.faults]} if faults else {}),
             "n_assigned": len(plan.assignments),
             "unassigned": list(plan.unassigned),
             "decentralized": decentralized,

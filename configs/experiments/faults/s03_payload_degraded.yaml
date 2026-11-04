@@ -1,0 +1,97 @@
+# Phase 3 fault scenario (S03: payload degradation). Base: nominal_ops_b3_24h.yaml.
+# Faults are simulator ground truth; agents learn of them only through effects (DL-050).
+schema_version: 1
+scenario_id: S03_PAYLOAD_DEGRADED_B3
+description: >-
+  Phase 2 S00 nominal operations, B3 decentralized allocation. FORMATION_24H_J2 dynamics,
+  MISSION_GEOMETRY_24H regions and spacecraft resources, AGENT_NETWORK_24H crosslinks.
+scenario_type: nominal_operations
+
+time:
+  epoch_utc: "2025-06-01T00:00:00Z"
+  duration_s: 86400
+  time_step_s: 10
+
+random:
+  seed: 1                              # unused (no stochastic elements); provenance only
+
+dynamics:
+  model: j2
+
+reference_orbit:                       # mean elements, Earth equatorial frame
+  mean_altitude_km: 525
+  mean_inclination_deg: 97.5
+  raan_deg: 0                          # LTAN ~07:25 at this epoch (summary.json)
+  start_argument_of_latitude_deg: 0
+
+formation:
+  n_spacecraft: 4
+  along_track_spacing_km: 20
+
+output:
+  trajectory_sample_interval_s: 60
+
+science:
+  min_elevation_deg: 20                # PROVISIONAL (DL-033)
+  regions:                             # synthetic grid: lat +-20 (EIA crests, p4), +-60 (p3)
+    - {region_id: REGION_01, latitude_deg: 60, longitude_deg: -135, priority: 3}
+    - {region_id: REGION_02, latitude_deg: 60, longitude_deg: -45, priority: 3}
+    - {region_id: REGION_03, latitude_deg: 60, longitude_deg: 45, priority: 3}
+    - {region_id: REGION_04, latitude_deg: 60, longitude_deg: 135, priority: 3}
+    - {region_id: REGION_05, latitude_deg: 20, longitude_deg: -135, priority: 4}
+    - {region_id: REGION_06, latitude_deg: 20, longitude_deg: -45, priority: 4}
+    - {region_id: REGION_07, latitude_deg: 20, longitude_deg: 45, priority: 4}
+    - {region_id: REGION_08, latitude_deg: 20, longitude_deg: 135, priority: 4}
+    - {region_id: REGION_09, latitude_deg: -20, longitude_deg: -135, priority: 4}
+    - {region_id: REGION_10, latitude_deg: -20, longitude_deg: -45, priority: 4}
+    - {region_id: REGION_11, latitude_deg: -20, longitude_deg: 45, priority: 4}
+    - {region_id: REGION_12, latitude_deg: -20, longitude_deg: 135, priority: 4}
+    - {region_id: REGION_13, latitude_deg: -60, longitude_deg: -135, priority: 3}
+    - {region_id: REGION_14, latitude_deg: -60, longitude_deg: -45, priority: 3}
+    - {region_id: REGION_15, latitude_deg: -60, longitude_deg: 45, priority: 3}
+    - {region_id: REGION_16, latitude_deg: -60, longitude_deg: 135, priority: 3}
+
+spacecraft:                            # every spacecraft; spec §3.3 values unless noted
+  mass_kg: 12
+  solar_generation_w: 25               # while sunlit (attitude abstracted, no pointing loss)
+  bus_power_w: 8                       # PROVISIONAL, not in spec (DL-035)
+  battery_capacity_wh: 100             # usable
+  battery_initial_fraction: 0.8        # PROVISIONAL (DL-035)
+  charge_efficiency_fraction: 0.9      # PROVISIONAL (DL-035)
+  payload_power_w: 5
+  payload_data_rate_kbps: 10           # PROVISIONAL, not in spec (DL-035)
+  storage_capacity_mb: 1000            # 1 GB working model
+  thrust_mn: 0.5
+  thruster_power_w: 2                  # cold gas, PROVISIONAL (DL-036)
+  specific_impulse_s: 70               # cold gas (butane-class), PROVISIONAL (DL-036)
+  delta_v_budget_mps: 5
+
+network:                               # spec §5.3, PROVISIONAL (DL-040)
+  crosslink_range_km: 100              # synthetic maximum, not a link budget
+  min_ray_altitude_km: 0               # line of sight just clears the WGS 84 equatorial sphere
+  delay_s: 1                           # application-level, not propagation time
+  loss_probability: 0.01               # "normal" stress setting
+  duplicate_probability: 0.0
+
+agents:                                # PROVISIONAL (DL-040)
+  status_interval_s: 30                # spec §5.3
+  status_lifetime_s: 60                # expires after two status periods
+  nav_fix_interval_s: 10
+  nav_position_sigma_m: 10             # GNSS-like own fix, 1-sigma per axis
+  nav_velocity_sigma_mps: 0.1
+
+operations:                            # DL-041, DL-043
+  algorithm: cbba_b3                 # B3, decentralized (DL-045)
+  min_observation_s: 60                # continuous observation needed to complete a task
+  battery_reserve_fraction: 0.2        # PROVISIONAL: no new observation below 20% charge
+
+# Ground-truth fault schedule (spec §5.4 fields)
+faults:
+- fault_id: F01
+  type: payload_degraded
+  spacecraft: [sc00]
+  start_s: 21600
+  end_s: 64800
+  cause: Synthetic receiver degradation; data unusable
+  observability: effects_only
+  consequences: sc00 observations between 6 h and 18 h are invalid

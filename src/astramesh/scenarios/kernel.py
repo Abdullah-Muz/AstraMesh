@@ -29,6 +29,7 @@ from astramesh.agents.packets import NavigationFix
 from astramesh.communications.messages import Delivery, Message
 from astramesh.communications.network import LinkModel, connectivity_graph, transmit
 from astramesh.core.events import EventLog
+from astramesh.faults.schedule import FaultSchedule
 
 
 class AgentKernel:
@@ -47,6 +48,7 @@ class AgentKernel:
         nav_interval_ns: int,
         nav_sigma_r_m: float,
         nav_sigma_v_mps: float,
+        faults: FaultSchedule | None = None,
     ) -> None:
         self.y = positions_m
         self.ids = ids
@@ -66,6 +68,10 @@ class AgentKernel:
         )  # fmt: skip
         self.graph_stats = {"epochs": 0, "fully_connected": 0, "min_edges": 10**9, "max_edges": 0}
         self._prev_edges: set[tuple[str, str]] | None = None
+        self.faults = faults if faults else None  # None when no faults: unchanged code path
+        if self.faults is not None:
+            self.counts["suppressed_radio_off"] = 0
+            self.counts["dropped_receiver_down"] = 0
 
     # -- events -------------------------------------------------------------------
     def record(self, t_ns: int, source: str, kind: str, data: dict[str, Any]) -> None:
@@ -85,6 +91,12 @@ class AgentKernel:
     # -- network ------------------------------------------------------------------
     def _graph_at(self, t_ns: int) -> nx.DiGraph:
         g = connectivity_graph(self.ids, self.y[t_ns // self.step_ns, :, :3], self.links)
+        if self.faults is not None:  # partitions and radios that are off (truth)
+            f = self.faults
+            g.remove_edges_from([
+                (a, b) for a, b in list(g.edges())
+                if f.link_cut(a, b, t_ns) or not f.radio_up(a, t_ns) or not f.radio_up(b, t_ns)
+            ])  # fmt: skip
         edges = set(g.edges())
         if self._prev_edges is not None:
             for e in sorted(edges - self._prev_edges):
@@ -96,6 +108,12 @@ class AgentKernel:
 
     def _deliver(self, d: Delivery) -> Generator[simpy.Event, None, None]:
         yield self.env.timeout(d.delivered_ns - int(self.env.now))
+        if self.faults is not None and not self.faults.radio_up(d.receiver, d.delivered_ns):
+            self.counts["dropped_receiver_down"] += 1
+            self.trace.append({"t_ns": d.delivered_ns, "event": "deliver",
+                               "sender": d.message.sender, "seq": d.message.seq,
+                               "receiver": d.receiver, "result": "receiver_down"})  # fmt: skip
+            return
         self.agents[d.receiver].receive_messages([d])
         entries = self.flush_agent_log(d.receiver, d.delivered_ns)
         rejected = [e for e in entries if e["kind"] == "message_rejected"]
@@ -106,6 +124,11 @@ class AgentKernel:
                            "result": result})  # fmt: skip
 
     def send(self, msg: Message, now: int) -> None:
+        if self.faults is not None and not self.faults.radio_up(msg.sender, now):
+            self.counts["suppressed_radio_off"] += 1
+            self.trace.append({"t_ns": now, "event": "send_suppressed", "sender": msg.sender,
+                               "seq": msg.seq, "type": str(msg.msg_type)})  # fmt: skip
+            return
         g = self._graph_at(now)
         gs, c = self.graph_stats, self.counts
         gs["epochs"] += 1
@@ -140,6 +163,8 @@ class AgentKernel:
             dv = self.sensors.normal(0.0, 1.0, 3) * self.nav_sigma_v_mps
             r = self.y[k, j, :3] + dr
             v = self.y[k, j, 3:] + dv
+            if self.faults is not None and self.faults.unavailable(a, t):
+                continue  # noise drawn anyway, so other agents' streams are unaffected
             self.agents[a].observe(NavigationFix(
                 t_ns=t,
                 r_m=(float(r[0]), float(r[1]), float(r[2])),
@@ -158,6 +183,8 @@ class AgentKernel:
                 if tick_hook is not None:
                     tick_hook(k, t)
                 for a in self.ids:
+                    if self.faults is not None and self.faults.unavailable(a, t):
+                        continue  # a completely unavailable spacecraft does nothing
                     for msg in self.agents[a].step(t):
                         self.send(msg, t)
                     self.flush_agent_log(a, t)

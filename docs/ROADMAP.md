@@ -9,7 +9,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 0 | Research and reproducibility foundation | **Complete except** Priority A full-text review (8 of 10 items drafted from full text, owner verification pending; P01 unavailable, P21 paywalled; see `LITERATURE_REVIEW.md`) |
 | 1 | Validated four-spacecraft dynamics and mission geometry | **Complete**: Gate P1 signed off 2026-11-03 (DL-037); open follow-ups listed there |
 | 2 | Decentralized nominal science operations | **Complete**: Gate P2 signed off 2026-11-03 (DL-049); open follow-ups listed there |
-| 3 | Deterministic faults and protection supervisor | Not started |
+| 3 | Deterministic faults and protection supervisor | **In progress** (DL-050) |
 | 4 | External data and probabilistic/ML experiments | Not started |
 | 5 | Storm-aware distributed recovery | Not started |
 | 6 | Research conclusion and public demonstration | Not started |
@@ -49,6 +49,24 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 2b | B1 centralized reference (SciPy `milp`, DL-042, DL-044) | **Done**: commit `5fa618c`, CI passing |
 | 3 | B2 one-shot auction, B3 CBBA (DL-045, DL-046) | **Done**: commit `eb9ee25`, CI passing |
 | 4 | S00 comparison of B0–B3 under message loss (DL-047, DL-048) | **Done**: results commit `60fbadf` (script `dafa540`); reviewed and approved 2026-11-03 |
+
+## Phase 3 increments
+
+| # | Increment | Status |
+|---|---|---|
+| 1 | Fault schema and deterministic injection: unavailable, comms outage, partition, payload and power degradation; scenarios S01–S05 + power fault | Implemented (`configs/experiments/faults/`, DL-051) |
+| 2 | Health beliefs (§5.4), timeout baseline, B4 fault-aware redistribution | Not started |
+| 3 | Supervisor NOMINAL/PROTECTIVE/SAFE, command filtering, planner cannot override | Not started |
+| 4 | Full five-mode machine: STORM_WATCH, RECOVERY, hysteresis, dwell, invalid-input rules | Not started |
+| 5 | Fault-scenario comparison (S01–S10) | Not started |
+
+## Gate P3 checklist (spec §13)
+
+- [ ] SAFE always overrides
+- [ ] Invalid forecast behaviour defined
+- [ ] No mode chatter under brief noise
+- [ ] False outage does not count as confirmed fatal failure
+- [ ] Distributed task replanning cannot defeat protection
 
 ## Gate P2 checklist (spec §13)
 

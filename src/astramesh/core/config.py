@@ -305,6 +305,51 @@ class OperationsConfig(_Model):
     )  # fmt: skip
 
 
+class FaultConfig(_Model):
+    """One injected fault (spec §5.4, DL-050). Ground truth; agents never see it."""
+
+    fault_id: Identifier
+    type: Literal["unavailable", "comms_outage", "partition", "payload_degraded", "power_degraded"]
+    spacecraft: list[Identifier] = Field(
+        default_factory=list, description="Affected spacecraft (not used for partition)"
+    )
+    groups: list[list[Identifier]] = Field(
+        default_factory=list, description="Partition groups; unlisted spacecraft form one more"
+    )
+    start_s: NonNegativeFloat = Field(description="Fault start [s since epoch]")
+    end_s: PositiveFloat | None = Field(default=None, description="Fault end [s]; null = permanent")
+    severity_fraction: float = Field(
+        default=1.0, ge=0.0, le=1.0, allow_inf_nan=False,
+        description="power_degraded: remaining generation fraction (0 = none)",
+    )  # fmt: skip
+    cause: str = Field(min_length=1, description="Cause / model (free text)")
+    observability: Literal["effects_only", "self_reported", "ground_confirmed"] = Field(
+        description="How agents can learn of it (DL-050); effects_only in increment 1"
+    )
+    consequences: str = Field(min_length=1, description="Expected consequences (free text)")
+
+    @model_validator(mode="after")
+    def _consistent(self) -> FaultConfig:
+        if self.end_s is not None and self.end_s <= self.start_s:
+            raise ValueError(f"{self.fault_id}: end_s must be after start_s")
+        if self.type == "partition":
+            members = [m for g in self.groups for m in g]
+            if len(self.groups) < 1 or len(members) != len(set(members)):
+                raise ValueError(f"{self.fault_id}: partition needs disjoint groups")
+            if self.spacecraft:
+                raise ValueError(f"{self.fault_id}: use groups, not spacecraft, for partition")
+        else:
+            if not self.spacecraft or self.groups:
+                raise ValueError(f"{self.fault_id}: needs spacecraft and no groups")
+        if self.type != "power_degraded" and self.severity_fraction != 1.0:
+            raise ValueError(f"{self.fault_id}: severity_fraction applies to power_degraded only")
+        return self
+
+    @property
+    def recoverable(self) -> bool:
+        return self.end_s is not None
+
+
 class NominalOperationsScenario(MissionScenarioBase):
     """Phase 2 S00: isolated agents execute a science plan over the crosslink network."""
 
@@ -312,9 +357,22 @@ class NominalOperationsScenario(MissionScenarioBase):
     network: NetworkConfig
     agents: AgentsConfig
     operations: OperationsConfig
+    faults: list[FaultConfig] = Field(default_factory=list, description="Injected faults (S01+)")
 
     @model_validator(mode="after")
     def _ops_timing_on_grid(self) -> NominalOperationsScenario:
+        ids = {f"sc{k:02d}" for k in range(self.formation.n_spacecraft)}
+        seen: set[str] = set()
+        for f in self.faults:
+            if f.fault_id in seen:
+                raise ValueError(f"duplicate fault_id {f.fault_id!r}")
+            seen.add(f.fault_id)
+            named = set(f.spacecraft) | {m for g in f.groups for m in g}
+            if named - ids:
+                raise ValueError(f"{f.fault_id}: unknown spacecraft {sorted(named - ids)}")
+            self._require_on_grid(f.start_s, f"faults[{f.fault_id}].start_s")
+            if f.end_s is not None:
+                self._require_on_grid(f.end_s, f"faults[{f.fault_id}].end_s")
         self._require_on_grid(self.agents.nav_fix_interval_s, "agents.nav_fix_interval_s")
         self._require_on_grid(self.agents.status_interval_s, "agents.status_interval_s")
         self._require_on_grid(self.operations.min_observation_s, "operations.min_observation_s")
