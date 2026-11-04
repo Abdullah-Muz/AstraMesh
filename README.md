@@ -4,8 +4,8 @@
 
 AstraMesh is an independent, public-methods computational research project. It is a Python-first, CPU-feasible simulation platform for a **simulated four-spacecraft, decentralized low-Earth-orbit mission** that cooperatively schedules ionospheric observations, coordinates over constrained inter-satellite links, assesses its own health and environmental risk, and tries to preserve scientific value when spacecraft become unavailable or space-weather conditions worsen.
 
-> **Project status: Phases 1 and 2 complete; Phase 3 (faults and protection supervisor) not started.**
-> The repository contains reproducibility infrastructure, validated truth dynamics (two-body and J2) for a four-spacecraft formation, mission geometry (illumination, geometry-only science opportunities), and resource accounting, each with its physics acceptance tests. Phase 2 added isolated spacecraft agents over a modelled crosslink network and four allocation baselines: a static scheduler, a centralized reference, a one-shot auction and CBBA. They are compared on a fault-free day under message loss. It contains **no** fault model, protection supervisor, science-retrieval model or proposed research method yet, and no research results. Nothing here should be read as a validated or published finding.
+> **Project status: Phases 1 and 2 complete; Phase 3 (faults and protection supervisor) implemented and awaiting Gate P3 review.**
+> The repository contains reproducibility infrastructure, validated truth dynamics (two-body and J2) for a four-spacecraft formation, mission geometry (illumination, geometry-only science opportunities), and resource accounting, each with its physics acceptance tests. Phase 2 added isolated spacecraft agents over a modelled crosslink network and four allocation baselines: a static scheduler, a centralized reference, a one-shot auction and CBBA. They are compared on a fault-free day under message loss. Phase 3 added deterministic fault injection, per-agent health beliefs, two fault-aware baselines (B3 + timeout and B4 rule-based redistribution), and a five-mode local protection supervisor; all six methods are compared across nine synthetic fault and hazard scenarios ([`docs/results/FAULT_COMPARISON.md`](docs/results/FAULT_COMPARISON.md)). It contains **no** science-retrieval model, external data or proposed research method yet, and no research results. Nothing here should be read as a validated or published finding.
 
 The authoritative design document is **[`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md)** (v1.0). Where this README and the specification differ, the specification governs.
 
@@ -106,7 +106,7 @@ A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a prove
 | 0 | Research and reproducibility foundation | Complete except the Priority A full-text literature review (in parallel; see [`docs/ROADMAP.md`](docs/ROADMAP.md)) |
 | 1 | Validated four-spacecraft dynamics and mission geometry | Complete (Gate P1 signed off 2026-11-03) |
 | 2 | Decentralized nominal science operations | Complete (Gate P2 signed off 2026-11-03) |
-| 3 | Deterministic faults and protection supervisor | Not started |
+| 3 | Deterministic faults and protection supervisor | Implemented; Gate P3 review pending |
 | 4 | External data and probabilistic/ML experiments | Not started |
 | 5 | Storm-aware distributed recovery | Not started |
 | 6 | Research conclusion and public demonstration | Not started |

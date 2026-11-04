@@ -43,6 +43,6 @@ Duplicates are second observations of an already completed task: they use energy
 
 ## Limits
 
-- One scenario (S00), one fleet size (4), one day. Ten seeds. The q = 1 utility (DL-041) gives every spacecraft the same score, so ties decide assignments (every method gives the tasks to sc00).
+- One scenario (S00), one fleet size (4), one day. Ten seeds. The q = 1 utility (DL-041) gives every spacecraft the same score, so ties decide assignments: B1, B2 and B3 give all 43 tasks to sc00, while B0's greedy scheduler spreads them 11/11/11/10. (Corrected 2026-11-04; this page first said every method gave the tasks to sc00. The results are unchanged.)
 - Message cost is counted in canonical-JSON bytes, not modelled radio bandwidth.
 - CPU time per run is in the per-run CSV (`wall_s`) but is not deterministic, so it is not summarised.

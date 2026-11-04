@@ -1,0 +1,96 @@
+{
+  "experiment": "Phase 3 fault-scenario comparison (DL-058)",
+  "git_commit": "311477a2887c33056b64b6893d4e1b2bda928d58",
+  "git_dirty": false,
+  "lockfile_sha256": "c4ec5d7393b0b0d390d76f60f42dc9fad145b3e1d870945175f0544e4c5486cf",
+  "base_config": "configs/experiments/nominal_ops_b0_24h.yaml",
+  "base_config_sha256": "f49f5ab909f7356e2820a2a7b9a875f537a85bb7d22b0a35e40abd552308b6d3",
+  "methods": [
+    "static_b0",
+    "centralized_b1",
+    "auction_b2",
+    "cbba_b3",
+    "cbba_b3_timeout",
+    "rule_b4"
+  ],
+  "scenarios": [
+    "S00",
+    "S01",
+    "S02",
+    "S03",
+    "S04",
+    "S05",
+    "S07",
+    "S08",
+    "S09",
+    "S10"
+  ],
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "hours": 24.0,
+  "n_runs": 600,
+  "draws": {
+    "1": {
+      "a": "sc01",
+      "b": "sc02",
+      "t0_s": 14810
+    },
+    "2": {
+      "a": "sc01",
+      "b": "sc02",
+      "t0_s": 17720
+    },
+    "3": {
+      "a": "sc03",
+      "b": "sc00",
+      "t0_s": 26620
+    },
+    "4": {
+      "a": "sc00",
+      "b": "sc02",
+      "t0_s": 33470
+    },
+    "5": {
+      "a": "sc01",
+      "b": "sc02",
+      "t0_s": 30740
+    },
+    "6": {
+      "a": "sc03",
+      "b": "sc01",
+      "t0_s": 15340
+    },
+    "7": {
+      "a": "sc03",
+      "b": "sc01",
+      "t0_s": 26770
+    },
+    "8": {
+      "a": "sc03",
+      "b": "sc00",
+      "t0_s": 29110
+    },
+    "9": {
+      "a": "sc02",
+      "b": "sc00",
+      "t0_s": 19600
+    },
+    "10": {
+      "a": "sc02",
+      "b": "sc00",
+      "t0_s": 25690
+    }
+  },
+  "total_wall_s": 2201.9,
+  "note": "synthetic faults and hazards; wall_s is the only non-deterministic column"
+}
