@@ -24,6 +24,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from astramesh.agents.agent import AgentSettings, SpacecraftAgent
+from astramesh.agents.health import HealthSettings
 from astramesh.communications.network import LinkModel
 from astramesh.core.clock import seconds_to_ns
 from astramesh.core.config import AgentNetworkScenario
@@ -48,6 +49,15 @@ class AgentNetworkRun:
     trace: list[dict[str, Any]]
     summary: dict[str, Any]
     agents: dict[str, SpacecraftAgent]
+
+
+def health_settings(config: AgentNetworkScenario | Any) -> HealthSettings:
+    ag = config.agents
+    return HealthSettings(
+        suspect_ns=seconds_to_ns(ag.health_suspect_s),
+        lost_ns=seconds_to_ns(ag.health_lost_s),
+        recover_messages=ag.health_recover_messages,
+    )
 
 
 def make_links(config: AgentNetworkScenario | Any) -> LinkModel:
@@ -96,6 +106,7 @@ def run_agent_network(
     settings = AgentSettings(
         status_interval_ns=seconds_to_ns(config.agents.status_interval_s),
         status_lifetime_ns=seconds_to_ns(config.agents.status_lifetime_s),
+        health=health_settings(config),
     )
     agents = {a: SpacecraftAgent(a, tuple(p for p in ids if p != a), settings) for a in ids}
     kernel = make_kernel(config, formation, agents, streams, log)

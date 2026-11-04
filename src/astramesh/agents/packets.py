@@ -64,6 +64,7 @@ class PlanUplink:
     algorithm: str
     version: int
     observations: tuple[PlannedObservation, ...]
+    public_tasks: tuple[PublicTask, ...] = ()  # B4 only: whole plan + catalogue (DL-052)
 
     def __post_init__(self) -> None:
         if self.version < 1:
@@ -105,3 +106,30 @@ class CatalogUplink:
         for t in self.own:
             if t.task_id not in known or not (0 <= t.start_ns < t.stop_ns):
                 raise ValueError(f"invalid own task {t.task_id!r}")
+
+
+@dataclass(frozen=True, slots=True)
+class GroundNotice:
+    """Explicit ground confirmation that spacecraft have failed (DL-052): the only
+    evidence that can make an agent believe CONFIRMED_FAILED."""
+
+    t_ns: int
+    confirmed_failed: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class PublicSlot:
+    spacecraft: str
+    start_ns: int
+    stop_ns: int
+
+
+@dataclass(frozen=True, slots=True)
+class PublicTask:
+    """B4: a task with every spacecraft's predicted slot and the planned owner."""
+
+    task_id: str
+    priority: int
+    owner: str | None
+    slots: tuple[PublicSlot, ...]
+    data_mb: float

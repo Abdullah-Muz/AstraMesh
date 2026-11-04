@@ -89,6 +89,20 @@ BASE = {"fault_id": "F1", "cause": "c", "observability": "effects_only", "conseq
         {**BASE, "type": "partition", "groups": [["sc00"]], "spacecraft": ["sc01"]},
         {**BASE, "type": "comms_outage", "spacecraft": ["sc00"], "observability": "magic"},
         {**BASE, "type": "comms_outage", "spacecraft": ["sc00"], "cause": ""},
+        {
+            **BASE,
+            "type": "unavailable",
+            "spacecraft": ["sc00"],
+            "observability": "ground_confirmed",
+        },
+        {**BASE, "type": "unavailable", "spacecraft": ["sc00"], "ground_confirmation_s": 900},
+        {
+            **BASE,
+            "type": "unavailable",
+            "spacecraft": ["sc00"],
+            "observability": "ground_confirmed",
+            "ground_confirmation_s": 300,
+        },
     ],
 )
 def test_invalid_fault_configs_rejected(fault: dict[str, Any]) -> None:

@@ -18,12 +18,12 @@ from astramesh.scenarios.nominal_operations import OBSERVATIONS_FILE, PLAN_FILE
 
 ROOT = Path(__file__).resolve().parents[2]
 GOLDEN = {
-    "events": "4cb17eaf4d85d62e991cac2fdb849fe7e9025eb4d95fbc5ff90932b52fa025c2",
+    "events": "4df5f6ba9b0752b801871a8f57f1173ef42b8b60172bdfd950943913b6397e85",
     PLAN_FILE: "d5bc2908554bdc3761ac84bf9e1d16566665a2d59dd0f3a4fd5f199385f89214",
     OBSERVATIONS_FILE: "39d73e9613fec90023c66c18fb9e8875b849a0a86285ca24f4d6e58b533315de",
-    SUMMARY_FILE: "726d5d89e37ff4a14c6fd97a09f960cb528f7ba105500cef8dae081dad2dbe85",
+    SUMMARY_FILE: "5faf453c021345e9eadb100675552a79a1e3bb2710cc4790842a1a8d12e1e97e",
 }
-AGENT_NETWORK_MESSAGES_SHA256 = "df06deca06f33a9f288b25fa29e76b9155a75e59bda8a98d182189348cf467cc"
+AGENT_NETWORK_MESSAGES_SHA256 = "b05a90cdf3499aa4207ab5841b8cf576072c0fba37f11f80235e743375f3dcfb"
 
 
 def test_24h_nominal_ops_b0_matches_golden(tmp_path: Path) -> None:
@@ -38,10 +38,10 @@ def test_24h_nominal_ops_b0_matches_golden(tmp_path: Path) -> None:
 
 
 GOLDEN_B1 = {
-    "events": "9e671235785eafc15134eccc2b9c75e08f9d119b2dcf18a3c97972d1874d8b70",
+    "events": "15bdb09061c1c30b50a347f377ad7c7c933808524bdd2aa9e7b78a9dbb5d1add",
     PLAN_FILE: "202a41e58156f06a9621a6e381aae5de1af4db97fca88843c2443dae07d43733",
     OBSERVATIONS_FILE: "25b9a1697e33ce0a8d5a2c00346beb173ca994d8c939ca42361ad3dd318df279",
-    SUMMARY_FILE: "9cbcca2dab9b0011e0299131c4a9c8097d772d27f7f263cb4220cb12cfeb9d88",
+    SUMMARY_FILE: "afa84acdf8cd6ee8b8a3df5cd651d348e2d429c7432feb26744c3c292eacae6c",
 }
 
 
@@ -62,16 +62,16 @@ def test_24h_nominal_ops_b1_matches_golden(tmp_path: Path) -> None:
 B1_OBSERVATIONS_SHA256 = GOLDEN_B1[OBSERVATIONS_FILE]
 GOLDEN_DECENTRALIZED = {
     "nominal_ops_b2_24h.yaml": {
-        "events": "cd364ae2809ea16e94460ba3d5e97e588c32cd0067aab69f898f47710faceac3",
+        "events": "759bed130b2df2506cffc133542216b161a6a5bbf1cf9b2ac696dd8ca2c342cc",
         PLAN_FILE: "bda4c39d3c1eccb0b0db788b3ef1a248dfb7756f8a6f5adc74d1f6df8efdd18f",
-        SUMMARY_FILE: "c48e9cafb4bcf9cd5e11d408b89f1e41dc1d3c7277cd03117eb69aabdce38f93",
-        MESSAGES_FILE: "ceb228e79defcfc9df7d4adb14d4103b6babaf8a540f74a7362830ac1f402a90",
+        SUMMARY_FILE: "23d14f8373433fb4ecf7f7a3f941c74d1f1f75db66ca16f126b01f4f760a99d2",
+        MESSAGES_FILE: "7839ddb57bac60ee0265541e4a857c61321a61522d3479c326ebc9b5e75acdb1",
     },
     "nominal_ops_b3_24h.yaml": {
-        "events": "fd976630010561050d701e03de3933ed1c7df8f68fc4d67f66ac52dd0d7d8c58",
+        "events": "8cf1d597fdef6f199ae0350e4897b30eced193acf85725c5bad83ee47d6b0e75",
         PLAN_FILE: "5190f5f2cd3be4c35232d088b25a868f8b141e717936482a06e3b237928bb448",
-        SUMMARY_FILE: "0cc16503f3cbe9de088e97c7ed15b870604520c192e65fac0ee533955e9ad6bb",
-        MESSAGES_FILE: "1426562c5ae403bf30f0cc52376e46d4a7a04816262418c89e1f82828844bcee",
+        SUMMARY_FILE: "429152a12a6a967c5da5ff42676aaa9a7405013749d3860a74b8bfafc8b6ef4e",
+        MESSAGES_FILE: "984b496f05b8c77094857201c2105de7a8807bd45105ee916e2fa4b77aad144a",
     },
 }
 

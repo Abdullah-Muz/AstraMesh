@@ -182,5 +182,12 @@ class CbbaState:
                 del self.bundle[n_bar:]
                 break
 
+    def forget_peer(self, peer: str) -> None:
+        """B3 + timeout (DL-052): drop every claim by a peer believed lost, so the tasks
+        are re-auctioned. Not part of published CBBA."""
+        for tid in self.catalog.task_order:
+            if self.z[tid] == peer:
+                self.y[tid], self.z[tid] = 0.0, None
+
     def winning(self) -> tuple[OwnTask, ...]:
         return tuple(self._own[t] for t in self.bundle if self.z[t] == self.me)

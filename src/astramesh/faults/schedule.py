@@ -45,6 +45,7 @@ class Fault:
     observability: str
     recoverable: bool
     consequences: str
+    ground_confirmation_ns: int | None = None  # ground notice to all agents (DL-052)
 
     def active(self, t_ns: int) -> bool:
         return self.start_ns <= t_ns and (self.end_ns is None or t_ns < self.end_ns)
@@ -62,6 +63,7 @@ class Fault:
             "observability": self.observability,
             "recoverable": self.recoverable,
             "consequences": self.consequences,
+            "ground_confirmation_ns": self.ground_confirmation_ns,
         }
 
 
@@ -101,6 +103,11 @@ class FaultSchedule:
             if ga != gb:
                 return True
         return False
+
+    def ground_notices(self, t_ns: int) -> tuple[str, ...]:
+        """Spacecraft whose failure the ground confirms exactly at ``t_ns``."""
+        return tuple(sorted({sc for f in self.faults if f.ground_confirmation_ns == t_ns
+                             for sc in f.spacecraft}))  # fmt: skip
 
     def payload_valid(self, sc: str, t_ns: int) -> bool:
         return not any(sc in f.spacecraft for f in self._active("payload_degraded", t_ns))

@@ -269,6 +269,21 @@ class AgentsConfig(_Model):
     nav_fix_interval_s: PositiveSeconds = Field(description="Own navigation-fix period")
     nav_position_sigma_m: NonNegativeFloat = Field(description="1-sigma per axis [m]")
     nav_velocity_sigma_mps: NonNegativeFloat = Field(description="1-sigma per axis [m/s]")
+    health_suspect_s: PositiveSeconds = Field(
+        default=90.0, description="Silence before SUSPECTED_UNAVAILABLE [s] (DL-052)"
+    )
+    health_lost_s: PositiveSeconds = Field(
+        default=300.0, description="Silence before COMMUNICATION_LOST [s] (DL-052)"
+    )
+    health_recover_messages: int = Field(
+        default=2, ge=1, le=100, description="Status messages after RECOVERING before HEALTHY"
+    )
+
+    @model_validator(mode="after")
+    def _health_order(self) -> AgentsConfig:
+        if not self.health_suspect_s < self.health_lost_s:
+            raise ValueError("agents.health_suspect_s must be < agents.health_lost_s")
+        return self
 
 
 class AgentNetworkScenario(FormationScenarioBase):
@@ -290,10 +305,13 @@ class AgentNetworkScenario(FormationScenarioBase):
 class OperationsConfig(_Model):
     """Nominal science operations (Phase 2 increment 2; DL-041, DL-043)."""
 
-    algorithm: Literal["static_b0", "centralized_b1", "auction_b2", "cbba_b3"] = Field(
+    algorithm: Literal[
+        "static_b0", "centralized_b1", "auction_b2", "cbba_b3", "rule_b4", "cbba_b3_timeout"
+    ] = Field(
         description=(
             "static_b0 = B0 static greedy; centralized_b1 = B1 MILP reference (privileged); "
-            "auction_b2 = B2 one-shot auction; cbba_b3 = B3 CBBA (decentralized)"
+            "auction_b2 = B2 one-shot auction; cbba_b3 = B3 CBBA (decentralized); "
+            "rule_b4 = B4 rule-based redistribution; cbba_b3_timeout = B3 + timeout handling"
         )
     )
     min_observation_s: PositiveSeconds = Field(
@@ -327,6 +345,9 @@ class FaultConfig(_Model):
         description="How agents can learn of it (DL-050); effects_only in increment 1"
     )
     consequences: str = Field(min_length=1, description="Expected consequences (free text)")
+    ground_confirmation_s: NonNegativeFloat | None = Field(
+        default=None, description="Ground confirms the failure to all agents at this time [s]"
+    )
 
     @model_validator(mode="after")
     def _consistent(self) -> FaultConfig:
@@ -341,6 +362,14 @@ class FaultConfig(_Model):
         else:
             if not self.spacecraft or self.groups:
                 raise ValueError(f"{self.fault_id}: needs spacecraft and no groups")
+        confirmed = self.observability == "ground_confirmed"
+        if confirmed != (self.ground_confirmation_s is not None):
+            raise ValueError(
+                f"{self.fault_id}: ground_confirmation_s is required for, and only for, "
+                "observability ground_confirmed"
+            )
+        if self.ground_confirmation_s is not None and self.ground_confirmation_s < self.start_s:
+            raise ValueError(f"{self.fault_id}: ground_confirmation_s before start_s")
         if self.type != "power_degraded" and self.severity_fraction != 1.0:
             raise ValueError(f"{self.fault_id}: severity_fraction applies to power_degraded only")
         return self
@@ -373,6 +402,10 @@ class NominalOperationsScenario(MissionScenarioBase):
             self._require_on_grid(f.start_s, f"faults[{f.fault_id}].start_s")
             if f.end_s is not None:
                 self._require_on_grid(f.end_s, f"faults[{f.fault_id}].end_s")
+            if f.ground_confirmation_s is not None:
+                self._require_on_grid(
+                    f.ground_confirmation_s, f"faults[{f.fault_id}].ground_confirmation_s"
+                )
         self._require_on_grid(self.agents.nav_fix_interval_s, "agents.nav_fix_interval_s")
         self._require_on_grid(self.agents.status_interval_s, "agents.status_interval_s")
         self._require_on_grid(self.operations.min_observation_s, "operations.min_observation_s")

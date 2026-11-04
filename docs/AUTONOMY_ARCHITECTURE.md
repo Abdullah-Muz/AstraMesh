@@ -93,6 +93,29 @@ For B2 and B3 there is no external plan. Each agent gets a **`CatalogUplink`** a
 
 An agent handles only its own algorithm's message type. Any other allocation type is `unhandled_type`, and a badly formed payload is `malformed_payload`; neither changes the plan. The executable plan is rebuilt from the allocation state after every round and receipt. Each change bumps `plan_version` and is logged as `plan_changed`. An observation is committed at slot start and finished even if the agent is outbid later.
 
-### 8. Not yet implemented
+### 8. Health beliefs and fault response (Phase 3 increment 2, DL-052, DL-053)
 
-Inter-agent re-planning after faults, health beliefs (§5.4), estimators beyond the latest fix, safety supervisor. Each will be added behind the same boundary.
+Each agent holds one belief per peer (`agents/health.py`), driven only by what it receives:
+- accepted messages, with the peer's self-reported health in its status;
+- silence timers;
+- ground notices.
+
+| Belief | Rule |
+|---|---|
+| UNKNOWN | before the first message |
+| HEALTHY / DEGRADED | heard within 90 s (DEGRADED if the peer reports itself degraded) |
+| SUSPECTED_UNAVAILABLE | silent for more than 90 s |
+| COMMUNICATION_LOST | silent for more than 300 s |
+| RECOVERING | heard again after suspicion or loss; HEALTHY after 2 more status messages |
+| CONFIRMED_FAILED | ground notice only; sticky; never from silence |
+
+On COMMUNICATION_LOST or CONFIRMED_FAILED:
+- **B4** gives each of the peer's future tasks to the lowest-ID spacecraft it believes available that has a slot;
+- **B3 + timeout** erases the peer's CBBA claims so the tasks are re-auctioned;
+- **B0–B2 and pure B3** do not react.
+
+Beliefs are compared with truth only after the run, in the summary's `health` section.
+
+### 9. Not yet implemented
+
+Inter-agent re-planning after faults beyond B4 / B3 + timeout, health beliefs (§5.4), estimators beyond the latest fix, safety supervisor. Each will be added behind the same boundary.

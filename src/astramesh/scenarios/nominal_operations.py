@@ -22,6 +22,7 @@ duplicates. Evaluation uses truth; agents never see it.
 
 from __future__ import annotations
 
+import itertools
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -29,12 +30,16 @@ import numpy as np
 from numpy.typing import NDArray
 
 from astramesh.agents.agent import AgentSettings, SpacecraftAgent
+from astramesh.agents.health import AVAILABLE_BELIEFS, CONFIRMED, UNAVAILABLE_BELIEFS
 from astramesh.agents.packets import (
     CatalogUplink,
+    GroundNotice,
     Housekeeping,
     OwnTask,
     PlannedObservation,
     PlanUplink,
+    PublicSlot,
+    PublicTask,
 )
 from astramesh.core.clock import seconds_to_ns
 from astramesh.core.config import NominalOperationsScenario
@@ -45,7 +50,7 @@ from astramesh.planning.centralized_b1 import EnergyModel, plan_centralized
 from astramesh.planning.plans import Assignment, Plan
 from astramesh.planning.static_b0 import plan_static
 from astramesh.resources.ledgers import Battery, data_volume_mb
-from astramesh.scenarios.agent_network import make_kernel
+from astramesh.scenarios.agent_network import health_settings, make_kernel
 from astramesh.scenarios.formation_dynamics import (
     FormationRun,
     record_scenario_end,
@@ -55,7 +60,9 @@ from astramesh.scenarios.formation_dynamics import (
 from astramesh.scenarios.mission_geometry import geometry_products
 from astramesh.science.tasks import Task, catalog_from_opportunities, observation_slot
 
-DECENTRALIZED = {"auction_b2": "B2-auction", "cbba_b3": "B3-cbba"}
+DECENTRALIZED = {"auction_b2": "B2-auction", "cbba_b3": "B3-cbba",
+                 "cbba_b3_timeout": "B3-cbba+timeout"}  # fmt: skip
+B4_NAME = "B4-rule-redistribution"
 PLAN_FILE = "plan.json"
 OBSERVATIONS_FILE = "observations.json"
 
@@ -110,8 +117,11 @@ def _plan(
         "storage_capacity_mb": sc.storage_capacity_mb,
         "data_mb_per_step": mb_per_step,
     }
-    if config.operations.algorithm == "static_b0":
-        return plan_static(catalog, ids, **common)  # type: ignore[arg-type]
+    if config.operations.algorithm in ("static_b0", "rule_b4"):
+        plan = plan_static(catalog, ids, **common)  # type: ignore[arg-type]
+        if config.operations.algorithm == "rule_b4":  # B4 starts from the B0 ground plan
+            return Plan(B4_NAME, plan.version, plan.assignments, plan.unassigned, False)
+        return plan
     if config.operations.algorithm == "centralized_b1":
         energy = EnergyModel(
             sunlit=sunlit,
@@ -165,6 +175,9 @@ def fault_schedule(config: NominalOperationsScenario, ids: list[str]) -> FaultSc
                 observability=f.observability,
                 recoverable=f.recoverable,
                 consequences=f.consequences,
+                ground_confirmation_ns=(
+                    None if f.ground_confirmation_s is None else ns(f.ground_confirmation_s)
+                ),
             )
             for f in config.faults
         ],
@@ -211,6 +224,7 @@ def run_nominal_operations(
         status_interval_ns=seconds_to_ns(config.agents.status_interval_s),
         status_lifetime_ns=seconds_to_ns(config.agents.status_lifetime_s),
         battery_reserve_fraction=config.operations.battery_reserve_fraction,
+        health=health_settings(config),
     )
     agents = {a: SpacecraftAgent(a, tuple(p for p in ids if p != a), settings) for a in ids}
     for a in ids:
@@ -225,11 +239,23 @@ def run_nominal_operations(
             agents[a].observe(CatalogUplink(0, plan.algorithm, tuple(t.task_id for t in catalog),
                                             tuple(own), sc.storage_capacity_mb))  # fmt: skip
             continue
+        public: tuple[PublicTask, ...] = ()
+        if algo == "rule_b4":
+            owner = {x.task_id: x.spacecraft for x in plan.assignments}
+            public = tuple(
+                PublicTask(t.task_id, t.priority, owner.get(t.task_id), tuple(
+                    PublicSlot(w.spacecraft, sl[0] * step_ns, sl[1] * step_ns)
+                    for w in t.windows
+                    if (sl := observation_slot(w, n_steps, n_ticks)) is not None
+                ), n_steps * mb_per_step)
+                for t in catalog
+            )  # fmt: skip
         agents[a].observe(PlanUplink(
             t_ns=0, algorithm=plan.algorithm, version=plan.version,
             observations=tuple(PlannedObservation(x.task_id, x.start_tick * step_ns,
                                                   x.stop_tick * step_ns)
                                for x in plan.for_spacecraft(a)),
+            public_tasks=public,
         ))  # fmt: skip
 
     batteries = {a: Battery(sc.battery_capacity_wh, sc.battery_initial_fraction,
@@ -254,6 +280,12 @@ def run_nominal_operations(
         for when, kind, f in transitions:  # truth events, never seen by agents
             if when == t:
                 kernel.record(t, "faults", kind, f.record())
+        confirmed_now = faults.ground_notices(t) if faults else ()
+        if confirmed_now:  # explicit evidence (DL-052): ground notice to every available agent
+            kernel.record(t, "ground", "failure_confirmed", {"spacecraft": list(confirmed_now)})
+            for a in ids:
+                if not faults.unavailable(a, t):
+                    agents[a].observe(GroundNotice(t, confirmed_now))
         for j, a in enumerate(ids):
             bat = batteries[a]
             down = bool(faults) and faults.unavailable(a, t)
@@ -327,6 +359,7 @@ def run_nominal_operations(
     segments.sort(key=lambda s: (s.start_tick, s.spacecraft))
 
     utility = sum(by_id[t].priority for t in completed)
+    health = _health_metrics(agents, ids, faults, spec.duration_ns, step_ns)
     summary = dict(formation.summary)
     summary.update({
         "operations": {
@@ -360,7 +393,66 @@ def run_nominal_operations(
             "storage_used_mb": storage,
             "note": "q_j = 1 (DL-041); utility counts each task once",
         },
+        "health": health,
         "network": kernel.network_summary(),
         **kernel.agents_summary(),
     })  # fmt: skip
     return OperationsRun(formation, plan, catalog, segments, kernel.trace, summary, agents)
+
+
+def _health_metrics(
+    agents: dict[str, SpacecraftAgent],
+    ids: list[str],
+    faults: FaultSchedule,
+    end_ns: int,
+    step: int,
+) -> dict[str, Any]:
+    """Beliefs vs truth (evaluation only; agents never see truth).
+
+    * ``confirmed_while_available``: CONFIRMED_FAILED believed about a peer that was
+      actually available at that time (must be 0: Gate P3).
+    * ``false_unavailable_s``: time a peer was believed LOST/CONFIRMED while available.
+    * ``missed_unavailable_s``: time a peer was actually unavailable but believed available.
+    * ``detection_latency_s``: per observer and unavailable peer, from the fault start to
+      the first LOST/CONFIRMED belief (None if never detected).
+    """
+
+    def truth_available(peer: str, t: int) -> bool:
+        return not (faults and faults.unavailable(peer, t))
+
+    out: dict[str, Any] = {"confirmed_while_available": 0, "false_unavailable_s": 0.0,
+                           "missed_unavailable_s": 0.0, "belief_changes": 0,
+                           "detection_latency_s": {}, "final_beliefs": {}}  # fmt: skip
+    starts: dict[str, int] = {}
+    for f in faults.faults if faults else ():
+        if f.fault_type == "unavailable":
+            for sc in f.spacecraft:
+                starts[sc] = min(starts.get(sc, f.start_ns), f.start_ns)
+    for obs in ids:
+        if faults and faults.unavailable(obs, end_ns):
+            continue  # a dead observer's beliefs are frozen; not evaluated after it died
+        hist = agents[obs].belief_history()
+        out["belief_changes"] += len(hist)
+        out["final_beliefs"][obs] = agents[obs].health_beliefs()
+        for peer in agents[obs].peers:
+            changes = [(t, new) for t, p, _, new in hist if p == peer]
+            if any(new == CONFIRMED and truth_available(peer, t) for t, new in changes):
+                out["confirmed_while_available"] += 1
+            bounds = [0, *[t for t, _ in changes], end_ns]
+            beliefs = ["UNKNOWN", *[b for _, b in changes]]
+            for (a, b), belief in zip(itertools.pairwise(bounds), beliefs, strict=False):
+                for t in range(a - a % step, b, step):  # sample on the 10 s grid
+                    if t < a:
+                        continue
+                    avail = truth_available(peer, t)
+                    if belief in UNAVAILABLE_BELIEFS and avail:
+                        out["false_unavailable_s"] += step / 1e9
+                    if belief in AVAILABLE_BELIEFS and not avail:
+                        out["missed_unavailable_s"] += step / 1e9
+            if peer in starts:
+                hit = next((t for t, b in changes if b in UNAVAILABLE_BELIEFS
+                            and t >= starts[peer]), None)  # fmt: skip
+                out["detection_latency_s"][f"{obs}->{peer}"] = (
+                    None if hit is None else (hit - starts[peer]) / 1e9
+                )
+    return out

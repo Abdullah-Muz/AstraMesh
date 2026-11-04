@@ -33,12 +33,20 @@ from typing import Any
 
 from astramesh.agents.auction import AuctionState
 from astramesh.agents.cbba import CbbaState
+from astramesh.agents.health import (
+    AVAILABLE_BELIEFS,
+    UNAVAILABLE_BELIEFS,
+    HealthSettings,
+    HealthTracker,
+)
 from astramesh.agents.packets import (
     CatalogUplink,
+    GroundNotice,
     Housekeeping,
     NavigationFix,
     PlannedObservation,
     PlanUplink,
+    PublicTask,
 )
 from astramesh.communications.messages import Delivery, Message, MessageType
 
@@ -53,7 +61,13 @@ REJECT_REASONS = (
     "malformed_payload",
 )
 HANDLED_TYPES = frozenset({MessageType.STATUS})
-ALLOCATION_TYPES = {"B2-auction": MessageType.TASK_BID, "B3-cbba": MessageType.PLAN_SYNC}
+ALLOCATION_TYPES = {
+    "B2-auction": MessageType.TASK_BID,
+    "B3-cbba": MessageType.PLAN_SYNC,
+    "B3-cbba+timeout": MessageType.PLAN_SYNC,
+}
+REDISTRIBUTING = {"B3-cbba+timeout", "B4-rule-redistribution"}  # react to lost peers (DL-052)
+DEFAULT_HEALTH = HealthSettings(suspect_ns=90 * 10**9, lost_ns=300 * 10**9, recover_messages=2)
 
 
 @dataclass(frozen=True, slots=True)
@@ -63,6 +77,7 @@ class AgentSettings:
     battery_reserve_fraction: float = 0.0  # do not start an observation below this charge
     allocation_lifetime_ns: int = 20_000_000_000  # task_bid / plan_sync expiry (DL-045)
     auction_deadline_ns: int = 5_000_000_000  # B2 decides at the first round at/after this
+    health: HealthSettings = DEFAULT_HEALTH
 
     def __post_init__(self) -> None:
         if self.status_interval_ns <= 0 or self.status_lifetime_ns <= 0:
@@ -102,6 +117,10 @@ class SpacecraftAgent:
     _observing: PlannedObservation | None = None
     _alloc: CbbaState | AuctionState | None = None
     _last_plan_change_ns: int | None = None
+    _health: HealthTracker | None = None
+    _history_seen: int = 0
+    _public: dict[str, PublicTask] = field(default_factory=dict)
+    _reassigned: set[str] = field(default_factory=set)
     _finished: set[str] = field(default_factory=set)
     _declined: dict[str, str] = field(default_factory=dict)
 
@@ -109,9 +128,13 @@ class SpacecraftAgent:
         if self.agent_id in self.peers:
             raise ValueError("an agent cannot be its own peer")
         self._peer_table = {p: PeerRecord() for p in self.peers}
+        self._health = HealthTracker(self.settings.health, self.peers)
 
     # -- inputs -----------------------------------------------------------------
-    def observe(self, packet: NavigationFix | Housekeeping | PlanUplink | CatalogUplink) -> None:
+    def observe(
+        self,
+        packet: NavigationFix | Housekeeping | PlanUplink | CatalogUplink | GroundNotice,
+    ) -> None:
         if isinstance(packet, NavigationFix):
             if self._nav is None or packet.t_ns >= self._nav.t_ns:
                 self._nav = packet
@@ -122,7 +145,7 @@ class SpacecraftAgent:
             if self._alloc is not None or packet.algorithm not in ALLOCATION_TYPES:
                 self._log.append({"kind": "catalog_rejected", "algorithm": packet.algorithm})
                 return
-            if packet.algorithm == "B3-cbba":
+            if packet.algorithm.startswith("B3-cbba"):
                 self._alloc = CbbaState(self.agent_id, packet)
             else:
                 self._alloc = AuctionState(self.agent_id, packet, self.settings.auction_deadline_ns)
@@ -143,6 +166,7 @@ class SpacecraftAgent:
             self._plan = tuple(sorted(packet.observations, key=lambda o: o.start_ns))
             self._plan_algorithm = packet.algorithm
             self.plan_version = packet.version
+            self._public = {t.task_id: t for t in packet.public_tasks}
             self._log.append(
                 {
                     "kind": "plan_accepted",
@@ -151,6 +175,12 @@ class SpacecraftAgent:
                     "n_observations": len(self._plan),
                 }
             )
+        elif isinstance(packet, GroundNotice):
+            assert self._health is not None
+            for p in packet.confirmed_failed:
+                if p in self._peer_table:
+                    self._health.confirm_failed(p, packet.t_ns)
+            self._after_health_change(packet.t_ns)
         else:
             raise TypeError(f"unsupported sensor packet {type(packet).__name__}")
 
@@ -251,6 +281,12 @@ class SpacecraftAgent:
         rec = self._peer_table[m.sender]
         rec.newest_seq = m.seq
         rec.last_heard_ns = d.delivered_ns
+        if self._health is not None:
+            is_status = m.msg_type is MessageType.STATUS
+            h = m.payload.get("health") if is_status else None
+            degraded = (h == "degraded") if isinstance(h, str) else None
+            self._health.heard(m.sender, d.delivered_ns, status=is_status, degraded=degraded)
+            self._after_health_change(d.delivered_ns)
         if m.msg_type is not MessageType.STATUS and self._alloc is not None:
             self._alloc.receive(m.sender, m.payload, d.delivered_ns)
             self._refresh_plan(d.delivered_ns)
@@ -263,6 +299,9 @@ class SpacecraftAgent:
     # -- outputs ----------------------------------------------------------------
     def step(self, now_ns: int) -> list[Message]:
         """Queue due periodic messages and hand over the outbound queue."""
+        if self._health is not None:
+            self._health.tick(now_ns)
+            self._after_health_change(now_ns)
         if now_ns >= self._next_status_ns:
             self._outbox.append(self._status(now_ns))
             self._next_status_ns = now_ns + self.settings.status_interval_ns
@@ -307,6 +346,71 @@ class SpacecraftAgent:
             self._log.append({"kind": "plan_changed", "version": self.plan_version,
                               "n_observations": len(plan)})  # fmt: skip
 
+    def _self_health(self) -> str:
+        hk = self._hk
+        if hk is not None and hk.battery_wh < self.settings.battery_reserve_fraction * (
+            hk.battery_capacity_wh
+        ):
+            return "degraded"
+        return "nominal"
+
+    def _after_health_change(self, now_ns: int) -> None:
+        """Log new belief changes and run the method's response to lost peers (DL-052)."""
+        h = self._health
+        if h is None:
+            return
+        new = h.history[self._history_seen :]
+        self._history_seen = len(h.history)
+        for t, peer, old, belief in new:
+            self._log.append({"kind": "belief_changed", "peer": peer, "from": old, "to": belief,
+                              "t_ns": t})  # fmt: skip
+            if belief in UNAVAILABLE_BELIEFS and self._plan_algorithm in REDISTRIBUTING:
+                self._respond_to_loss(peer, now_ns)
+
+    def _respond_to_loss(self, peer: str, now_ns: int) -> None:
+        if isinstance(self._alloc, CbbaState):  # B3 + timeout: re-auction the peer's claims
+            self._alloc.forget_peer(peer)
+            self._log.append({"kind": "claims_forgotten", "peer": peer})
+            self._refresh_plan(now_ns)
+            return
+        assert self._health is not None
+        beliefs = self._health.beliefs()  # B4: fixed rule, lowest available ID with a slot
+        mine = {o.task_id for o in self._plan}
+        taken: list[PlannedObservation] = []
+        for tid, t in sorted(self._public.items()):
+            if t.owner != peer or tid in self._reassigned:
+                continue
+            slots = {s.spacecraft: s for s in t.slots if s.start_ns > now_ns}
+            ok = [sc for sc in sorted(slots)
+                  if sc == self.agent_id or beliefs.get(sc) in AVAILABLE_BELIEFS]  # fmt: skip
+            if not ok:
+                continue
+            self._reassigned.add(tid)
+            winner = ok[0]
+            self._public[tid] = PublicTask(t.task_id, t.priority, winner, t.slots, t.data_mb)
+            if winner != self.agent_id or tid in mine:
+                continue
+            s = slots[winner]
+            obs = PlannedObservation(tid, s.start_ns, s.stop_ns)
+            plan = list(self._plan) + taken
+            if any(o.start_ns < obs.stop_ns and obs.start_ns < o.stop_ns for o in plan):
+                self._log.append({"kind": "takeover_skipped", "task": tid, "reason": "overlap"})
+                continue
+            taken.append(obs)
+            self._log.append({"kind": "task_taken_over", "task": tid, "from": peer})
+        if taken:
+            self._plan = tuple(sorted(list(self._plan) + taken, key=lambda o: o.start_ns))
+            self.plan_version += 1
+            self._last_plan_change_ns = now_ns
+            self._log.append({"kind": "plan_changed", "version": self.plan_version,
+                              "n_observations": len(self._plan)})  # fmt: skip
+
+    def health_beliefs(self) -> dict[str, str]:
+        return self._health.beliefs() if self._health is not None else {}
+
+    def belief_history(self) -> list[tuple[int, str, str, str]]:
+        return list(self._health.history) if self._health is not None else []
+
     def _status(self, now_ns: int) -> Message:
         payload: dict[str, Any] = {"nav_t_ns": None, "r_m": None, "sigma_r_m": None}
         if self._nav is not None:
@@ -315,6 +419,7 @@ class SpacecraftAgent:
                 "r_m": list(self._nav.r_m),
                 "sigma_r_m": self._nav.sigma_r_m,
             }
+        payload["health"] = self._self_health()
         msg = Message(
             sender=self.agent_id,
             seq=self._seq,
