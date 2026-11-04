@@ -4,8 +4,8 @@
 
 AstraMesh is an independent, public-methods computational research project. It is a Python-first, CPU-feasible simulation platform for a **simulated four-spacecraft, decentralized low-Earth-orbit mission** that cooperatively schedules ionospheric observations, coordinates over constrained inter-satellite links, assesses its own health and environmental risk, and tries to preserve scientific value when spacecraft become unavailable or space-weather conditions worsen.
 
-> **Project status: Phase 1 complete; Phase 2 (decentralized nominal science operations) in progress.**
-> The repository contains reproducibility infrastructure, validated truth dynamics (two-body and J2) for a four-spacecraft formation, mission geometry (illumination, geometry-only science opportunities), and resource accounting, each with its physics acceptance tests. Phase 2 has started with isolated spacecraft agents exchanging messages over a modelled crosslink network. It contains **no** task-allocation, planning, or science-retrieval model yet, and no research results. Nothing here should be read as a validated or published finding.
+> **Project status: Phases 1 and 2 complete; Phase 3 (faults and protection supervisor) not started.**
+> The repository contains reproducibility infrastructure, validated truth dynamics (two-body and J2) for a four-spacecraft formation, mission geometry (illumination, geometry-only science opportunities), and resource accounting, each with its physics acceptance tests. Phase 2 added isolated spacecraft agents over a modelled crosslink network and four allocation baselines: a static scheduler, a centralized reference, a one-shot auction and CBBA. They are compared on a fault-free day under message loss. It contains **no** fault model, protection supervisor, science-retrieval model or proposed research method yet, and no research results. Nothing here should be read as a validated or published finding.
 
 The authoritative design document is **[`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md)** (v1.0). Where this README and the specification differ, the specification governs.
 
@@ -105,7 +105,7 @@ A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a prove
 |---|---|---|
 | 0 | Research and reproducibility foundation | Complete except the Priority A full-text literature review (in parallel; see [`docs/ROADMAP.md`](docs/ROADMAP.md)) |
 | 1 | Validated four-spacecraft dynamics and mission geometry | Complete (Gate P1 signed off 2026-11-03) |
-| 2 | Decentralized nominal science operations | In progress (B0–B3 on the nominal scenario, compared under message loss; sign-off pending) |
+| 2 | Decentralized nominal science operations | Complete (Gate P2 signed off 2026-11-03) |
 | 3 | Deterministic faults and protection supervisor | Not started |
 | 4 | External data and probabilistic/ML experiments | Not started |
 | 5 | Storm-aware distributed recovery | Not started |
