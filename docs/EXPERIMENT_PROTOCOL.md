@@ -27,6 +27,8 @@ Each run directory contains:
 
 **Rule:** a result may be reported only if its manifest has `git_dirty: false` (run from a committed tree) and every data version it depends on is recorded. `results/` is Git-ignored; archive reported runs separately (to be decided, spec §11 mentions DVC/MLflow as later options).
 
+Multi-run experiments live in `scripts/experiments/`. Their recorded outputs (CSV, summary, metadata with commit, dirty flag, lockfile and config hashes) are committed under `docs/results/` only when produced from a clean commit. The first is the S00 loss comparison ([`results/S00_LOSS_COMPARISON.md`](results/S00_LOSS_COMPARISON.md), DL-047/048).
+
 Diagnostic figures: `uv run astramesh plot <run_dir>` writes PNGs to `<run_dir>/figures/`. These are **not** run artifacts and are not hashed in the manifest, because PNG encoding is not byte-reproducible.
 
 ## 2. Replay verification — IMPLEMENTED

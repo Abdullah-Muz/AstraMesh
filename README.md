@@ -105,7 +105,7 @@ A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a prove
 |---|---|---|
 | 0 | Research and reproducibility foundation | Complete except the Priority A full-text literature review (in parallel; see [`docs/ROADMAP.md`](docs/ROADMAP.md)) |
 | 1 | Validated four-spacecraft dynamics and mission geometry | Complete (Gate P1 signed off 2026-11-03) |
-| 2 | Decentralized nominal science operations | In progress (agents, crosslink network, B0–B3 allocation on the nominal scenario) |
+| 2 | Decentralized nominal science operations | In progress (B0–B3 on the nominal scenario, compared under message loss; sign-off pending) |
 | 3 | Deterministic faults and protection supervisor | Not started |
 | 4 | External data and probabilistic/ML experiments | Not started |
 | 5 | Storm-aware distributed recovery | Not started |

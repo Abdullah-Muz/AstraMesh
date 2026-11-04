@@ -94,6 +94,8 @@ checkpoints/
 experiments/**/output/
 experiments/**/outputs/
 experiments/**/results/
+# Recorded, reviewed experiment results (small CSV/JSON/Markdown) are committed:
+!docs/results/
 *.jsonl.gz
 *.log
 *.ckpt

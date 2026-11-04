@@ -8,7 +8,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 |---|---|---|
 | 0 | Research and reproducibility foundation | **Complete except** Priority A full-text review (8 of 10 items drafted from full text, owner verification pending; P01 unavailable, P21 paywalled; see `LITERATURE_REVIEW.md`) |
 | 1 | Validated four-spacecraft dynamics and mission geometry | **Complete**: Gate P1 signed off 2026-11-03 (DL-037); open follow-ups listed there |
-| 2 | Decentralized nominal science operations | **In progress** (DL-038). Increment 1 (agents, messages, network) done; Priority A review drafted (8 of 10) |
+| 2 | Decentralized nominal science operations | **In progress** (DL-038). Increments 1–3 done, 4 recorded; all Gate P2 items met; phase sign-off pending owner review |
 | 3 | Deterministic faults and protection supervisor | Not started |
 | 4 | External data and probabilistic/ML experiments | Not started |
 | 5 | Storm-aware distributed recovery | Not started |
@@ -47,15 +47,15 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 1 | Isolated `SpacecraftAgent`s, message schema, NetworkX G(t) crosslinks, SimPy kernel, acceptance rules, isolation tests (`agent_network` scenario) | **Done**: commit `414bf2d`, CI passing; values and acceptance rules (DL-040) approved 2026-11-03 |
 | 2a | Task catalogue and utility (DL-041), live battery/storage truth, agent plan execution with resource checks, truth scoring, B0 static scheduler, S00 scenario (`nominal_operations`) | **Done**: commit `a48de98`, CI passing; DL-043 approved 2026-11-03 |
 | 2b | B1 centralized reference (SciPy `milp`, DL-042, DL-044) | **Done**: commit `5fa618c`, CI passing |
-| 3 | B2 one-shot auction, B3 CBBA (DL-045, DL-046) | Implemented (`configs/experiments/nominal_ops_b2_24h.yaml`, `nominal_ops_b3_24h.yaml`) |
-| 4 | Nominal S00 comparison on identical tasks and resources | Not started |
+| 3 | B2 one-shot auction, B3 CBBA (DL-045, DL-046) | **Done**: commit `eb9ee25`, CI passing |
+| 4 | S00 comparison of B0–B3 under message loss (DL-047, DL-048) | Recorded (`docs/results/S00_LOSS_COMPARISON.md`, script commit `dafa540`); awaiting review |
 
 ## Gate P2 checklist (spec §13)
 
-- [ ] Each agent acts only on local state/delivered messages (increment 1: static and dynamic isolation tests in `tests/agent_isolation/`)
-- [ ] No privileged leakage (increment 1 tests; to be extended to task and plan data)
-- [ ] Baseline comparisons operate on identical tasks/resources (B0 and B1 share the catalogue, slots, network and random streams, which a test checks; full comparison in increment 4)
-- [ ] Unhandled network messages cannot alter plans (increment 1: acceptance rules + property test; to be re-checked once plans exist)
+- [x] Each agent acts only on local state/delivered messages (static import rule and object-graph checks, shown to catch planted leaks, for status, B0/B1 execution and B3 CBBA agents)
+- [x] No privileged leakage (agents receive only own sensor packets, own plan or catalogue, and delivered messages; B1's truth use is confined to the external reference planner and flagged `privileged_information`)
+- [x] Baseline comparisons operate on identical tasks/resources (one base configuration; catalogue checked identical across B0–B3 for every seed in the 120-run comparison)
+- [x] Unhandled network messages cannot alter plans (acceptance rules incl. `malformed_payload`; property tests interleave arbitrary messages with plan execution; B3 accepts only well-formed `plan_sync`)
 
 ## Gate P1 checklist (spec §13)
 
