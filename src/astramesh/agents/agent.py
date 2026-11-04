@@ -41,6 +41,7 @@ from astramesh.agents.health import (
 )
 from astramesh.agents.packets import (
     CatalogUplink,
+    ExposureForecast,
     GroundNotice,
     Housekeeping,
     NavigationFix,
@@ -48,6 +49,7 @@ from astramesh.agents.packets import (
     PlanUplink,
     PublicTask,
 )
+from astramesh.agents.supervisor import NOMINAL, Supervisor, SupervisorSettings
 from astramesh.communications.messages import Delivery, Message, MessageType
 
 REJECT_REASONS = (
@@ -67,6 +69,7 @@ ALLOCATION_TYPES = {
     "B3-cbba+timeout": MessageType.PLAN_SYNC,
 }
 REDISTRIBUTING = {"B3-cbba+timeout", "B4-rule-redistribution"}  # react to lost peers (DL-052)
+DEFAULT_SUPERVISOR = SupervisorSettings()
 DEFAULT_HEALTH = HealthSettings(suspect_ns=90 * 10**9, lost_ns=300 * 10**9, recover_messages=2)
 
 
@@ -78,6 +81,7 @@ class AgentSettings:
     allocation_lifetime_ns: int = 20_000_000_000  # task_bid / plan_sync expiry (DL-045)
     auction_deadline_ns: int = 5_000_000_000  # B2 decides at the first round at/after this
     health: HealthSettings = DEFAULT_HEALTH
+    supervisor: SupervisorSettings = DEFAULT_SUPERVISOR
 
     def __post_init__(self) -> None:
         if self.status_interval_ns <= 0 or self.status_lifetime_ns <= 0:
@@ -95,6 +99,7 @@ class PeerRecord:
     last_status_created_ns: int | None = None
     reported_plan_version: int | None = None
     reported_r_m: tuple[float, ...] | None = None
+    reported_mode: str | None = None
 
 
 @dataclass(slots=True)
@@ -118,6 +123,9 @@ class SpacecraftAgent:
     _alloc: CbbaState | AuctionState | None = None
     _last_plan_change_ns: int | None = None
     _health: HealthTracker | None = None
+    _sup: Supervisor | None = None
+    _sup_seen: int = 0
+    _forecast: ExposureForecast | None = None
     _history_seen: int = 0
     _public: dict[str, PublicTask] = field(default_factory=dict)
     _reassigned: set[str] = field(default_factory=set)
@@ -129,11 +137,17 @@ class SpacecraftAgent:
             raise ValueError("an agent cannot be its own peer")
         self._peer_table = {p: PeerRecord() for p in self.peers}
         self._health = HealthTracker(self.settings.health, self.peers)
+        self._sup = Supervisor(self.settings.supervisor)
 
     # -- inputs -----------------------------------------------------------------
     def observe(
         self,
-        packet: NavigationFix | Housekeeping | PlanUplink | CatalogUplink | GroundNotice,
+        packet: NavigationFix
+        | Housekeeping
+        | PlanUplink
+        | CatalogUplink
+        | GroundNotice
+        | ExposureForecast,
     ) -> None:
         if isinstance(packet, NavigationFix):
             if self._nav is None or packet.t_ns >= self._nav.t_ns:
@@ -175,6 +189,9 @@ class SpacecraftAgent:
                     "n_observations": len(self._plan),
                 }
             )
+        elif isinstance(packet, ExposureForecast):
+            if self._forecast is None or packet.t_ns >= self._forecast.t_ns:
+                self._forecast = packet
         elif isinstance(packet, GroundNotice):
             assert self._health is not None
             for p in packet.confirmed_failed:
@@ -192,7 +209,15 @@ class SpacecraftAgent:
         battery at or above the reserve and room for the remaining data. Once
         started it continues until the planned stop unless housekeeping shows an
         empty battery or full storage. It never acts on another agent's state.
+
+        The protection supervisor is consulted first (DL-054): outside NOMINAL the
+        payload stays off and any running observation stops, whatever the plan says.
         """
+        if not self._supervise(now_ns):  # protection first: the planner cannot override it
+            if self._observing is not None:
+                obs, self._observing = self._observing, None
+                self._decline(obs, "protection_" + self.mode.lower())
+            return None
         if self._observing is not None and now_ns >= self._observing.stop_ns:
             self._finished.add(self._observing.task_id)
             self._observing = None
@@ -221,6 +246,36 @@ class SpacecraftAgent:
             return self._decline(current, "storage")
         self._observing = current
         return current.task_id
+
+    @property
+    def mode(self) -> str:
+        return self._sup.mode if self._sup is not None else NOMINAL
+
+    def _supervise(self, now_ns: int) -> bool:
+        """Update the supervisor from own housekeeping and forecast; True if science allowed."""
+        sup = self._sup
+        if sup is None:
+            return True
+        hk = self._hk
+        frac = hk.battery_wh / hk.battery_capacity_wh if hk and hk.battery_capacity_wh else None
+        sup.update(
+            now_ns,
+            battery_fraction=frac,
+            critical_flags=hk.critical_flags if hk else (),
+            exposure_ratio=self._forecast.exposure_ratio if self._forecast else None,
+            forecast_enabled=self._forecast is not None,
+        )
+        for t, old, new, why in sup.history[self._sup_seen :]:
+            self._log.append({"kind": "mode_changed", "from": old, "to": new, "reason": why,
+                              "t_ns": t})  # fmt: skip
+            if old == NOMINAL and isinstance(self._alloc, CbbaState):
+                self._alloc.release_all()  # stop claiming; peers re-auction (DL-054)
+                self._refresh_plan(now_ns)
+        self._sup_seen = len(sup.history)
+        for t, note in sup.notes:
+            self._log.append({"kind": "supervisor_note", "note": note, "t_ns": t})
+        sup.notes.clear()
+        return sup.allows_payload()
 
     def _decline(self, obs: PlannedObservation, reason: str) -> str | None:
         """Record that a planned observation will not be made; always returns None."""
@@ -295,6 +350,13 @@ class SpacecraftAgent:
             rec.reported_plan_version = m.plan_version
             r = m.payload.get("r_m")
             rec.reported_r_m = tuple(float(x) for x in r) if isinstance(r, tuple) else None
+            mode = m.payload.get("mode")
+            if isinstance(mode, str):
+                was = rec.reported_mode
+                rec.reported_mode = mode
+                if (mode != NOMINAL and was in (None, NOMINAL)
+                        and self._plan_algorithm == "B4-rule-redistribution"):  # fmt: skip
+                    self._respond_to_loss(m.sender, d.delivered_ns)
 
     # -- outputs ----------------------------------------------------------------
     def step(self, now_ns: int) -> list[Message]:
@@ -312,7 +374,8 @@ class SpacecraftAgent:
     def _allocation_round(self, now_ns: int) -> None:
         alloc = self._alloc
         if isinstance(alloc, CbbaState):
-            alloc.build_bundle(now_ns)
+            if self.mode == NOMINAL:  # a protected or safe spacecraft does not bid
+                alloc.build_bundle(now_ns)
             self._refresh_plan(now_ns)
             self._outbox.append(self._message(now_ns, MessageType.PLAN_SYNC,
                                               alloc.message_payload()))  # fmt: skip
@@ -381,8 +444,7 @@ class SpacecraftAgent:
             if t.owner != peer or tid in self._reassigned:
                 continue
             slots = {s.spacecraft: s for s in t.slots if s.start_ns > now_ns}
-            ok = [sc for sc in sorted(slots)
-                  if sc == self.agent_id or beliefs.get(sc) in AVAILABLE_BELIEFS]  # fmt: skip
+            ok = [sc for sc in sorted(slots) if self._can_take(sc, beliefs)]
             if not ok:
                 continue
             self._reassigned.add(tid)
@@ -405,6 +467,17 @@ class SpacecraftAgent:
             self._log.append({"kind": "plan_changed", "version": self.plan_version,
                               "n_observations": len(self._plan)})  # fmt: skip
 
+    def _can_take(self, sc: str, beliefs: dict[str, str]) -> bool:
+        """B4: believed available for new tasks (health and reported mode)."""
+        if sc == self.agent_id:
+            return self.mode == NOMINAL
+        rec = self._peer_table.get(sc)
+        mode_ok = rec is None or rec.reported_mode in (None, NOMINAL)
+        return beliefs.get(sc) in AVAILABLE_BELIEFS and mode_ok
+
+    def mode_history(self) -> list[tuple[int, str, str, str]]:
+        return list(self._sup.history) if self._sup is not None else []
+
     def health_beliefs(self) -> dict[str, str]:
         return self._health.beliefs() if self._health is not None else {}
 
@@ -420,6 +493,7 @@ class SpacecraftAgent:
                 "sigma_r_m": self._nav.sigma_r_m,
             }
         payload["health"] = self._self_health()
+        payload["mode"] = self.mode
         msg = Message(
             sender=self.agent_id,
             seq=self._seq,

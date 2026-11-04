@@ -3,8 +3,7 @@
 schema_version: 1
 scenario_id: S03_PAYLOAD_DEGRADED_B3
 description: >-
-  Phase 2 S00 nominal operations, B3 decentralized allocation. FORMATION_24H_J2 dynamics,
-  MISSION_GEOMETRY_24H regions and spacecraft resources, AGENT_NETWORK_24H crosslinks.
+  S03: sc00 payload degraded 6-18 h; its observations are invalid (B3).
 scenario_type: nominal_operations
 
 time:

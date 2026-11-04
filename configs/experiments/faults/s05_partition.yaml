@@ -3,8 +3,7 @@
 schema_version: 1
 scenario_id: S05_PARTITION_B3
 description: >-
-  Phase 2 S00 nominal operations, B3 decentralized allocation. FORMATION_24H_J2 dynamics,
-  MISSION_GEOMETRY_24H regions and spacecraft resources, AGENT_NETWORK_24H crosslinks.
+  S05: 2 + 2 crosslink partition 6-12 h, then reconnect (B3).
 scenario_type: nominal_operations
 
 time:

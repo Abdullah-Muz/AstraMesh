@@ -121,4 +121,4 @@ def test_fault_configs_in_repo_are_valid() -> None:
     assert len(paths) >= 6
     for p in paths:
         cfg = parse_scenario(yaml.safe_load(p.read_text()))
-        assert cfg.faults  # type: ignore[union-attr]
+        assert cfg.faults or cfg.environment, p.name  # type: ignore[union-attr]

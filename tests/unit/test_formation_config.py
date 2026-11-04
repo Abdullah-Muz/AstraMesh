@@ -16,7 +16,8 @@ from astramesh.core.config import (
 )
 
 UNIT_SUFFIXES = ("_s", "_ns", "_m", "_km", "_mps", "_kg", "_w", "_wh", "_j", "_n", "_mn",
-                 "_rad", "_deg", "_mb", "_gb", "_probability", "_fraction", "_kbps")  # fmt: skip
+                 "_rad", "_deg", "_mb", "_gb", "_probability", "_fraction", "_kbps",
+                 "_ratio")  # fmt: skip
 # Non-physical (dimensionless, identifiers, or explicitly unit-less) fields.
 UNITLESS_OK = {"schema_version", "seed", "n_spacecraft", "n_nodes", "priority",
                "health_recover_messages"}  # fmt: skip

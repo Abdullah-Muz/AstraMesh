@@ -33,6 +33,7 @@ from astramesh.agents.agent import AgentSettings, SpacecraftAgent
 from astramesh.agents.health import AVAILABLE_BELIEFS, CONFIRMED, UNAVAILABLE_BELIEFS
 from astramesh.agents.packets import (
     CatalogUplink,
+    ExposureForecast,
     GroundNotice,
     Housekeeping,
     OwnTask,
@@ -41,6 +42,7 @@ from astramesh.agents.packets import (
     PublicSlot,
     PublicTask,
 )
+from astramesh.agents.supervisor import MODES, NOMINAL, SupervisorSettings
 from astramesh.core.clock import seconds_to_ns
 from astramesh.core.config import NominalOperationsScenario
 from astramesh.core.events import EventLog
@@ -185,6 +187,29 @@ def fault_schedule(config: NominalOperationsScenario, ids: list[str]) -> FaultSc
     )
 
 
+def supervisor_settings(config: NominalOperationsScenario) -> SupervisorSettings:
+    sv = config.supervisor
+    return SupervisorSettings(
+        safe_battery_fraction=sv.safe_battery_fraction,
+        safe_exit_battery_fraction=sv.safe_exit_battery_fraction,
+        safe_exit_dwell_ns=seconds_to_ns(sv.safe_exit_dwell_s),
+        protect_ratio=sv.protect_exposure_ratio,
+        release_ratio=sv.release_exposure_ratio,
+        release_dwell_ns=seconds_to_ns(sv.release_dwell_s),
+    )
+
+
+def exposure_ratio(config: NominalOperationsScenario, sc: str, t_ns: int) -> float | None:
+    """Truth-side forecast service: scheduled exposure ratio for ``sc`` at ``t_ns``."""
+    env = config.environment
+    assert env is not None
+    t_s = t_ns / 1e9
+    for fc in env.forecasts:  # first matching interval wins (config order)
+        if (not fc.spacecraft or sc in fc.spacecraft) and fc.start_s <= t_s < fc.end_s:
+            return fc.exposure_ratio
+    return env.background_exposure_ratio
+
+
 def run_nominal_operations(
     config: NominalOperationsScenario, streams: RandomStreams, log: EventLog
 ) -> OperationsRun:
@@ -225,6 +250,7 @@ def run_nominal_operations(
         status_lifetime_ns=seconds_to_ns(config.agents.status_lifetime_s),
         battery_reserve_fraction=config.operations.battery_reserve_fraction,
         health=health_settings(config),
+        supervisor=supervisor_settings(config),
     )
     agents = {a: SpacecraftAgent(a, tuple(p for p in ids if p != a), settings) for a in ids}
     for a in ids:
@@ -262,6 +288,7 @@ def run_nominal_operations(
                             sc.charge_efficiency_fraction) for a in ids}  # fmt: skip
     storage = dict.fromkeys(ids, 0.0)
     min_wh = {a: batteries[a].stored_wh for a in ids}
+    protection_violations = dict.fromkeys(ids, 0)
     active: dict[str, Segment] = {}
     segments: list[Segment] = []
     faults = fault_schedule(config, ids)
@@ -290,11 +317,17 @@ def run_nominal_operations(
             bat = batteries[a]
             down = bool(faults) and faults.unavailable(a, t)
             if not down:
-                agents[a].observe(Housekeeping(t, bat.stored_wh, sc.battery_capacity_wh,
-                                               storage[a], sc.storage_capacity_mb))  # fmt: skip
+                flags = faults.critical_flags(a, t) if faults else ()
+                hk = Housekeeping(t, bat.stored_wh, sc.battery_capacity_wh, storage[a],
+                                  sc.storage_capacity_mb, flags)  # fmt: skip
+                agents[a].observe(hk)
+                if config.environment is not None:
+                    agents[a].observe(ExposureForecast(t, exposure_ratio(config, a, t)))
             if k == n_ticks - 1:
                 continue  # no step after the final tick
             cmd = None if down else agents[a].payload_command(t, step_ns, mb_per_step)
+            if cmd is not None and agents[a].mode != NOMINAL:  # truth check (Gate P3)
+                protection_violations[a] += 1
             if a in active and active[a].task_id != cmd:
                 close(a, k)
             if cmd is not None and a not in active:
@@ -394,6 +427,7 @@ def run_nominal_operations(
             "note": "q_j = 1 (DL-041); utility counts each task once",
         },
         "health": health,
+        "protection": _protection_summary(agents, ids, spec.duration_ns, protection_violations),
         "network": kernel.network_summary(),
         **kernel.agents_summary(),
     })  # fmt: skip
@@ -456,3 +490,22 @@ def _health_metrics(
                     None if hit is None else (hit - starts[peer]) / 1e9
                 )
     return out
+
+
+def _protection_summary(agents: dict[str, SpacecraftAgent], ids: list[str], end_ns: int,
+                        violations: dict[str, int]) -> dict[str, Any]:  # fmt: skip
+    """Time per mode and transitions per spacecraft; payload-on steps outside NOMINAL
+    (must be 0: the planner cannot defeat protection, Gate P3)."""
+    time_s: dict[str, dict[str, float]] = {}
+    transitions: dict[str, list[dict[str, Any]]] = {}
+    for a in ids:
+        hist = agents[a].mode_history()
+        bounds = [0, *[t for t, _, _, _ in hist], end_ns]
+        modes = [NOMINAL, *[new for _, _, new, _ in hist]]
+        acc = dict.fromkeys(MODES, 0.0)
+        for (t0, t1), m in zip(itertools.pairwise(bounds), modes, strict=False):
+            acc[m] += (t1 - t0) / 1e9
+        time_s[a] = acc
+        transitions[a] = [{"t_s": t / 1e9, "from": o, "to": n, "reason": w} for t, o, n, w in hist]
+    return {"time_in_mode_s": time_s, "transitions": transitions,
+            "payload_steps_outside_nominal": violations}  # fmt: skip

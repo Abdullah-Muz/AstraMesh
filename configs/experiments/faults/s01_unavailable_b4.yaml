@@ -3,8 +3,7 @@
 schema_version: 1
 scenario_id: S01_UNAVAILABLE_B4
 description: >-
-  Phase 2 S00 nominal operations, B3 decentralized allocation. FORMATION_24H_J2 dynamics,
-  MISSION_GEOMETRY_24H regions and spacecraft resources, AGENT_NETWORK_24H crosslinks.
+  S01: sc00 permanently unavailable from 6 h (B4 rule-based redistribution).
 scenario_type: nominal_operations
 
 time:

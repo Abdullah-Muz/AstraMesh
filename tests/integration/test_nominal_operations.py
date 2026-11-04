@@ -26,7 +26,7 @@ def _cfg(base: dict[str, Any], hours: float = 6, **changes: Any) -> NominalOpera
     cfg["time"]["duration_s"] = int(hours * 3600)
     for path, value in changes.items():
         sec, key = path.split("__")
-        cfg[sec][key] = value
+        cfg.setdefault(sec, {})[key] = value
     parsed = parse_scenario(cfg)
     assert isinstance(parsed, NominalOperationsScenario)
     return parsed
@@ -80,10 +80,16 @@ def test_storage_limit_leaves_tasks_unassigned(ops_config_dict: dict[str, Any]) 
 
 
 def test_starved_battery_aborts_are_not_credited(ops_config_dict: dict[str, Any]) -> None:
+    # The battery must run out *during* an observation: no bus load and no solar, and a
+    # 0.05 Wh battery against a 0.083 Wh observation (6 steps x 5 W x 10 s). Reserve and
+    # SAFE thresholds are 0, so the observation starts on a non-empty battery and aborts.
     starved = {
         "spacecraft__solar_generation_w": 0.0,
-        "spacecraft__battery_capacity_wh": 10.0,
+        "spacecraft__bus_power_w": 0.0,
+        "spacecraft__battery_capacity_wh": 0.05,
+        "spacecraft__battery_initial_fraction": 1.0,
         "operations__battery_reserve_fraction": 0.0,
+        "supervisor__safe_battery_fraction": 0.0,
     }
     run = _run(_cfg(ops_config_dict, hours=12, **starved))
     o = run.summary["operations"]

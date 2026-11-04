@@ -41,6 +41,7 @@ class Housekeeping:
     battery_capacity_wh: float
     storage_used_mb: float
     storage_capacity_mb: float
+    critical_flags: tuple[str, ...] = ()  # own critical-subsystem flags (DL-054)
 
     def __post_init__(self) -> None:
         vals = (self.battery_wh, self.battery_capacity_wh, self.storage_used_mb,
@@ -133,3 +134,17 @@ class PublicTask:
     owner: str | None
     slots: tuple[PublicSlot, ...]
     data_mb: float
+
+
+@dataclass(frozen=True, slots=True)
+class ExposureForecast:
+    """Own predicted environmental exposure relative to the payload's modelled tolerance
+    (1.0 = at the limit); ``None`` = missing or invalid, which is never zero risk (DL-054)."""
+
+    t_ns: int
+    exposure_ratio: float | None
+
+    def __post_init__(self) -> None:
+        r = self.exposure_ratio
+        if r is not None and not (math.isfinite(r) and r >= 0.0):
+            raise ValueError("exposure_ratio must be finite and >= 0, or None")

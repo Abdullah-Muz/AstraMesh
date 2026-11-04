@@ -327,7 +327,14 @@ class FaultConfig(_Model):
     """One injected fault (spec §5.4, DL-050). Ground truth; agents never see it."""
 
     fault_id: Identifier
-    type: Literal["unavailable", "comms_outage", "partition", "payload_degraded", "power_degraded"]
+    type: Literal[
+        "unavailable",
+        "comms_outage",
+        "partition",
+        "payload_degraded",
+        "power_degraded",
+        "critical_fault",
+    ]
     spacecraft: list[Identifier] = Field(
         default_factory=list, description="Affected spacecraft (not used for partition)"
     )
@@ -379,6 +386,53 @@ class FaultConfig(_Model):
         return self.end_s is not None
 
 
+class ForecastConfig(_Model):
+    """A scheduled interval of predicted exposure (synthetic, Phase 3; DL-054)."""
+
+    forecast_id: Identifier
+    spacecraft: list[Identifier] = Field(default_factory=list, description="Empty = all")
+    start_s: NonNegativeFloat
+    end_s: PositiveFloat
+    exposure_ratio: float | None = Field(
+        ge=0.0, allow_inf_nan=False,
+        description="Predicted exposure / modelled payload tolerance; null = invalid forecast",
+    )  # fmt: skip
+
+    @model_validator(mode="after")
+    def _ordered(self) -> ForecastConfig:
+        if self.end_s <= self.start_s:
+            raise ValueError(f"{self.forecast_id}: end_s must be after start_s")
+        return self
+
+
+class EnvironmentConfig(_Model):
+    """Synthetic environmental hazard forecasts (real data is Phase 4)."""
+
+    background_exposure_ratio: float = Field(
+        ge=0.0, allow_inf_nan=False, description="Exposure ratio outside scheduled intervals"
+    )
+    forecasts: list[ForecastConfig] = Field(default_factory=list)
+
+
+class SupervisorConfig(_Model):
+    """Protection supervisor guards (DL-054; PROVISIONAL)."""
+
+    safe_battery_fraction: float = Field(default=0.10, ge=0.0, lt=1.0, allow_inf_nan=False)
+    safe_exit_battery_fraction: float = Field(default=0.50, gt=0.0, le=1.0, allow_inf_nan=False)
+    safe_exit_dwell_s: NonNegativeFloat = 600.0
+    protect_exposure_ratio: PositiveFloat = 1.0
+    release_exposure_ratio: PositiveFloat = 0.8
+    release_dwell_s: NonNegativeFloat = 1800.0
+
+    @model_validator(mode="after")
+    def _ordered(self) -> SupervisorConfig:
+        if not self.safe_battery_fraction < self.safe_exit_battery_fraction:
+            raise ValueError("safe_battery_fraction must be < safe_exit_battery_fraction")
+        if not self.release_exposure_ratio < self.protect_exposure_ratio:
+            raise ValueError("release_exposure_ratio must be < protect_exposure_ratio")
+        return self
+
+
 class NominalOperationsScenario(MissionScenarioBase):
     """Phase 2 S00: isolated agents execute a science plan over the crosslink network."""
 
@@ -387,6 +441,10 @@ class NominalOperationsScenario(MissionScenarioBase):
     agents: AgentsConfig
     operations: OperationsConfig
     faults: list[FaultConfig] = Field(default_factory=list, description="Injected faults (S01+)")
+    environment: EnvironmentConfig | None = Field(
+        default=None, description="Synthetic hazard forecasts; absent = no hazard model"
+    )
+    supervisor: SupervisorConfig = Field(default_factory=SupervisorConfig)
 
     @model_validator(mode="after")
     def _ops_timing_on_grid(self) -> NominalOperationsScenario:
@@ -406,6 +464,12 @@ class NominalOperationsScenario(MissionScenarioBase):
                 self._require_on_grid(
                     f.ground_confirmation_s, f"faults[{f.fault_id}].ground_confirmation_s"
                 )
+        if self.environment is not None:
+            for fc in self.environment.forecasts:
+                if set(fc.spacecraft) - ids:
+                    raise ValueError(f"{fc.forecast_id}: unknown spacecraft")
+                self._require_on_grid(fc.start_s, f"forecasts[{fc.forecast_id}].start_s")
+                self._require_on_grid(fc.end_s, f"forecasts[{fc.forecast_id}].end_s")
         self._require_on_grid(self.agents.nav_fix_interval_s, "agents.nav_fix_interval_s")
         self._require_on_grid(self.agents.status_interval_s, "agents.status_interval_s")
         self._require_on_grid(self.operations.min_observation_s, "operations.min_observation_s")

@@ -182,6 +182,13 @@ class CbbaState:
                 del self.bundle[n_bar:]
                 break
 
+    def release_all(self) -> None:
+        """Supervisor left NOMINAL (DL-054): give up every own claim; peers re-auction."""
+        for tid in self.bundle:
+            if self.z[tid] == self.me:
+                self.y[tid], self.z[tid] = 0.0, None
+        self.bundle.clear()
+
     def forget_peer(self, peer: str) -> None:
         """B3 + timeout (DL-052): drop every claim by a peer believed lost, so the tasks
         are re-auctioned. Not part of published CBBA."""

@@ -3,8 +3,7 @@
 schema_version: 1
 scenario_id: S02_TWO_FAILURES_B3
 description: >-
-  Phase 2 S00 nominal operations, B3 decentralized allocation. FORMATION_24H_J2 dynamics,
-  MISSION_GEOMETRY_24H regions and spacecraft resources, AGENT_NETWORK_24H crosslinks.
+  S02: sc00 unavailable from 6 h and sc01 from 14 h (B3).
 scenario_type: nominal_operations
 
 time:

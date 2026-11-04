@@ -55,18 +55,18 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | # | Increment | Status |
 |---|---|---|
 | 1 | Fault schema and deterministic injection: unavailable, comms outage, partition, payload and power degradation; scenarios S01–S05 + power fault | **Done**: commit `9bcd8ee`, CI passing |
-| 2 | Health beliefs (§5.4), timeout baseline, B4 fault-aware redistribution, B3 + timeout | Implemented (DL-052, DL-053) |
-| 3 | Supervisor NOMINAL/PROTECTIVE/SAFE, command filtering, planner cannot override | Not started |
+| 2 | Health beliefs (§5.4), timeout baseline, B4 fault-aware redistribution, B3 + timeout | **Done**: commit `362d648`, CI passing |
+| 3 | Supervisor NOMINAL/PROTECTIVE/SAFE, command filtering, planner cannot override | Implemented (DL-054, DL-055) |
 | 4 | Full five-mode machine: STORM_WATCH, RECOVERY, hysteresis, dwell, invalid-input rules | Not started |
 | 5 | Fault-scenario comparison (S01–S10) | Not started |
 
 ## Gate P3 checklist (spec §13)
 
-- [ ] SAFE always overrides
-- [ ] Invalid forecast behaviour defined
-- [ ] No mode chatter under brief noise
+- [ ] SAFE always overrides (increment 3: SAFE checked first; property test + override tests from every mode; ticks at sign-off)
+- [ ] Invalid forecast behaviour defined (increment 3: hold mode, restart release dwell, log once per episode; full policy in increment 4)
+- [ ] No mode chatter under brief noise (increment 3: hysteresis + 30 min release dwell, tested; full five-mode machine in increment 4)
 - [ ] False outage does not count as confirmed fatal failure (increment 2: CONFIRMED_FAILED only from ground notices; property test and S04 runs show 0 confirmations while available; ticks at phase sign-off)
-- [ ] Distributed task replanning cannot defeat protection
+- [ ] Distributed task replanning cannot defeat protection (increment 3: supervisor gates every payload command; property test with arbitrary messages and plan uplinks; payload steps outside NOMINAL = 0 in all runs)
 
 ## Gate P2 checklist (spec §13)
 

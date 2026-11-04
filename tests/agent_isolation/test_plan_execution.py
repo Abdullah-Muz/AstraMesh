@@ -57,7 +57,9 @@ def test_stops_when_battery_empties_mid_observation() -> None:
     assert a.payload_command(0, STEP, 0.1) == "T1"
     a.observe(_hk(10, wh=0.0))
     assert a.payload_command(10, STEP, 0.1) is None
-    assert a.execution_view()["declined"] == {"T1": "resources_exhausted"}
+    # The supervisor sees battery 0% <= 10% first: SAFE preempts the observation (DL-054).
+    assert a.execution_view()["declined"] == {"T1": "protection_safe"}
+    assert a.mode == "SAFE"
 
 
 def test_older_or_equal_plan_versions_are_rejected() -> None:

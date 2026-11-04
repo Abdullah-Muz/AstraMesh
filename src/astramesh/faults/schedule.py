@@ -18,6 +18,10 @@ Fault types and their *truth* effects while active (``start_ns <= t < end_ns``):
 ``power_degraded``
     Solar generation is multiplied by ``severity_fraction`` (0 = no power).
     The agent sees the consequence only in its own housekeeping (battery).
+``critical_fault``
+    A critical local subsystem fault (thermal/attitude abstraction): the
+    spacecraft's *own* housekeeping carries a critical flag while it is active,
+    which drives its supervisor to SAFE (DL-054).
 
 Agents learn of faults only through effects (missing messages, housekeeping),
 never from this module (enforced by the agent import rule).
@@ -29,7 +33,14 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any
 
-FAULT_TYPES = ("unavailable", "comms_outage", "partition", "payload_degraded", "power_degraded")
+FAULT_TYPES = (
+    "unavailable",
+    "comms_outage",
+    "partition",
+    "payload_degraded",
+    "power_degraded",
+    "critical_fault",
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -108,6 +119,9 @@ class FaultSchedule:
         """Spacecraft whose failure the ground confirms exactly at ``t_ns``."""
         return tuple(sorted({sc for f in self.faults if f.ground_confirmation_ns == t_ns
                              for sc in f.spacecraft}))  # fmt: skip
+
+    def critical_flags(self, sc: str, t_ns: int) -> tuple[str, ...]:
+        return tuple(f.fault_id for f in self._active("critical_fault", t_ns) if sc in f.spacecraft)
 
     def payload_valid(self, sc: str, t_ns: int) -> bool:
         return not any(sc in f.spacecraft for f in self._active("payload_degraded", t_ns))
