@@ -1,0 +1,74 @@
+# Pinned external data files (DL-063; records in docs/DATASET_REGISTRY.md).
+#
+# Fetch:   uv run python scripts/data/fetch_data.py [--dataset DS-02] [--verify-only]
+# Files are written to data/raw/<dataset id>/<name> (Git-ignored) and are only kept
+# when their size and every pinned checksum match. `md5` is the provider's published
+# checksum, where one exists. `sha256` is recorded by us at first download and checked
+# on every later fetch. A file is not used in an experiment until its sha256 is pinned
+# here.
+
+datasets:
+  DS-02:
+    name: "OPSSAT-AD: anomaly detection dataset for satellite telemetry"
+    provider: "ESA OPS-SAT; dataset by B. Ruszczak et al. (Zenodo)"
+    doi: "10.5281/zenodo.15108715"
+    license: "CC-BY-4.0"
+    files:
+      - name: segments.csv
+        url: "https://zenodo.org/api/records/15108715/files/segments.csv/content"
+        bytes: 18987091
+        md5: "72f109630abb933a386106897a631188"
+        sha256: "d5201e9e751eb2a53a0ff7c11567dc4239f594ea4b479b2aa66fe67ddcbcb9ba"
+      - name: dataset.csv
+        url: "https://zenodo.org/api/records/15108715/files/dataset.csv/content"
+        bytes: 507550
+        md5: "5246fdc5e4630a4cecbf7fb6bc8b795e"
+        sha256: "b524177da6f516d5c9f63c7acbc385341f0ad42046ef20c1bed2d25e51b98f02"
+      - name: LICENSE
+        url: "https://zenodo.org/api/records/15108715/files/LICENSE/content"
+        bytes: 1091
+        md5: "ea8befa9af2b37b7a54b5a16fc3712b0"
+        sha256: "76d2ff9834ed2bb1356d9f7eb303c289817374bb1d5bbe5af86817e73e0f47d2"
+
+  DS-06:
+    name: "NASA OMNI high-resolution 1-min data (May 2024)"
+    provider: "NASA/GSFC Space Physics Data Facility (OMNIWeb)"
+    doi: "10.48322/45bb-8792"
+    license: "NASA open data; citation and acknowledgement requested (omniweb.gsfc.nasa.gov/html/citing.html)"
+    files:
+      - name: omni_min202405.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202405.asc"
+        bytes: 13392000
+        md5: null
+        sha256: "b5aaa14f4daf0b03d697fa4380f659ba2a4bf8e1df223b320df087b2772acca5"
+
+  DS-07:
+    name: "GOES-18 SEISS SGPS L2 5-min averages, 8-15 May 2024"
+    provider: "NOAA NCEI (GOES-R Space Environment In-Situ Suite)"
+    doi: null
+    license: "US Government work (NOAA); no copyright restrictions found, source acknowledgement requested"
+    files:
+      - {name: sci_sgps-l2-avg5m_g18_d20240508_v3-0-2.nc, bytes: 594301, md5: null,
+         sha256: "90e0f60513eb0a1d217bb3ccceea2ce4c9f8364b382799e8e93eb6b5c925281f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/05/sci_sgps-l2-avg5m_g18_d20240508_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240509_v3-0-2.nc, bytes: 616746, md5: null,
+         sha256: "806344d55daa0432bff1c7a570e4e06f8d4f221f7977631a0eb35b6936541fab",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/05/sci_sgps-l2-avg5m_g18_d20240509_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240510_v3-0-2.nc, bytes: 635517, md5: null,
+         sha256: "c4845f6da65b090525cac560037bc038dde9850a7334dbf76d4b4c944c59cb02",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/05/sci_sgps-l2-avg5m_g18_d20240510_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240511_v3-0-2.nc, bytes: 643228, md5: null,
+         sha256: "050920f03057d478f361ea662cc5d8a50bf20261e449c9df02637b7bc5777d81",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/05/sci_sgps-l2-avg5m_g18_d20240511_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240512_v3-0-2.nc, bytes: 636015, md5: null,
+         sha256: "25c7912b4198f8bf9fb26c0022c18394df347570e381547da958e8a09584212e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/05/sci_sgps-l2-avg5m_g18_d20240512_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240513_v3-0-2.nc, bytes: 634970, md5: null,
+         sha256: "cc93ac4c4db3584f7c60a71d3cd5e77663a872140b4130a4177a802f3bee3174",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/05/sci_sgps-l2-avg5m_g18_d20240513_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240514_v3-0-2.nc, bytes: 637173, md5: null,
+         sha256: "dd7eaa7d5e234e729c9eae372780c7d76fc8195dc45b167a90b5082bcac1fe3b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/05/sci_sgps-l2-avg5m_g18_d20240514_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240515_v3-0-2.nc, bytes: 638003, md5: null,
+         sha256: "0dc046c27fd32e08ccbfce4d3d6fb3fed30bf5ede177f8194a9a594f47e3df10",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/05/sci_sgps-l2-avg5m_g18_d20240515_v3-0-2.nc"}

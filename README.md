@@ -4,7 +4,7 @@
 
 AstraMesh is an independent, public-methods computational research project. It is a Python-first, CPU-feasible simulation platform for a **simulated four-spacecraft, decentralized low-Earth-orbit mission** that cooperatively schedules ionospheric observations, coordinates over constrained inter-satellite links, assesses its own health and environmental risk, and tries to preserve scientific value when spacecraft become unavailable or space-weather conditions worsen.
 
-> **Project status: Phases 1–3 complete (Gate P3 signed off 2026-11-04); Phase 4 (external data and probabilistic/ML experiments) not started.**
+> **Project status: Phases 1–3 complete (Gate P3 signed off 2026-11-04); Phase 4 (external data and probabilistic/ML experiments) in progress.**
 > The repository contains reproducibility infrastructure, validated truth dynamics (two-body and J2) for a four-spacecraft formation, mission geometry (illumination, geometry-only science opportunities), and resource accounting, each with its physics acceptance tests. Phase 2 added isolated spacecraft agents over a modelled crosslink network and four allocation baselines: a static scheduler, a centralized reference, a one-shot auction and CBBA. They are compared on a fault-free day under message loss. Phase 3 added deterministic fault injection, per-agent health beliefs, two fault-aware baselines (B3 + timeout and B4 rule-based redistribution), and a five-mode local protection supervisor; all six methods are compared across nine synthetic fault and hazard scenarios ([`docs/results/FAULT_COMPARISON.md`](docs/results/FAULT_COMPARISON.md)). It contains **no** science-retrieval model, external data or proposed research method yet, and no research results. Nothing here should be read as a validated or published finding.
 
 The authoritative design document is **[`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md)** (v1.0). Where this README and the specification differ, the specification governs.
@@ -107,7 +107,7 @@ A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a prove
 | 1 | Validated four-spacecraft dynamics and mission geometry | Complete (Gate P1 signed off 2026-11-03) |
 | 2 | Decentralized nominal science operations | Complete (Gate P2 signed off 2026-11-03) |
 | 3 | Deterministic faults and protection supervisor | Complete (Gate P3 signed off 2026-11-04) |
-| 4 | External data and probabilistic/ML experiments | Not started |
+| 4 | External data and probabilistic/ML experiments | In progress |
 | 5 | Storm-aware distributed recovery | Not started |
 | 6 | Research conclusion and public demonstration | Not started |
 
@@ -123,7 +123,7 @@ AstraMesh is a **simulation and research project**. It is **not** a real satelli
 |---|---|
 | [`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md) | Authoritative research and engineering specification (v1.0) |
 | [`docs/`](docs/) | Supporting documents: conventions, physics test plan, literature matrix, dataset registry, decision log, roadmap |
-| [`src/astramesh/`](src/astramesh/) | Python package (`core/` clock, RNG, events, config; `dynamics/` validated truth dynamics, frames, time scales; `evaluation/` runner and manifests; `science/` region access and science opportunities; `resources/` energy, storage and Δv ledgers; `agents/` isolated spacecraft agents; `faults/` simulator-side fault injection (truth only); agent-side health beliefs and the protection supervisor in `agents/`; `planning/` external allocation (B0 static, B1 centralized reference); agent-side B2 auction and B3 CBBA in `agents/`; `communications/` messages and crosslink network; `scenarios/` runnable scenarios; `visualization/` diagnostic plots) |
+| [`src/astramesh/`](src/astramesh/) | Python package (`core/` clock, RNG, events, config; `dynamics/` validated truth dynamics, frames, time scales; `evaluation/` runner and manifests; `science/` region access and science opportunities; `resources/` energy, storage and Δv ledgers; `agents/` isolated spacecraft agents; `faults/` simulator-side fault injection (truth only); `datasets/` pinned external-data fetch and verification; agent-side health beliefs and the protection supervisor in `agents/`; `planning/` external allocation (B0 static, B1 centralized reference); agent-side B2 auction and B3 CBBA in `agents/`; `communications/` messages and crosslink network; `scenarios/` runnable scenarios; `visualization/` diagnostic plots) |
 | [`scripts/studies/`](scripts/studies/) | Reference-error studies behind every physics test tolerance |
 | [`configs/`](configs/) | Scenario configuration files (YAML) |
 | [`tests/`](tests/) | Unit, integration, and regression tests |

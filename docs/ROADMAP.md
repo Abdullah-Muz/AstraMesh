@@ -10,7 +10,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 1 | Validated four-spacecraft dynamics and mission geometry | **Complete**: Gate P1 signed off 2026-11-03 (DL-037); open follow-ups listed there |
 | 2 | Decentralized nominal science operations | **Complete**: Gate P2 signed off 2026-11-03 (DL-049); open follow-ups listed there |
 | 3 | Deterministic faults and protection supervisor | **Complete**: Gate P3 signed off 2026-11-04 (DL-061); open follow-ups listed there |
-| 4 | External data and probabilistic/ML experiments | Not started |
+| 4 | External data and probabilistic/ML experiments | **In progress** (DL-062) |
 | 5 | Storm-aware distributed recovery | Not started |
 | 6 | Research conclusion and public demonstration | Not started |
 
@@ -59,6 +59,23 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 3 | Supervisor NOMINAL/PROTECTIVE/SAFE, command filtering, planner cannot override | **Done**: commit `85b8cff`, CI passing |
 | 4 | Full five-mode machine: STORM_WATCH, RECOVERY, three risk dimensions, hysteresis, dwell, invalid-input policy | **Done**: commit `e3c675f`, CI passing |
 | 5 | Fault-scenario comparison (S01–S10; S06 deferred) | **Done**: script `bb2ea8e`, B4 fix `311477a` (DL-059), 600-run results in [`docs/results/FAULT_COMPARISON.md`](results/FAULT_COMPARISON.md) (DL-060); reviewed and approved 2026-11-04 |
+
+## Phase 4 increments
+
+| # | Increment | Status |
+|---|---|---|
+| 1 | Data registry and pinned fetch: OPS-SAT-AD, OMNI 1-min and GOES-18 SGPS for May 2024; ESA-ADB sized only | Implemented (DL-063) |
+| 2 | Anomaly-detection benchmark on OPS-SAT-AD, independent of the simulation; official and time-ordered splits | Not started |
+| 3 | Calibrated probabilistic health model; adapter from detector scores to simulated beliefs; comparison with the timeout on S01/S03/S04 | Not started |
+| 4 | May 2024 storm replay (OMNI, GOES protons) as S11, no future-data leakage; bounded COSMIC-2/GloTEC context | Not started |
+| 5 | Gate P4 comparison write-up | Not started |
+
+## Gate P4 checklist (spec §13)
+
+- [ ] Data licences/provenance and train/test partitions documented (increment 1: licences, hashes and measured facts in `DATASET_REGISTRY.md`; partitions in increment 2)
+- [ ] Anomaly results independently benchmarked
+- [ ] Synthetic-vs-real interface explicit
+- [ ] Preliminary health/forecast comparisons complete with uncertainty
 
 ## Gate P3 checklist (spec §13)
 

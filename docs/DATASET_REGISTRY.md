@@ -1,6 +1,6 @@
 # Dataset Registry
 
-> **Owner:** Abdullah Muzher · **Status:** STARTED — no dataset downloaded · **Spec:** §8 · **Last updated:** 2026-11-03
+> **Owner:** Abdullah Muzher · **Status:** Phase 4 increment 1: three bounded datasets downloaded and pinned (DS-02, DS-06, DS-07) · **Spec:** §8 · **Last updated:** 2026-11-04
 
 ## Rules (spec §8.2)
 
@@ -8,18 +8,19 @@
 - **License/terms must be confirmed from the provider before download.** "UNVERIFIED" means not yet checked; do not assume government or open-access data is unrestricted.
 - Raw data lives under `data/` (Git-ignored). Record retrieved file names and SHA-256 hashes here; never commit the files.
 - Do **not** download the full ESA-ADB (spec §8.1, §8.2): start with a bounded OPS-SAT-AD sample after measured resource sizing.
+- **Fetching (DL-063):** every downloaded file is listed in [`configs/data/sources.yaml`](../configs/data/sources.yaml) with its URL, size, the provider's MD5 (where published) and our SHA-256. `uv run python scripts/data/fetch_data.py` downloads into `data/raw/<id>/` and keeps a file only if all its pins match; `--verify-only` re-checks local copies without network. Experiments open files only through `require_pinned`.
 
 ## Summary
 
 | ID | Dataset | License / terms | Downloaded | Phase |
 |---|---|---|---|---|
-| DS-01 | ESA Anomaly Dataset (ESA-ADB) | CC BY 3.0 IGO per the `LICENSE` file in `github.com/esa/anomaly-dataset`; Zenodo record 12528696 carries **no** license field — **confirm the license applies to the data files** | No | 4 |
-| DS-02 | ESA OPS-SAT-AD | CC BY 4.0 per Zenodo record 15108715 metadata (checked 2026-11-03) | No | 4 |
+| DS-01 | ESA Anomaly Dataset (ESA-ADB) | CC BY 3.0 IGO per the `LICENSE` file in `github.com/esa/anomaly-dataset`; Zenodo record 12528696 carries **no** license field — **confirm the license applies to the data files** | No — sized only (DL-062: 11.6 GB compressed, more than the 14 GB RAM available in WSL once unpacked) | 4 |
+| DS-02 | ESA OPS-SAT-AD | CC BY 4.0 (Zenodo metadata) **and** MIT (the record's `LICENSE` file, © 2024 KP Labs); both permit use and require attribution — we meet both | **Yes** (19.5 MB, pinned 2026-11-04) | 4 |
 | DS-03 | NOAA GloTEC | UNVERIFIED | No | 4 |
 | DS-04 | CelesTrak GP / OMM | UNVERIFIED | No | 1+ |
 | DS-05 | UCAR COSMIC-2 | UNVERIFIED (check data-use / citation policy) | No | 4 |
-| DS-06 | NASA OMNI / SPDF | UNVERIFIED | No | 4–5 |
-| DS-07 | NOAA SWPC / NCEI space-weather products | UNVERIFIED | No | 4–5 |
+| DS-06 | NASA OMNI / SPDF | No restrictions stated; citation (DOI) and acknowledgement requested | **Yes** (May 2024 1-min, 13.4 MB, pinned 2026-11-04) | 4–5 |
+| DS-07 | NOAA NCEI GOES-18 SEISS/SGPS L2 | File metadata: "These data may be redistributed and used without restriction." | **Yes** (8–15 May 2024, 5-min, 5.0 MB, pinned 2026-11-04) | 4–5 |
 
 ## Record template
 
@@ -85,11 +86,76 @@ leakage_risks: "Use the benchmark's official splits; do not shuffle across time 
 domain_transfer_caveats: "An anomaly label is not a confirmed failure (spec §8.1)"
 ```
 
-### DS-03 … DS-07
+Measured from the downloaded files (2026-11-04):
+
+```yaml
+retrieved_utc: "2026-11-04"
+retrieved_files:   # sha256 and sizes pinned in configs/data/sources.yaml; provider md5 matched
+  - segments.csv (18 987 091 B): 303 493 rows; columns channel, timestamp, value, label, sampling, anomaly, segment, train
+  - dataset.csv (507 550 B): 2 123 segments x 18 engineered features + segment, anomaly, train, channel, sampling
+  - LICENSE (1 091 B): MIT License for OPS-SAT Dataset, Copyright (c) 2024 KP Labs
+license_terms: "CC BY 4.0 (Zenodo record metadata) and MIT (LICENSE file in the record). Comply with both: cite the dataset and paper (D05), keep the MIT notice with any redistributed copy (we redistribute nothing)."
+license_verified_utc: "2026-11-04"
+citation_required: "Ruszczak et al., The OPS-SAT benchmark for detecting anomalies in satellite telemetry, Scientific Data (2025), doi:10.1038/s41597-025-05035-3; dataset doi:10.5281/zenodo.15108715"
+sampling_interval: "1 s (793 segments) or 5 s (1 330 segments); segment length 8-1 040 samples, median 70"
+time_conventions: "ISO 8601 UTC timestamps, 2022-01-04 to 2022-06-02"
+event_labels: "`anomaly` (0/1) per segment: 434 anomalous of 2 123 (20.4%). The `label` column is the string 'anomaly' on every row and is NOT the label."
+channels: "9 channels CADC0872-CADC0894 (paper: 3 magnetometer, 6 photodiode). CADC0884 has no anomalous segments; CADC0886 and CADC0890 have 11 and 14 segments."
+official_split: "train = 1 594 segments (321 anomalous), test = 529 (113 anomalous); stratified random, interleaved in time (train/test alternate 4-234 times per channel)"
+leakage_risks: "The official split mixes time: neighbouring segments of the same channel fall on both sides. DL-062: report the official split (comparability) AND a per-channel time-ordered split; the gap is a possible leakage effect."
+expected_storage_gb: 0.02
+expected_ram_gb: "< 0.5"
+```
+
+### DS-06 — NASA OMNI high-resolution 1-min (May 2024)
+
+```yaml
+id: DS-06
+name: "OMNI high-resolution (HRO) 1-min data, May 2024"
+owner_provider: "NASA/GSFC Space Physics Data Facility (OMNIWeb)"
+url: https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202405.asc
+doi: "10.48322/45bb-8792"
+version_or_date: "file dated 2025-11-24 on the SPDF server"
+retrieved_utc: "2026-11-04"
+retrieved_files: "omni_min202405.asc (13 392 000 B; sha256 pinned in configs/data/sources.yaml)"
+license_terms: "No restrictions stated; citation and acknowledgement requested (https://omniweb.gsfc.nasa.gov/html/citing.html)"
+license_verified_utc: "2026-11-04"
+citation_required: "Papitashvili, N. E. and King, J. H. (2020), OMNI 1-min Data [Data set], NASA SPDF, doi:10.48322/45bb-8792 (with access date); acknowledge 'NASA/GSFC's Space Physics Data Facility's OMNIWeb service, and OMNI data'"
+sampling_interval: "1 min; 44 640 rows = 31 days x 1 440"
+units: "per the HRO format description (HROdocum.html); 46 whitespace-separated fields per row"
+time_conventions: "year, day of year, hour, minute (UT); time-shifted to the bow-shock nose"
+missingness_quality_flags: "fill values are runs of 9s (e.g. 9999.99, 99999.9), field-specific"
+intended_experiment: "Phase 4 increment 4: May 2024 storm environment replay (S11)"
+leakage_risks: "A forecast at time t may use only rows with time <= t minus the stated data latency"
+```
+
+### DS-07 — GOES-18 SEISS/SGPS L2 5-min averages (8–15 May 2024)
+
+```yaml
+id: DS-07
+name: "L2 SEISS/SGPS 5-minute Flux Averages, GOES-18"
+owner_provider: "NOAA NCEI"
+url: https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/05/
+doi: null
+version_or_date: "v3-0-2; files created 2024-05-15 to 2024-05-22"
+retrieved_utc: "2026-11-04"
+retrieved_files: "8 daily netCDF-4 files, 594-643 kB each (sha256 pinned in configs/data/sources.yaml)"
+license_terms: "Global attribute in every file: 'These data may be redistributed and used without restriction.'"
+license_verified_utc: "2026-11-04"
+citation_required: "None specified ('references: TBD'); acknowledge NOAA NCEI and GOES-R SEISS"
+sampling_interval: "5 min (288 records per day); 2 sensor units (-X and +X look directions)"
+units: "differential proton flux protons/(cm^2 sr keV s) in 13 channels from 1 to 500 MeV; integral flux protons/(cm^2 sr s) for >500 MeV only"
+missingness_quality_flags: "per-average counts of valid 1-s samples and of dead-time, out-of-bounds and error DQFs; yaw-flip flag"
+intended_experiment: "Phase 4 increment 4: proton environment for the S11 radiation-risk replay"
+caveats: "This product has no >10 MeV integral channel; a >=10 MeV flux must be integrated from the differential channels (method to be decided in increment 4). A 2025 NOAA/CIRES presentation reports a 2024 problem with SWPC proton integral fluxes; it concerns a different product but is recorded here. Temperature-corrected and observed fluxes are both provided."
+leakage_risks: "Same rule as DS-06"
+domain_transfer_caveats: "Geostationary orbit, not the AstraMesh LEO orbit: geomagnetic shielding differs, so GOES flux is an upper-bound proxy, not the dose at AstraMesh"
+```
+
+### DS-03, DS-04, DS-05
 
 Not yet started. Source URLs are listed in spec §8.1. Specific cautions recorded there:
 
-- **GloTEC:** operational global product begins in 2025; it is an assimilated model product, not ground truth. Not usable as 2024 truth.
-- **CelesTrak GP:** general-perturbations elements are not exact inertial truth; prefer OMM over TLE-only.
-- **COSMIC-2:** multiple processing levels; check dependency with GloTEC (which assimilates it).
-- **OMNI / SWPC:** prevent future-information leakage in forecasting experiments.
+- **GloTEC:** operational global product begins in 2025 (NCEI archive "2025-Feb to present"); it is an assimilated model product, not ground truth. Not usable as 2024 truth.
+- **CelesTrak GP:** general-perturbations elements are not exact inertial truth; prefer OMM over TLE-only. CelesTrak links its own usage policy; read it before any download.
+- **COSMIC-2:** multiple processing levels (podTc2 absolute TEC is level 1b; ionPrf electron density is level 2); suggested citation "UCAR COSMIC Program, 2019: COSMIC-2 Data Products, doi:10.5065/T353-C093"; no licence text found on the data page yet. Check dependency with GloTEC (which assimilates it).
