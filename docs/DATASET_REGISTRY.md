@@ -1,6 +1,6 @@
 # Dataset Registry
 
-> **Owner:** Abdullah Muzher · **Status:** Phase 4 increment 1: three bounded datasets downloaded and pinned (DS-02, DS-06, DS-07) · **Spec:** §8 · **Last updated:** 2026-11-04
+> **Owner:** Abdullah Muzher · **Status:** Phase 4: five bounded datasets downloaded and pinned (DS-02, DS-06, DS-07; forecast training data DS-08, DS-09) · **Spec:** §8 · **Last updated:** 2026-11-05
 
 ## Rules (spec §8.2)
 
@@ -21,6 +21,8 @@
 | DS-05 | UCAR COSMIC-2 | UNVERIFIED (check data-use / citation policy) | No | 4 |
 | DS-06 | NASA OMNI / SPDF | No restrictions stated; citation (DOI) and acknowledgement requested | **Yes** (May 2024 1-min, 13.4 MB, pinned 2026-11-04) | 4–5 |
 | DS-07 | NOAA NCEI GOES-18 SEISS/SGPS L2 | File metadata: "These data may be redistributed and used without restriction." | **Yes** (8–15 May 2024, 5-min, 5.0 MB, pinned 2026-11-04) | 4–5 |
+| DS-08 | NOAA NCEI GOES-18 SEISS/SGPS L2 (forecast training) | As DS-07 (same metadata statement in every file) | **Yes** (1 Jan 2023 – 30 Apr 2024, 5-min, 486 files, 293 MB, pinned 2026-11-05) | 4–5 |
+| DS-09 | NASA OMNI / SPDF (forecast training) | As DS-06 | **Yes** (Jan 2023 – Apr 2024 1-min, 16 files, 210 MB, pinned 2026-11-05) | 4–5 |
 
 ## Record template
 
@@ -154,6 +156,53 @@ intended_experiment: "Phase 4 increment 4: proton environment for the S11 radiat
 caveats: "This product has no >10 MeV integral channel; a >=10 MeV flux must be integrated from the differential channels (method to be decided in increment 4). A 2025 NOAA/CIRES presentation reports a 2024 problem with SWPC proton integral fluxes; it concerns a different product but is recorded here. Temperature-corrected and observed fluxes are both provided."
 leakage_risks: "Same rule as DS-06"
 domain_transfer_caveats: "Geostationary orbit, not the AstraMesh LEO orbit: geomagnetic shielding differs, so GOES flux is an upper-bound proxy, not the dose at AstraMesh"
+```
+
+### DS-08 — GOES-18 SEISS/SGPS L2 5-min averages (Jan 2023 – Apr 2024; forecast training)
+
+```yaml
+id: DS-08
+name: "L2 SEISS/SGPS 5-minute Flux Averages, GOES-18, 2023-01-01 to 2024-04-30"
+owner_provider: "NOAA NCEI"
+url: https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/
+doi: null
+version_or_date: "v3-0-0 (to 2023-03-29), v3-0-1 and v3-0-2; the channel band edges changed with v3-0-1 and differ between the two sensor units"
+retrieved_utc: "2026-11-05"
+retrieved_files: "486 daily netCDF-4 files, one per day with no gaps (sha256 pinned in configs/data/sources.yaml)"
+license_terms: "As DS-07: 'These data may be redistributed and used without restriction.'"
+license_verified_utc: "2026-11-05"
+citation_required: "As DS-07"
+sampling_interval: "5 min; 139 968 records"
+units: "as DS-07"
+missingness_quality_flags: "as DS-07; 0.06 % of records have no valid >= 10 MeV flux under the DL-068 validity rule. v3-0-0 files write the time units without 'UTC' (same epoch; every stamp falls on the 5-min grid)"
+intended_experiment: "Phase 4 increment 4: training and calibration of the P-B and P-C radiation forecasts (DL-068). Never used to evaluate them"
+partitions: "Everything here is training data; chronological folds inside it for calibration. The test event is the May 2024 storm week (DS-07), which starts 8 days after this period ends"
+derived_quantity: ">= 10 MeV integral flux from the differential channels, astramesh.datasets.goes (DL-068): measured band integrals where a band lies wholly above 10 MeV, power laws matched to the neighbouring band averages elsewhere, plus the > 500 MeV channel; larger of the two units. Training period: 32 onsets of >= 100 pfu (78 h above), maximum 1 048 pfu (2024-03-23 18:20 UT)"
+caveats: "The derived flux depends on the method: at the 10 May 2024 peak a flat-band sum gives 404 pfu and the DL-068 method 221 pfu, because the spectrum is steep (index about 5) across 10-12 MeV, where only interpolation is possible"
+leakage_risks: "Same rule as DS-06; and no record from May 2024 or later may enter training or calibration"
+domain_transfer_caveats: "As DS-07"
+```
+
+### DS-09 — NASA OMNI 1-min (Jan 2023 – Apr 2024; forecast training)
+
+```yaml
+id: DS-09
+name: "OMNI high-resolution (HRO) 1-min data, January 2023 - April 2024"
+owner_provider: "NASA/GSFC Space Physics Data Facility (OMNIWeb)"
+url: https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/
+doi: "10.48322/45bb-8792"
+version_or_date: "files as served on 2026-11-05"
+retrieved_utc: "2026-11-05"
+retrieved_files: "16 monthly files omni_min202301.asc ... omni_min202404.asc (sha256 pinned in configs/data/sources.yaml)"
+license_terms: "As DS-06"
+license_verified_utc: "2026-11-05"
+citation_required: "As DS-06"
+sampling_interval: "1 min; 699 840 rows, contiguous"
+units: "as DS-06; columns used: Bz GSM, flow speed, AE, SYM/H (astramesh.datasets.omni)"
+missingness_quality_flags: "AE and SYM/H complete; Bz GSM 10 % missing; flow speed 29 % missing"
+intended_experiment: "Phase 4 increment 4: forecast features (DL-068)"
+partitions: "Training only, as DS-08"
+leakage_risks: "As DS-08"
 ```
 
 ### DS-03, DS-04, DS-05

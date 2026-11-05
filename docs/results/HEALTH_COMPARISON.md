@@ -1,6 +1,6 @@
 # Health models H-A / H-B / H-C on S01, S03 and S04
 
-> **Status:** recorded 2026-11-05 from clean commit `42c24a9` (`git_dirty: false`). **Preliminary, not a research result:** the faults are synthetic. The payload detector's scores are real (OPS-SAT-AD), but the way they are attached to simulated faults is an assumption (see "Synthetic-vs-real interface"). Phase 4 increment 3 (DL-066, DL-067).
+> **Status:** recorded 2026-11-05 from clean commit `42c24a9` (`git_dirty: false`); approved by the owner 2026-11-05 (DL-067). **Preliminary, not a research result:** the faults are synthetic. The payload detector's scores are real (OPS-SAT-AD), but the way they are attached to simulated faults is an assumption (see "Synthetic-vs-real interface"). Phase 4 increment 3 (DL-066, DL-067).
 
 ## Setup (DL-066)
 

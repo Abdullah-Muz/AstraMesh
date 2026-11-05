@@ -51,7 +51,7 @@ All physical and numerical parameters are starting points that must be validated
 | Configuration | YAML validated with pydantic (unknown keys rejected) |
 | Numerics & physics | NumPy, SciPy; Astropy for time, frames, and units |
 | Networking & discrete events | NetworkX, SimPy |
-| Data | pandas, PyArrow, Xarray |
+| Data | h5py for the GOES netCDF-4 files (`data` dependency group, DL-068); pandas, PyArrow and Xarray not needed so far |
 | Machine learning | scikit-learn; PyOD, xgboost-cpu and CPU-only PyTorch for the Phase 4 anomaly benchmark (`ml` dependency group, DL-064) |
 | Visualization | Matplotlib, Plotly |
 | Testing | pytest, Hypothesis |

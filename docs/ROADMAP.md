@@ -66,8 +66,8 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 |---|---|---|
 | 1 | Data registry and pinned fetch: OPS-SAT-AD, OMNI 1-min and GOES-18 SGPS for May 2024; ESA-ADB sized only | Implemented (DL-063) |
 | 2 | Anomaly-detection benchmark on OPS-SAT-AD, independent of the simulation; official and time-ordered splits | **Done**: code `c557c6b` (DL-064), results `f0760f8` in [`docs/results/OPSSAT_BENCHMARK.md`](results/OPSSAT_BENCHMARK.md) (DL-065); approved 2026-11-05 |
-| 3 | Calibrated probabilistic health model; adapter from detector scores to simulated beliefs; comparison with the timeout on S01/S03/S04 | Code `42c24a9` (DL-066); 440-run results in [`docs/results/HEALTH_COMPARISON.md`](results/HEALTH_COMPARISON.md) (DL-067), awaiting review |
-| 4 | May 2024 storm replay (OMNI, GOES protons) as S11, no future-data leakage; bounded COSMIC-2/GloTEC context | Not started |
+| 3 | Calibrated probabilistic health model; adapter from detector scores to simulated beliefs; comparison with the timeout on S01/S03/S04 | **Done**: code `42c24a9` (DL-066), results `7f01b8e` in [`docs/results/HEALTH_COMPARISON.md`](results/HEALTH_COMPARISON.md) (DL-067); approved 2026-11-05 |
+| 4 | May 2024 storm replay (OMNI, GOES protons) as S11, no future-data leakage; bounded COSMIC-2/GloTEC context | In progress: design approved (DL-068); training data pinned (DS-08, DS-09) and GOES/OMNI loaders implemented |
 | 5 | Gate P4 comparison write-up | Not started |
 
 ## Gate P4 checklist (spec §13)

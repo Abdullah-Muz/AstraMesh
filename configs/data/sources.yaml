@@ -72,3 +72,1557 @@ datasets:
       - {name: sci_sgps-l2-avg5m_g18_d20240515_v3-0-2.nc, bytes: 638003, md5: null,
          sha256: "0dc046c27fd32e08ccbfce4d3d6fb3fed30bf5ede177f8194a9a594f47e3df10",
          url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/05/sci_sgps-l2-avg5m_g18_d20240515_v3-0-2.nc"}
+
+  # Training data for the storm forecasts (DL-068): everything before the held-out
+  # May 2024 storm week (DS-06, DS-07). sha256 recorded at first download, 2026-11-05.
+  DS-08:
+    name: "GOES-18 SEISS SGPS L2 5-min averages, Jan 2023 - Apr 2024 (forecast training)"
+    provider: "NOAA NCEI (GOES-R Space Environment In-Situ Suite)"
+    doi: null
+    license: "US Government work (NOAA); file metadata: 'These data may be redistributed and used without restriction.'"
+    files:
+      - {name: sci_sgps-l2-avg5m_g18_d20230101_v3-0-0.nc, bytes: 592240, md5: null,
+         sha256: "c8f7cf15760e7bd4500f920ffd412d344a6199bd8a91f3f539f2d8dc3c0bf5cf",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230101_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230102_v3-0-0.nc, bytes: 593313, md5: null,
+         sha256: "f25d86d869d7aaa91dc9be92ff2d7f1f1f7a2c1746faa45f138cb50c1ce2b321",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230102_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230103_v3-0-0.nc, bytes: 593605, md5: null,
+         sha256: "0a765a358ce4c52d3ce7125ad9f6c8191bffeef5601402c8af0c5f3e3d97fdab",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230103_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230104_v3-0-0.nc, bytes: 591829, md5: null,
+         sha256: "b995f0b0e1441be5e8645c57501b171ab47e90f3b04c532cd8d281afffa018a2",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230104_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230105_v3-0-0.nc, bytes: 589331, md5: null,
+         sha256: "0b2057e469049722e4150e6d3f9a32af74f9d0587fb9b768d23799525f94979c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230105_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230106_v3-0-0.nc, bytes: 591546, md5: null,
+         sha256: "6141781f934260a037fb7d22950363f96c691512b5f4118d6612d5cbabbdac1a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230106_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230107_v3-0-0.nc, bytes: 599076, md5: null,
+         sha256: "bb0b167cfa3985e54a99f0c1209d3319b8770245674ae2908459ead2412f71fd",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230107_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230108_v3-0-0.nc, bytes: 603254, md5: null,
+         sha256: "e725a3e285521277a1886303247d337819cf16be9a0927aef3411b5b237ca5f6",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230108_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230109_v3-0-0.nc, bytes: 599249, md5: null,
+         sha256: "79ffe5adf345bba7ee0f844125f3984ef276558458b7188dbf2e5e0a0298c0fe",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230109_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230110_v3-0-0.nc, bytes: 614910, md5: null,
+         sha256: "4687df8bcf421628b919baa90fd0c5f563c0e43f081078658d5df04f85f190e2",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230110_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230111_v3-0-0.nc, bytes: 612242, md5: null,
+         sha256: "623cbba2a28d223e13db0758205c3aa8cf77370cda81729b54c72071173c3782",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230111_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230112_v3-0-0.nc, bytes: 607994, md5: null,
+         sha256: "ae79444218f0e3ac92618e7bfef5517e96fcfebb0a0c0fbcf132a455187346b0",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230112_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230113_v3-0-0.nc, bytes: 611951, md5: null,
+         sha256: "dd6d5dc84e79ccbaaaab5dc6c49c9a79defec0ce891577b18c3827eea91301d9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230113_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230114_v3-0-0.nc, bytes: 603358, md5: null,
+         sha256: "29fc840b2154e1b75e2c1295b861826a7ef6b071d646cba6e89a9320a8fc3460",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230114_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230115_v3-0-0.nc, bytes: 604534, md5: null,
+         sha256: "e76384cdf5843e25cd61b7ad69c825b729ed3510cc535c6d9c78eb0e02b6b9c4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230115_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230116_v3-0-0.nc, bytes: 603046, md5: null,
+         sha256: "b53f2ca376544b856dcd47cf8d6091cb3dbcbbda91a3ccdf1b0846e2221a319b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230116_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230117_v3-0-0.nc, bytes: 600083, md5: null,
+         sha256: "e6b217f230c0f3568eb22223113e370dd1d1126339ac879370ca05ac994cc440",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230117_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230118_v3-0-0.nc, bytes: 602040, md5: null,
+         sha256: "345ff74c015a98cf7f3209e0262fdff36180d4020df176c6475a507e2b3225de",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230118_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230119_v3-0-0.nc, bytes: 599328, md5: null,
+         sha256: "f8e52146ded62dd70178e9cca7369e1f5a82a75fd59c02cf7e9d5143207a6e34",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230119_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230120_v3-0-0.nc, bytes: 605946, md5: null,
+         sha256: "ab9f41ff2e02f405b33419faef7b5f2974a59c4e1340d75cb5ac820066dd3936",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230120_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230121_v3-0-0.nc, bytes: 605350, md5: null,
+         sha256: "31864829ac46bace60d122d507e4419cc5b660ed58c88249859e34a682742ba9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230121_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230122_v3-0-0.nc, bytes: 600762, md5: null,
+         sha256: "68deafc025cd28da3fb1b27443866a335b7497c3cbdd511e5ca062adb91415d8",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230122_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230123_v3-0-0.nc, bytes: 594779, md5: null,
+         sha256: "ba219b8ef994068edd5a49d53eccfb492083a383cf34ec5938455922970d9249",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230123_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230124_v3-0-0.nc, bytes: 592664, md5: null,
+         sha256: "6fc2495bdf0089b22ebf3fb95f53e7198f24556f9e896879ea763977df147b8e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230124_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230125_v3-0-0.nc, bytes: 595903, md5: null,
+         sha256: "5e56e1ade6f0b579f19eb429f7699fa209f686606d78f9417ec4d3db8f0c45b0",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230125_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230126_v3-0-0.nc, bytes: 593153, md5: null,
+         sha256: "3039dbd182ec0d26c6a4c2cfbb359c33e3b48460291e0d849cc0ccef32701547",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230126_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230127_v3-0-0.nc, bytes: 591336, md5: null,
+         sha256: "b353b5528b85a08e3ed1bd89d7a97612d42db0b0d200a70c7c2545ef1f768597",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230127_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230128_v3-0-0.nc, bytes: 590547, md5: null,
+         sha256: "9cf7d2c9f8ca7ec0f36b6715c7d0c97e2d4e8c6d03a1ba1e01b618b32653da6c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230128_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230129_v3-0-0.nc, bytes: 590989, md5: null,
+         sha256: "ed3000106541b630b7bbb3174136278d548cacb1f473821e11bd2ea5592b50fe",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230129_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230130_v3-0-0.nc, bytes: 594149, md5: null,
+         sha256: "fcacc5a87c38685913ed98126e3d4cfea4a546bce65d6be792c55c8e7e97b2f9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230130_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230131_v3-0-0.nc, bytes: 594195, md5: null,
+         sha256: "ec68e6bb15ab8132e2cfaec6a46d850f1c69d74a2e0faebab67e0396a7ba989f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/01/sci_sgps-l2-avg5m_g18_d20230131_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230201_v3-0-0.nc, bytes: 600478, md5: null,
+         sha256: "e8ba20dcde844bf86a6fd67218407dd564eae3f81a010c7175f48a7189447f1a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230201_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230202_v3-0-0.nc, bytes: 604239, md5: null,
+         sha256: "6c47c7b035c644f2ce2f8a5a53ed160e8434d06508e4d5c99f3bc575d7990595",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230202_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230203_v3-0-0.nc, bytes: 603030, md5: null,
+         sha256: "4ab41d4b101cbfb8e7d1ef433611134755f6cc86dcb8bc33cdd9f06537a0795c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230203_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230204_v3-0-0.nc, bytes: 601170, md5: null,
+         sha256: "bdc952e899dbd7944b7ebf714da3f0f8b324ce5698354741b9a9c8445105586b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230204_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230205_v3-0-0.nc, bytes: 598848, md5: null,
+         sha256: "f9adfa50d0b1e093cb067c4f6aba345c5fdba8bb08689aa6bebc8ef94e494e62",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230205_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230206_v3-0-0.nc, bytes: 595554, md5: null,
+         sha256: "eabc3ff4ea7671ff944562b8cea6e05ac96fc6fd9b288af1593e06672c834b07",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230206_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230207_v3-0-0.nc, bytes: 601429, md5: null,
+         sha256: "aab3d40d5b03a74dac1dbf339bc73ca5aff88600a4d358bb3b851e6f4d75ef4c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230207_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230208_v3-0-0.nc, bytes: 604644, md5: null,
+         sha256: "2d058fe0e3b2e8694673d1000347b36c135d3f4254e7515f8872e90b260f69cf",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230208_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230209_v3-0-0.nc, bytes: 604442, md5: null,
+         sha256: "97053d2b6c605d7ec2cc50be1447496d0dd0e71966aec36ead2ae1152f883865",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230209_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230210_v3-0-0.nc, bytes: 603075, md5: null,
+         sha256: "ffda97e4d5eb5a254f6cb35623ba8bf16678a6baa4174611c1563681772adcf7",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230210_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230211_v3-0-0.nc, bytes: 603361, md5: null,
+         sha256: "025c6da2b1e0fda2590f20dc78c17921c5a4fdfbe1ec95a56b88613200a284e1",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230211_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230212_v3-0-0.nc, bytes: 605406, md5: null,
+         sha256: "8bac2bb967352eb6020576a50e160554d3daed31bae01ba0c26bb36d4386ff4e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230212_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230213_v3-0-0.nc, bytes: 609033, md5: null,
+         sha256: "d8f1bcad799af92d7df182f5ef2a05756e557e1c7018814ed5bcb366e71d0129",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230213_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230214_v3-0-0.nc, bytes: 607531, md5: null,
+         sha256: "313712d8947dc7b04e4e472010ad39a4e9a6373f7db2121795e53d7ce3a88ed9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230214_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230215_v3-0-0.nc, bytes: 607579, md5: null,
+         sha256: "fad6c63a753392b205c3fac73dff45fed844bc3cbea2a3e5334eee490e887407",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230215_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230216_v3-0-0.nc, bytes: 609514, md5: null,
+         sha256: "c35741bb98d283f04b85195b25827c32714a9a3e847cc3e6dc60c60ba6b96916",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230216_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230217_v3-0-0.nc, bytes: 605107, md5: null,
+         sha256: "6c3353c6e8d13b40b51c6aa4931443efa6eda37734d1215331dd851479382f86",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230217_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230218_v3-0-0.nc, bytes: 603296, md5: null,
+         sha256: "295f60fc93b4fa695e426905ac617e6f31866a752483c168b00091b083db59b9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230218_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230219_v3-0-0.nc, bytes: 603195, md5: null,
+         sha256: "27a2e4fd818762a5f6240323996ee0413a8932cafacd5f37dc373dc82b68631d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230219_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230220_v3-0-0.nc, bytes: 607842, md5: null,
+         sha256: "1361dccf21cc4e63129b393fda588ee2769369bb7da6b450860962add6416c64",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230220_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230221_v3-0-0.nc, bytes: 610643, md5: null,
+         sha256: "4b65caf08095be2ab8c6133ba9f902197c4530f60f9c35db1f34c5f168669258",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230221_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230222_v3-0-0.nc, bytes: 607113, md5: null,
+         sha256: "dce9e416a3a7b6a6f3d9f591f0699c7ce13bfbe91848b6a401cdd4f28317a71a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230222_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230223_v3-0-0.nc, bytes: 605072, md5: null,
+         sha256: "376cda092ec5c68a02ef2104ebbedcf2720fb3beff63490b1f3ae05a57760350",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230223_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230224_v3-0-0.nc, bytes: 601443, md5: null,
+         sha256: "183dffbd2eb13c857a560e3e5b387e53ffb31959d3f3395f79e90082bcd8ba4a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230224_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230225_v3-0-0.nc, bytes: 615337, md5: null,
+         sha256: "677286b06d81764d2f0ae5c60520fcd71888b8b9c9276b30597fe95ffbb9fea2",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230225_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230226_v3-0-0.nc, bytes: 625074, md5: null,
+         sha256: "54078ee50240cdb3cfa7b4080e5094b5020f4118b5f089e0c1c5307277eb99fc",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230226_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230227_v3-0-0.nc, bytes: 619945, md5: null,
+         sha256: "13a0de755011bd1ffbf6aa5295945403e7bac72ebe866a2c9040758ade301f1b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230227_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230228_v3-0-0.nc, bytes: 613074, md5: null,
+         sha256: "7e66aaf3cb51f17965ab760bdab9742b53aac6eb27e3b0e5a30fcbc5a35faf64",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/02/sci_sgps-l2-avg5m_g18_d20230228_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230301_v3-0-0.nc, bytes: 604548, md5: null,
+         sha256: "ea9375b703c3b3e7cf58b67974d10dc2a7de0b505d524023525a194fc3d41883",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230301_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230302_v3-0-0.nc, bytes: 601312, md5: null,
+         sha256: "86ce4df12275f2797acb3d3c6b27c64e49bfe7d026678d91071bbd83af4ef55e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230302_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230303_v3-0-0.nc, bytes: 600865, md5: null,
+         sha256: "c7bef7fa835b4b2c3e6ac237cc3aa53f0abeaf7b2b77d2a3622a290554fafb09",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230303_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230304_v3-0-0.nc, bytes: 601008, md5: null,
+         sha256: "beb1db7280fad578b04e0a0142b007c1f2ad5017c21109518f433fcd0b4e2185",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230304_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230305_v3-0-0.nc, bytes: 598669, md5: null,
+         sha256: "4d2710e3738b5e58e59b34525bc3f27787a2048eff86f6708b4d5c9a7c326894",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230305_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230306_v3-0-0.nc, bytes: 595299, md5: null,
+         sha256: "1c63154785cd00f6ab4f3a4f588d47f1ad713ed84dfb4faad5a459b1d44147c6",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230306_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230307_v3-0-0.nc, bytes: 594621, md5: null,
+         sha256: "441fef4e92807159c7e9423b55247ae2012b2b53f4a80982217e001a7a10ac51",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230307_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230308_v3-0-0.nc, bytes: 592731, md5: null,
+         sha256: "6c02686670e6a2f11bac78cd965bf6d176fa9dd2ecc038d936bb01baefa7b33f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230308_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230309_v3-0-0.nc, bytes: 592903, md5: null,
+         sha256: "c9e550b43452b1c24994c93eb809adc15ccc540fa1e202daef1190167cd554ee",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230309_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230310_v3-0-0.nc, bytes: 599561, md5: null,
+         sha256: "4ead68d9aef6cd22c2b8a76f65abd7347534224946dd99ddf66e0cd379660dd3",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230310_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230311_v3-0-0.nc, bytes: 599064, md5: null,
+         sha256: "60f8f17581b5d7bcba31e6b995b6c6be4125b1e9eafd4808360c4b62ae76fe39",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230311_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230312_v3-0-0.nc, bytes: 596909, md5: null,
+         sha256: "c41e4bf4cff2d439718848bfef078bf93850750fd04f2e89924499ddaf4dab39",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230312_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230313_v3-0-0.nc, bytes: 608571, md5: null,
+         sha256: "999238413c9a34986e9e1d5e4bc396c5f6294bd121b41b4ed9bd35c3b06dabf1",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230313_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230314_v3-0-0.nc, bytes: 623949, md5: null,
+         sha256: "cc7baa9941c382b453d3590a5615c0c68fb11f9a2f5db779182c5c7c77b2f37c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230314_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230315_v3-0-0.nc, bytes: 621517, md5: null,
+         sha256: "20cff8bb6cb8bcfc04593e0f665057ea6dd08fd1db4f41982ccd4575d37a5289",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230315_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230316_v3-0-0.nc, bytes: 610693, md5: null,
+         sha256: "01c06e35f2a16ad3b83c2208e2d12338d320100d56a30886aa0f8467a03accdc",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230316_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230317_v3-0-0.nc, bytes: 608305, md5: null,
+         sha256: "fbf64d131e8840b2179007b6dae17751ab5bb50c965dc10d128bbe64663866d0",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230317_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230318_v3-0-0.nc, bytes: 608134, md5: null,
+         sha256: "ce08acbcf7fb0872b0a17dade5c7f0f88f237ac2cf412b961ef1efb70312608b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230318_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230319_v3-0-0.nc, bytes: 613887, md5: null,
+         sha256: "c37014aaa69fbb8bb10e1e3a32c749868a6fe1c026b906265e1be2e18496df7c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230319_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230320_v3-0-0.nc, bytes: 617327, md5: null,
+         sha256: "ca0c956ce1c8184d3e934b70adddf2c14051b144830ebf83512fed50192925c6",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230320_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230321_v3-0-0.nc, bytes: 614245, md5: null,
+         sha256: "12cc3e0e150efee46575c7369218e205d3b79fed38d852a50c0cff9314d8ab44",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230321_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230322_v3-0-0.nc, bytes: 612499, md5: null,
+         sha256: "810244120215aa746d174f1570ac3083b272ee694dd43c15bee3e0f349177ca1",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230322_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230323_v3-0-0.nc, bytes: 606427, md5: null,
+         sha256: "e4d96e8bd4b13049ec6ba7b4b99c6020ba5f4a9e64a63d860defc00864b4a35d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230323_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230324_v3-0-0.nc, bytes: 605040, md5: null,
+         sha256: "09843011d63aa38a4558cd427e02a6af663ace37b83a30de87e583c23fb41915",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230324_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230325_v3-0-0.nc, bytes: 602062, md5: null,
+         sha256: "b0c90cad18cc8e61db4e25a96106c71b0869a5ef4852954bb67529a3a620f9d4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230325_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230326_v3-0-0.nc, bytes: 599057, md5: null,
+         sha256: "25f46173330428a71147b41b6bda35b0d0e0ab0e4763f7231de082473b7e9da0",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230326_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230327_v3-0-0.nc, bytes: 596491, md5: null,
+         sha256: "a17b91870ce3a8766ef2bc4d2249357e7c0486dece335b47e7b9266daeea3a57",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230327_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230328_v3-0-0.nc, bytes: 597142, md5: null,
+         sha256: "476a793a3625ca72d9992df4fbe1c748d60f519c58b4cf1630f9008e7d12d35a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230328_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230329_v3-0-0.nc, bytes: 597943, md5: null,
+         sha256: "ecedd6036ee747107b967f6ae0b319a09da1b3f8072565f472ebe2514674347a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230329_v3-0-0.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230330_v3-0-1.nc, bytes: 603449, md5: null,
+         sha256: "d8292f776ee4685a6ce88f13bdf90d6bd57547830b7c86fb9c06128455e9bf71",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230330_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230331_v3-0-1.nc, bytes: 599147, md5: null,
+         sha256: "b6fd30ce576e7832deae68d521b835147a2a18af189684aaa8b9280c5d61ec7b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/03/sci_sgps-l2-avg5m_g18_d20230331_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230401_v3-0-1.nc, bytes: 597421, md5: null,
+         sha256: "47ac46f83b324da86dce4483830800db380f48d6963d0b46bd5aaee4c0605c8d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230401_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230402_v3-0-1.nc, bytes: 593816, md5: null,
+         sha256: "277b74a84d06e0221c75146615fcc3fe103e5fc5ff16d84cf49c82d193b6fd75",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230402_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230403_v3-0-1.nc, bytes: 591817, md5: null,
+         sha256: "721cfb46078ad3eb59c667c3b3ad8be4af08a06992bdff846e353f9b80c69379",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230403_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230404_v3-0-1.nc, bytes: 590608, md5: null,
+         sha256: "7fc68c98f5f198e2dd901def8429b6e1d53774baa420c621a53b2aee56ca41bf",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230404_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230405_v3-0-1.nc, bytes: 590405, md5: null,
+         sha256: "a3e6347faeb2506e4f8a24340d8f4f3c06a6cf8a10cf760a5581352b6f33172d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230405_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230406_v3-0-1.nc, bytes: 591341, md5: null,
+         sha256: "d9f2d8f995c20c5c23bdb4b1c0e10ff34931b4de3adc41894bac0e69324578a8",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230406_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230407_v3-0-1.nc, bytes: 588545, md5: null,
+         sha256: "ba8b7215fa86045fca7d9dd08a879593b80958cb8fb8f9a022f1c4af7913b281",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230407_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230408_v3-0-1.nc, bytes: 588989, md5: null,
+         sha256: "830624c80904c0e094aa96a2464dff5c7828485088a46eac74bc1911c70998fa",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230408_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230409_v3-0-1.nc, bytes: 592436, md5: null,
+         sha256: "22f35f844bdb507839800f30e6ebad7e24638403f46309960c8c89727961473e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230409_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230410_v3-0-1.nc, bytes: 600155, md5: null,
+         sha256: "3ea8f12e8acab42e9a8e86f22e60b8921dd6bfa4b875f9c999bf2cc9fbf280db",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230410_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230411_v3-0-1.nc, bytes: 593644, md5: null,
+         sha256: "c103a2266731406cf557dbc9e0753607efd2d80688eae39e29586a4ba40f7065",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230411_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230412_v3-0-1.nc, bytes: 591003, md5: null,
+         sha256: "8c9c5a87a515e01d5ced1f35c2ebf84034718593e6ac3dd08ed62c0105d657d5",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230412_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230413_v3-0-1.nc, bytes: 591223, md5: null,
+         sha256: "385e2d7b136f6dd828f19c84175f6f85eaabb50adab602d129f529a498b1ad62",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230413_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230414_v3-0-1.nc, bytes: 591204, md5: null,
+         sha256: "1f9ba20e5c749910627473f338c391c2fceb02f3541679b4743bc6aba371c003",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230414_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230415_v3-0-1.nc, bytes: 590670, md5: null,
+         sha256: "6b486ee87dfea0ac4f4aea288b247b17c1e3338ed39264c7b8592b2ebd9b3732",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230415_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230416_v3-0-1.nc, bytes: 590225, md5: null,
+         sha256: "fcbc3fb5e86b96f9541031708f08e84498992050e859a96520d8b004f455fc89",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230416_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230417_v3-0-1.nc, bytes: 590476, md5: null,
+         sha256: "9c04aa0e493d988bed19c26ee6bd2b70d752101d5a2efbadee910268f4769aa8",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230417_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230418_v3-0-1.nc, bytes: 593908, md5: null,
+         sha256: "3934b12d20707cf64350eb18933d938babb60a31bf7d321cdfe23a4d5afabcf6",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230418_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230419_v3-0-1.nc, bytes: 589112, md5: null,
+         sha256: "0cb190a87f4411fa22285856d5f62cfb8af1fd8a47722575b36c8da2a7e9302e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230419_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230420_v3-0-1.nc, bytes: 587152, md5: null,
+         sha256: "a33c5def39f11a0deec159f295daecacc74daace0105363b12a7c7f393b4087f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230420_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230421_v3-0-1.nc, bytes: 590309, md5: null,
+         sha256: "ee1cd7d05aad84fcb257aea9b58a7705e778f25e5f4ec3c9d8e072cf2d0db579",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230421_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230422_v3-0-1.nc, bytes: 611578, md5: null,
+         sha256: "4301d5667935f90d8b7a6c09a2b2b328697e56766a42c0726317a1622fe7c1c2",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230422_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230423_v3-0-1.nc, bytes: 620592, md5: null,
+         sha256: "8ced33047ed50d43851e2b82b699a009b81122be79502e706639b6bf40a5e4f3",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230423_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230424_v3-0-1.nc, bytes: 610810, md5: null,
+         sha256: "45d419f38a5d1d3fae963c8be79128614ff812192e7c0cf6c8661e9e386699d4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230424_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230425_v3-0-1.nc, bytes: 603459, md5: null,
+         sha256: "ad685135d3c9800eb11164ffee2346b1718833989be549accb23fb316911cf1c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230425_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230426_v3-0-1.nc, bytes: 602345, md5: null,
+         sha256: "8c0dbc24056c2c0394ad251ed01d901cd3d75b05500fb914b620333768f694a9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230426_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230427_v3-0-1.nc, bytes: 596629, md5: null,
+         sha256: "35e8f341188b1527bf9f1f4a9f1a7cd514fa4d7c4a82d06c3eb8c0bf865263b7",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230427_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230428_v3-0-1.nc, bytes: 593949, md5: null,
+         sha256: "6c952a12919adfeaeedaab0af40e14909397125e2d74d46b0514faff11d49e10",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230428_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230429_v3-0-1.nc, bytes: 594692, md5: null,
+         sha256: "5636c311a53e65c7457b449fffb9b3cc89ec970d2c9c1e01e229fc296658c245",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230429_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230430_v3-0-1.nc, bytes: 594784, md5: null,
+         sha256: "c2aa26f1e2b70aa0bd94aad861614f88b280e371bd5965e9f52788748d3bd460",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/04/sci_sgps-l2-avg5m_g18_d20230430_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230501_v3-0-1.nc, bytes: 595180, md5: null,
+         sha256: "aa474da369f0f0b44a473a8871350859e8c27928531b0118c003d7eeb7b254b5",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230501_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230502_v3-0-1.nc, bytes: 597223, md5: null,
+         sha256: "2be19e36d2fbabfdda06c494fdf713b282357e68c371fcf2f88f4d21e15f7831",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230502_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230503_v3-0-1.nc, bytes: 593397, md5: null,
+         sha256: "2114f6742969a93c776d9ac24e7cc7bada68c15770fc6a50bcac474c818b8e71",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230503_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230504_v3-0-1.nc, bytes: 593801, md5: null,
+         sha256: "a08d4a501d0a2b9c7a29e905efc78a2e3149a19d24b98ae4e1498c427d77d7fb",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230504_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230505_v3-0-1.nc, bytes: 596415, md5: null,
+         sha256: "26ca8e567a50389c661bd1b572f58b77cfbd19f6b459384861808102afb4ba94",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230505_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230506_v3-0-1.nc, bytes: 606139, md5: null,
+         sha256: "c497c7aa3a1215b82c3b26bd78e02a31b3d1a9b66353e0b7beb5bb6101217818",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230506_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230507_v3-0-1.nc, bytes: 602292, md5: null,
+         sha256: "44849683387076f41c6184eb9ad8f66b58e7f70cbc49c70d9fb49181047da9bf",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230507_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230508_v3-0-1.nc, bytes: 619902, md5: null,
+         sha256: "33e1ad4cdbf89353846ee4ebae364fbc9fd314122ed703626804c23dbaa3aacd",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230508_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230509_v3-0-1.nc, bytes: 622359, md5: null,
+         sha256: "5f41c4d9fd69b89bb91197943514afa9c38332e35647415c465ec476fce4d8f8",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230509_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230510_v3-0-1.nc, bytes: 627457, md5: null,
+         sha256: "16f5e0b7ec9f6fb0e778030127e2934cc0f3d5c9bf46c37abdc6e23d8f1871ea",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230510_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230511_v3-0-1.nc, bytes: 621391, md5: null,
+         sha256: "21518d89ac610a9e5b26aa5fc6634dae71ce58debeced6f7d08e3dcb902cc905",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230511_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230512_v3-0-1.nc, bytes: 616436, md5: null,
+         sha256: "a8fb90d99afb8d9434069f71fab5df772967c80b13c305d388f42172c7598db7",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230512_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230513_v3-0-1.nc, bytes: 608122, md5: null,
+         sha256: "a2f873e02278712cebf74957fa72651839611184923ed7138990dc42dfe86f83",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230513_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230514_v3-0-1.nc, bytes: 602183, md5: null,
+         sha256: "1176c4220d85b6f60a4473057de5af4c6bef128fbf9a8972f54409caad40e4e4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230514_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230515_v3-0-1.nc, bytes: 597124, md5: null,
+         sha256: "5596ffdb15d7bd5cc7bf9f20c6099d4cd68993798971a1f05ed96094747488b9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230515_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230516_v3-0-1.nc, bytes: 597714, md5: null,
+         sha256: "567cdbff1a6e227dda95b4220769683c7b37288672d92acfd01069f76f4f50b8",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230516_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230517_v3-0-1.nc, bytes: 600158, md5: null,
+         sha256: "a1a43293ab9cdb4cc5c53100a2fb35cbbc6098cb3f931e612eab4dc954487e44",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230517_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230518_v3-0-1.nc, bytes: 598214, md5: null,
+         sha256: "4c59bb41a1f029914fee844a26e9637abda22bc9125f3ca5f10707a92cf54a3d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230518_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230519_v3-0-1.nc, bytes: 598237, md5: null,
+         sha256: "7099e5257b64d4af998c8558039a860402dd23edf52cf6715480222a9e48d79b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230519_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230520_v3-0-1.nc, bytes: 593100, md5: null,
+         sha256: "e928daf3f938c56535ba520bc69554277b18e9a538b1717870141ccb3b8fa903",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230520_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230521_v3-0-1.nc, bytes: 590752, md5: null,
+         sha256: "819e2589db9c3daa15e7fa619af136d7068ea2500348ec6c834ea1e000ae055f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230521_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230522_v3-0-1.nc, bytes: 589851, md5: null,
+         sha256: "2b931d0cf12ea41254132e73d1b31a2f97525776fea88ee3846fba55da5b132d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230522_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230523_v3-0-1.nc, bytes: 591353, md5: null,
+         sha256: "8f36428d67c18ad85b63788cc3530857880bfef7d1463b3a81a43536099e0c5c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230523_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230524_v3-0-1.nc, bytes: 590695, md5: null,
+         sha256: "877e2729f1914e138246ec483063059c91063b5a036c2a62f18e39dbf2490537",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230524_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230525_v3-0-1.nc, bytes: 592062, md5: null,
+         sha256: "9a68eef3dbad341b4c1851463df850db93011b6ed49a4179c81a4efd103a097d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230525_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230526_v3-0-1.nc, bytes: 589539, md5: null,
+         sha256: "eb04b84f0eab3dd804a3cb8aeba3a6018daa0c86b6513b52c193cec0e4126c44",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230526_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230527_v3-0-1.nc, bytes: 590200, md5: null,
+         sha256: "e135ca5a7bc57a66a7a29c6771b6ac643084905f6698562aa256f3a1462097bf",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230527_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230528_v3-0-1.nc, bytes: 592568, md5: null,
+         sha256: "0dd430abd4a3225a27d0bd41264554a5704ebac1d39a0e32d22cd96b863770ce",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230528_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230529_v3-0-1.nc, bytes: 588468, md5: null,
+         sha256: "ae91987cdaffbcbb92cc4225830a74c29e5c8e568269ec9c807766752732cca6",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230529_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230530_v3-0-1.nc, bytes: 589452, md5: null,
+         sha256: "9fa806624c7d5ff38e854870deead3f938fab48605f9406f6b70305941c67ad4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230530_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230531_v3-0-1.nc, bytes: 592176, md5: null,
+         sha256: "2d70b5ac2887b0d4931bbe8474516ff1753bc37c23e41cc6ee00288d14471d79",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/05/sci_sgps-l2-avg5m_g18_d20230531_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230601_v3-0-1.nc, bytes: 602371, md5: null,
+         sha256: "b7fded836391373bed20e8d03635d94ce48c99753143d4e759b4aa93a6c68546",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230601_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230602_v3-0-1.nc, bytes: 604923, md5: null,
+         sha256: "89275d725c2b4d64fd0d8a9f3673e4b0eeeb6fc4ba3c93c7a36c03984f6732a1",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230602_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230603_v3-0-1.nc, bytes: 598656, md5: null,
+         sha256: "258b5af2decb40724fe8818bd23d5177c0989c8c531cd447fb7daff3c1f550e0",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230603_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230604_v3-0-1.nc, bytes: 597653, md5: null,
+         sha256: "1c21ffaf714cab58227202bb81c80ee23cf53f48e209960048f1dde1344f1116",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230604_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230605_v3-0-1.nc, bytes: 591035, md5: null,
+         sha256: "d797f2e90f2ae129e2aa543369701e14655c28164340973363b04901e8ef2650",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230605_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230606_v3-0-1.nc, bytes: 590269, md5: null,
+         sha256: "d41ff9547f7280ed770ab8708117a8caccc1c922082c17fee2292c454b4a328c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230606_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230607_v3-0-1.nc, bytes: 589339, md5: null,
+         sha256: "5fc422ac7071877da9a74aa616acb01f3e1ef127b0111432f6fcdfd59983c379",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230607_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230608_v3-0-1.nc, bytes: 587815, md5: null,
+         sha256: "2f0442ddee23e78f3fbdf3743b55843fd41e1eb5e5c39fb961a30e9749156144",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230608_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230609_v3-0-1.nc, bytes: 588465, md5: null,
+         sha256: "e6a1a38f668266b1d11224066258a83a973d72dcaa378cf85c8edba5746ce2b8",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230609_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230610_v3-0-1.nc, bytes: 589120, md5: null,
+         sha256: "86a797c4add29de13d7111cf889566a288e394e9705bb422bdc6e9d2a6a02997",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230610_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230611_v3-0-1.nc, bytes: 589319, md5: null,
+         sha256: "c300bd67a734f7324dfc02d1b06be1ed3b4f503ae31a4fc9308a2e6d3e13375f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230611_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230612_v3-0-1.nc, bytes: 591912, md5: null,
+         sha256: "fb903e6fa26ddb0ff366a5230a090b7e60f4330704d94ec09f3068b5ccea9a21",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230612_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230613_v3-0-1.nc, bytes: 590540, md5: null,
+         sha256: "c22652dad5a2e9dc0a6a7ec6b13b148611b3bc28f6a137fc53a282781430b5ab",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230613_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230614_v3-0-1.nc, bytes: 591609, md5: null,
+         sha256: "42201ae093ceeb48041525738da37b4a2bcfe98b515ee899099a439ff983ed4f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230614_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230615_v3-0-1.nc, bytes: 590000, md5: null,
+         sha256: "5a92244c1ae54983bbcaca1d095db10dd819c0fede5550b250e4d906eee82dab",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230615_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230616_v3-0-1.nc, bytes: 591729, md5: null,
+         sha256: "9721325e20315a91105fd4acc187a192e8d9afeeea63a9364d13bd8bdf4819ba",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230616_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230617_v3-0-1.nc, bytes: 588430, md5: null,
+         sha256: "b112901b5d67375eb5b2e223436a292606015ecaa368f79b571a003390633c3f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230617_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230618_v3-0-1.nc, bytes: 589162, md5: null,
+         sha256: "3db91865f61bb3c7c7c571401343ee3e14255e787d97b72d2893fd6e0e3983ea",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230618_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230619_v3-0-1.nc, bytes: 588098, md5: null,
+         sha256: "a337546d909762b20819716e5b9c078206da8f101a5cb81179206c77526199e1",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230619_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230620_v3-0-1.nc, bytes: 589412, md5: null,
+         sha256: "61b4ae421b15f2ed3b455413bd33ed2d4f05c2fe411baaad7b8e6233b8625cba",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230620_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230621_v3-0-1.nc, bytes: 589095, md5: null,
+         sha256: "49fc95d7431b69f580d88b8323f0f7746c228573bccbca148fcefc626fa27931",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230621_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230622_v3-0-1.nc, bytes: 593273, md5: null,
+         sha256: "ef3a879fe0ada6f12c0f6131b868debd02e0e2f89c3de388a11a2d54e2b847d9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230622_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230623_v3-0-1.nc, bytes: 594217, md5: null,
+         sha256: "003a33c9d7227d409afc1c5d093f212ea81a622369921026fde02b50e0cb9a1e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230623_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230624_v3-0-1.nc, bytes: 596493, md5: null,
+         sha256: "8a4aab0fdb7f9ee2e81ae68b8039113289684de6831c701614ea682e30bcc468",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230624_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230625_v3-0-1.nc, bytes: 594965, md5: null,
+         sha256: "deaf59bdf5a04e22f78c77db8840222965baa2cc4659104714f20e21dc63d1b2",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230625_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230626_v3-0-1.nc, bytes: 591265, md5: null,
+         sha256: "5b743cf8b6e0ba6475dace7ea2cce211dd474693f4205434322ce15730e86571",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230626_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230627_v3-0-1.nc, bytes: 589644, md5: null,
+         sha256: "5847ee76ed5a2a7daf0fc31e27ba75d4c567d428c3c4cf875aaba8222e4be42f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230627_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230628_v3-0-1.nc, bytes: 589546, md5: null,
+         sha256: "82148fb1f0c59a9ba2d5468dfd2d0e5de4ee266bf293872f766d8b1bf4a499b5",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230628_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230629_v3-0-1.nc, bytes: 594026, md5: null,
+         sha256: "b7624673042a01a499c535900ec47b6a13b2df388f161f25b74b909eb9e3472c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230629_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230630_v3-0-1.nc, bytes: 595135, md5: null,
+         sha256: "21812c3e1561e1fcae644f305bb2868ce607606d65dfb158e51c115065cdb07f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/06/sci_sgps-l2-avg5m_g18_d20230630_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230701_v3-0-1.nc, bytes: 591203, md5: null,
+         sha256: "4d866192da0b1d7eb38fc6f081f3ce1961fe4803ad70655fff714def581851f2",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230701_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230702_v3-0-1.nc, bytes: 592251, md5: null,
+         sha256: "69660e9ed03655729feb7aa35aa26c6ab4c399590a2ee6b7dc304dc9a4f6ced4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230702_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230703_v3-0-1.nc, bytes: 592282, md5: null,
+         sha256: "aec989d4d248b459497080cefdbce19a1013b9313a79417803151c995bb8a5b7",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230703_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230704_v3-0-1.nc, bytes: 590235, md5: null,
+         sha256: "4429d31c3d0609c6e3a66a242066aefe0fd9afcff641182d60e816bee7b4392b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230704_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230705_v3-0-1.nc, bytes: 591360, md5: null,
+         sha256: "c4f2d32569ad108781b33411a3c92daa85b4b1d1a04b52d73984ce932f3427e6",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230705_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230706_v3-0-1.nc, bytes: 589134, md5: null,
+         sha256: "f3b73c0b44a405bdf0b6ee4d8c9b6f68356abf81aea31697f490107fd974fe48",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230706_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230707_v3-0-1.nc, bytes: 589799, md5: null,
+         sha256: "e32bd91623e3127ef8337e934a77606967e8ee78e57c7768743b2682dcf48cd6",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230707_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230708_v3-0-1.nc, bytes: 591456, md5: null,
+         sha256: "51f0174a3f982575a1e24e9fa9fb3084d405d1cdf5bb355b41ed4b1bf894c89b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230708_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230709_v3-0-1.nc, bytes: 590342, md5: null,
+         sha256: "d7f6fd5ffd21ce781a82325f218017013bffae8c6fbf94bca48ecdb40322a039",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230709_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230710_v3-0-1.nc, bytes: 597854, md5: null,
+         sha256: "5f7f163296670af7835ba28789a0dcce36252aa2c049772dc57235b25292f1cd",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230710_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230711_v3-0-1.nc, bytes: 608355, md5: null,
+         sha256: "0daeed21f9ac75e60e2727e4736bebf96f891e3661632978a18a97ef2b4eaa1b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230711_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230712_v3-0-1.nc, bytes: 604343, md5: null,
+         sha256: "4de0885f63034453153db8ca0d7a260335e511173a592acad8c9876a5d5385b5",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230712_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230713_v3-0-1.nc, bytes: 600783, md5: null,
+         sha256: "f33d52f34a8c80a2cb8a148136ebcb3e991197a017ff1e39388e5c3e90572f6f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230713_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230714_v3-0-1.nc, bytes: 604704, md5: null,
+         sha256: "98f18ab6e936bebf6f44d29467604855191feb39314a4ab81dfd5de03dba36c3",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230714_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230715_v3-0-1.nc, bytes: 600458, md5: null,
+         sha256: "f6b775c5fa2030249441ad1c2911dbf9e531058f83019787e2cf0b3c94531038",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230715_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230716_v3-0-1.nc, bytes: 609597, md5: null,
+         sha256: "37ace144056fe2ac6b89e6ccf24758bd0aadc1af5fbd0e9e1f7076a86897d06a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230716_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230717_v3-0-1.nc, bytes: 611230, md5: null,
+         sha256: "8cacab0eeed50f2425b3bddf1ea2bf4c99f9604a443979d8e599980a66879e51",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230717_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230718_v3-0-1.nc, bytes: 622802, md5: null,
+         sha256: "e91f71c990d6df23722d2188b066059f77165f202ae5cff049993dbb095720cd",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230718_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230719_v3-0-1.nc, bytes: 620473, md5: null,
+         sha256: "36a5a8d864204d084e8bedae069baafcb6b1008f8516c65c1163c44a96adacfe",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230719_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230720_v3-0-1.nc, bytes: 619058, md5: null,
+         sha256: "3f1b97c8ea3b694826bfcce90e686d36b1a8c95b1c18d17161a40345839e47d2",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230720_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230721_v3-0-1.nc, bytes: 616926, md5: null,
+         sha256: "e50e34bee4937d9287f8c0fc48fa075ba055a1ba909394c01a009cfc85b9cf17",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230721_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230722_v3-0-1.nc, bytes: 607417, md5: null,
+         sha256: "ffa4eee3f979ed0ea91f8b51cb8a74c4bb81b472e057479714d71f8b088bf100",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230722_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230723_v3-0-1.nc, bytes: 604087, md5: null,
+         sha256: "939aee247e8ee414e4216f55a8279faea216ccc76f42b30c1e54c8e4038ef2b3",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230723_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230724_v3-0-1.nc, bytes: 605483, md5: null,
+         sha256: "62f2aaa710e657bafaa4b69e4f6cb41ec163b9e4e38d1afd0731aef16c70a032",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230724_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230725_v3-0-1.nc, bytes: 615485, md5: null,
+         sha256: "96407015db8d4c10427710d0cebef8c87d1e7a7037023e9c57d9be6a8ba5838f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230725_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230726_v3-0-1.nc, bytes: 612192, md5: null,
+         sha256: "cd43edb86b5c33acd6fd4c94c38cf5f7cbc14d4ad6e7a4544db2c82ba177750b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230726_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230727_v3-0-1.nc, bytes: 608636, md5: null,
+         sha256: "97fb4f88c3316dc53bb3566165e3f85e6022fb4c7e16ab82c8ba603bd028c1fc",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230727_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230728_v3-0-1.nc, bytes: 610214, md5: null,
+         sha256: "b3235b9dc125c38fdf780823ac14751fcae3f5862ad5242f8ebfa10619963fe7",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230728_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230729_v3-0-1.nc, bytes: 623697, md5: null,
+         sha256: "5ba2f0d20c7466c04157db15c405a55f8dbf8298011d1837e62bbedc8abb5e3e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230729_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230730_v3-0-1.nc, bytes: 620368, md5: null,
+         sha256: "6114c77a1d66ca2920dd676bdfe26e81671db6e1067ed2274361919af68b8ef6",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230730_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230731_v3-0-1.nc, bytes: 618290, md5: null,
+         sha256: "172f2d1b9d7f87c470890c1aee5bf64bb3b39859ae01a7e69b16397f1cb1d42c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/07/sci_sgps-l2-avg5m_g18_d20230731_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230801_v3-0-1.nc, bytes: 617313, md5: null,
+         sha256: "41a360354d0563082fa59062ee67b754e7d70a1032043dbf82347e09ceeaff1c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230801_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230802_v3-0-1.nc, bytes: 609268, md5: null,
+         sha256: "56912a702a8323139e710e9e829ff158f5b8a37d842031737824c742f3119662",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230802_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230803_v3-0-1.nc, bytes: 604327, md5: null,
+         sha256: "7abe7bfe679550d025511480f63ae61c206c9b7ac70f4bd5c8fe02e5d3009d94",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230803_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230804_v3-0-1.nc, bytes: 604206, md5: null,
+         sha256: "55629abb5e5537e2219237482e9c34f33692b4853b360241b1d31396e8006186",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230804_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230805_v3-0-1.nc, bytes: 612860, md5: null,
+         sha256: "dc227ac5f567c67513e2393f1976281e1448d8aeaec0c3d6a268c527de7167b5",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230805_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230806_v3-0-1.nc, bytes: 614296, md5: null,
+         sha256: "c9421bcd35ede164c0f2b64389472c98335275dcb8b97866d922eaa5c39b5111",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230806_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230807_v3-0-1.nc, bytes: 617006, md5: null,
+         sha256: "d09fc496910d11eb4f1e1ccb667abcd67db12370b7a9f8d07d1f2b500c51891e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230807_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230808_v3-0-1.nc, bytes: 623723, md5: null,
+         sha256: "e9988c37848b3d129e8591ce2ad7dd068e50d9cefb5c66d2dc6f6c1a5da58f91",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230808_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230809_v3-0-1.nc, bytes: 623093, md5: null,
+         sha256: "467b1fae25d949fff590bd1a256b2ed498827eb35e028e173d96bf9f79b11d36",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230809_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230810_v3-0-1.nc, bytes: 619999, md5: null,
+         sha256: "f0174377be78232a77e4adba0af124d90d9c79c5b6adeeb1a945083eae835273",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230810_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230811_v3-0-1.nc, bytes: 612286, md5: null,
+         sha256: "f35961a7137a2ac6da9b46fbdefbf96f13433a71c9174d03cbb1108e99fbe6be",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230811_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230812_v3-0-1.nc, bytes: 608048, md5: null,
+         sha256: "ccfa41082aa3902a07c92d67be2aa373a5af237897212f0428e5359a98fd8c34",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230812_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230813_v3-0-1.nc, bytes: 603107, md5: null,
+         sha256: "4c8ecd1e537fa92b4c3d11bf6093a4c2247fa6dd5cf9f6d9acadcfa51b00dd22",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230813_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230814_v3-0-1.nc, bytes: 600524, md5: null,
+         sha256: "1ac8acc9dc0ac8b7ac3270f52fed146a9cb6135ceca195a419bf58aab893e28a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230814_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230815_v3-0-1.nc, bytes: 600235, md5: null,
+         sha256: "7537f345389a769b196df83e16686afba2b4b94edf6cc23f9e13e44548f508c2",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230815_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230816_v3-0-1.nc, bytes: 600129, md5: null,
+         sha256: "0cd63ee53a7a5ed072d85f6ad0f7ec1f039a2b9b6fbb18fc117746cde09224b2",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230816_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230817_v3-0-1.nc, bytes: 601385, md5: null,
+         sha256: "34042291215599b9fb331514acee905d0dd6d91b0d4c47a4dc503722f7ad2e0f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230817_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230818_v3-0-1.nc, bytes: 599341, md5: null,
+         sha256: "a689f9fa97e0dd4f78ea3961e7eba154ee93ade7d8fe92738aa35312e750d793",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230818_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230819_v3-0-1.nc, bytes: 596655, md5: null,
+         sha256: "3ecb4a247da7b338825ef37630898ba3fdcc78e7f2f6af239bd0d49461e84c0f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230819_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230820_v3-0-1.nc, bytes: 594012, md5: null,
+         sha256: "6f8c2f808a431162b8e12d2c73042156986b086d9857a9dc5ba1bab48de5f778",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230820_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230821_v3-0-1.nc, bytes: 592145, md5: null,
+         sha256: "faa51a4b2585ee41c98b3e82131dc322c3e81b1ed6153c37fc1baf80535da3b2",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230821_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230822_v3-0-1.nc, bytes: 591282, md5: null,
+         sha256: "7c784d526c38c5eb188a7a82f77afc6bfaeff401a364aee35e51935f61bdc40a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230822_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230823_v3-0-1.nc, bytes: 589274, md5: null,
+         sha256: "cbd45732587331f29c6e73af570de55a607417efa77b07af15fbcce97bc960bd",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230823_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230824_v3-0-1.nc, bytes: 590262, md5: null,
+         sha256: "bc65f03ac4ff19b26ba9344932c3200724bba012dbbc397ccb22a03aa1982c51",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230824_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230825_v3-0-1.nc, bytes: 589190, md5: null,
+         sha256: "22bf9a6bb35fa6afb259c04cfefd014682139fd45b525da79b6e198f32dd5719",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230825_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230826_v3-0-1.nc, bytes: 591195, md5: null,
+         sha256: "1621269fccbf654e7e20b36caf52e06dfa54111fba62dfc3f148ea14078a67f8",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230826_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230827_v3-0-1.nc, bytes: 589913, md5: null,
+         sha256: "ba5ee8a12bd966b62a35d0d67ff5a8e155c0408174ae3c34d2a19a8c72abc4b5",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230827_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230828_v3-0-1.nc, bytes: 587825, md5: null,
+         sha256: "1fd46d754af7f9908004ce631eff5f1cbf0766c6bfbd99725c3d4c0e8f3dcc3e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230828_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230829_v3-0-1.nc, bytes: 586860, md5: null,
+         sha256: "6b88e58fa9922e5153a56f5303661be97a1e4ad83bcc1018c4b7f9a346081ffb",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230829_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230830_v3-0-1.nc, bytes: 590755, md5: null,
+         sha256: "b0d54167e7430acb3831c2bc6e9d2a38f1b1fc5eb4f5cb165f748fcfa057e96c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230830_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230831_v3-0-1.nc, bytes: 595966, md5: null,
+         sha256: "8d520f36f43568f4a88b3677c1c983d7ce8f9eacf847bac7bdeda625d968a219",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/08/sci_sgps-l2-avg5m_g18_d20230831_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230901_v3-0-1.nc, bytes: 616599, md5: null,
+         sha256: "282ca86218950b6275a45c3eafaa53b617457e43573779d6e6df2ef6e45ad824",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230901_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230902_v3-0-1.nc, bytes: 617054, md5: null,
+         sha256: "1e278fddbe8cd356326e508b4f94503a03774cb56ac37142975314e805aa7a56",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230902_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230903_v3-0-1.nc, bytes: 611572, md5: null,
+         sha256: "ae4b8b8d6a61aa89a226fcf45cf3db66806b658ab1c1cba97145249056aef562",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230903_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230904_v3-0-1.nc, bytes: 608607, md5: null,
+         sha256: "27d1291a05b8157fc30820526ddb0156cd688c710a5b08cb05e059b3e3ee81a9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230904_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230905_v3-0-1.nc, bytes: 604249, md5: null,
+         sha256: "7e92b890a45ef30f3d3a7b35e887012c6dce4c977b54f1bea52131c6dde12908",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230905_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230906_v3-0-1.nc, bytes: 606378, md5: null,
+         sha256: "771182e981df22bd3f8d0ca79ff0121b06c32ac1d022a83e953e8a2f1ac304df",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230906_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230907_v3-0-1.nc, bytes: 602103, md5: null,
+         sha256: "8923f7d9e0f7900998b9479994b8125f087098e524c1755b536461e3d4748876",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230907_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230908_v3-0-1.nc, bytes: 599670, md5: null,
+         sha256: "556838456a1ba51f06bcc92a1b5dea5b1b0de9b9598baa44a71f90bfc5f4175c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230908_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230909_v3-0-1.nc, bytes: 601365, md5: null,
+         sha256: "6c32707d8491d7594c5559a1905ec89583d8a20dc5cd73f34632ec5f0b3f9022",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230909_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230910_v3-0-1.nc, bytes: 600664, md5: null,
+         sha256: "8b78946213e751ca5e61088a6893d27c38944760e23b43feffde69e24749d078",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230910_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230911_v3-0-1.nc, bytes: 600032, md5: null,
+         sha256: "6d1697d3f89e6881de1205f9961b501a75f9bd948d3a62124e0455d8860051ef",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230911_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230912_v3-0-1.nc, bytes: 601803, md5: null,
+         sha256: "2de2c752ca7fc2cd23908f57fa0483a2681b0ae4b6462c613227c1db0bd92e91",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230912_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230913_v3-0-1.nc, bytes: 607656, md5: null,
+         sha256: "79b852f3835bb6cde7ea5abdda04f0e52da34bb28da812fd9c4ef3a78a356026",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230913_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230914_v3-0-1.nc, bytes: 608047, md5: null,
+         sha256: "9a628b8f2dc15dd415c23432e8077c59b5af41d6895291169edea248a8fe6139",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230914_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230915_v3-0-1.nc, bytes: 602830, md5: null,
+         sha256: "0a1f9b1126f82b39bd78a2549a2ec9b38d18be3f5a17c2066f476c8dae489038",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230915_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230916_v3-0-1.nc, bytes: 601563, md5: null,
+         sha256: "ff28ae20c9ccae544545fadc98e769084ee7f9b8493853a0e4493bb304c0c0a9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230916_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230917_v3-0-1.nc, bytes: 610121, md5: null,
+         sha256: "218af1cc5e93e103edc08dc53f5e509504f1fe6b94b556fb4e59960cc0a69a31",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230917_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230918_v3-0-1.nc, bytes: 612985, md5: null,
+         sha256: "72fd41af0a79e95ebd078c1ff84c5d56cac31d3287394046c258c7bdce9d0bfb",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230918_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230919_v3-0-1.nc, bytes: 597228, md5: null,
+         sha256: "d27fb5323d45b5718c4033231f627ec1d83d671be371471cce233b00b713dc35",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230919_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230920_v3-0-1.nc, bytes: 595727, md5: null,
+         sha256: "891b864002b17730a6a523ca0df002009556744172d134d2bf136867020fc91b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230920_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230921_v3-0-1.nc, bytes: 593267, md5: null,
+         sha256: "75a960d31bc8a3c6da1741abdacfa95d43f659ecb0e555b31b907ab87ebb1875",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230921_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230922_v3-0-1.nc, bytes: 594131, md5: null,
+         sha256: "232423c55b487c2cce4027fdde44780e38d66653a274a808772c9d73559498ec",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230922_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230923_v3-0-1.nc, bytes: 597823, md5: null,
+         sha256: "d82238f73582db85a633f5e5cdcb2238c197e05de7d26b5b022154980ed03cf1",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230923_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230924_v3-0-1.nc, bytes: 612055, md5: null,
+         sha256: "8d310a42b756138422904546bcf518eea7c163ec9aa58ac65a21053d2b2d0ae7",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230924_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230925_v3-0-1.nc, bytes: 610950, md5: null,
+         sha256: "33b189ccf9240c1373a7ca21a3dedd188bbee6c01101c41a2f05d820ae6d235d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230925_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230926_v3-0-1.nc, bytes: 605987, md5: null,
+         sha256: "a923c7b697a4730336b242cac8e3fa33555e4acc82584de6e46dd3f14bf7bf07",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230926_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230927_v3-0-1.nc, bytes: 601830, md5: null,
+         sha256: "006f1ad9362243e0c8361145f0c4475785886f2ae66747341cafe9b6d9fd414a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230927_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230928_v3-0-1.nc, bytes: 596184, md5: null,
+         sha256: "64dff489ef0049e68cbb5e2db0234ae18172efd6fac5a7bd2b7d877f843f42f1",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230928_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230929_v3-0-1.nc, bytes: 595505, md5: null,
+         sha256: "237e519ba1edf76f93ca7ef3648cfa3abb8d5141b14d6daf91b74c6e50fa0fe3",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230929_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20230930_v3-0-1.nc, bytes: 590903, md5: null,
+         sha256: "c283fa4cd99c22eeb7091d23bec7e4e6716222f48ed2c39729d8758fad9fd33a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/09/sci_sgps-l2-avg5m_g18_d20230930_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231001_v3-0-1.nc, bytes: 586831, md5: null,
+         sha256: "8eefcd18065ed4592e7fca1bee40f9bc7fbcde7bf84e587295323a3ea7b1f5ac",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231001_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231002_v3-0-1.nc, bytes: 584933, md5: null,
+         sha256: "22ff837767e2459dd0bd337ae0871aa0e21bda864e4c536aee768135813f265e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231002_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231003_v3-0-1.nc, bytes: 585146, md5: null,
+         sha256: "c408335b46f7a5add678ced64ef25bf8356bda5ea946af8861904e840227844a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231003_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231004_v3-0-1.nc, bytes: 587181, md5: null,
+         sha256: "540de2b24908e9c8cb2df157dd89bf4c1487261c6076b3536d051d304fdeecc7",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231004_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231005_v3-0-1.nc, bytes: 604351, md5: null,
+         sha256: "680f45a2abfceb6b9141b65314f75a48dfb0cebeb6dee2b105502d03f17ca302",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231005_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231006_v3-0-1.nc, bytes: 597893, md5: null,
+         sha256: "01f5603c8af2d90c3f2773ed136d271904df7043f681ec829b388d858620ce98",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231006_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231007_v3-0-1.nc, bytes: 590770, md5: null,
+         sha256: "a15762c649c3039e0ca5c9b19bb36589cb56725e1ad9a644a0458229ef1b41dd",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231007_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231008_v3-0-1.nc, bytes: 593441, md5: null,
+         sha256: "a08ecd3f730a0cbab040e1ba5ca6d6a8e3a102c7c6722403393a0f0773b8720c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231008_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231009_v3-0-1.nc, bytes: 590554, md5: null,
+         sha256: "5ec842978758773972985848d390a59f7e7029ca407d72eafd12231485d2dfdd",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231009_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231010_v3-0-1.nc, bytes: 584290, md5: null,
+         sha256: "7e4b27d5570ba85c8ae32853fdf29b81314d8ccd95feb08a3d56f599187c280f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231010_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231011_v3-0-1.nc, bytes: 585788, md5: null,
+         sha256: "b2ea4debbc9d0ca60f655fa3e3bea0ce83f118df0bca88400acdbc99c2902198",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231011_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231012_v3-0-1.nc, bytes: 587912, md5: null,
+         sha256: "65adc8987161b133f41bad150dbd3e08804a0731d43d3127a4f653dc6881d5a4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231012_v3-0-1.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231013_v3-0-2.nc, bytes: 596566, md5: null,
+         sha256: "cba3cd8bb3060a4c6df097847564ee2da1116ead559808c5135369ae0f56039e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231013_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231014_v3-0-2.nc, bytes: 598850, md5: null,
+         sha256: "ee870b35e3285a9d3306f5838560aad28caebff5b147315fa2a4000429dd8361",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231014_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231015_v3-0-2.nc, bytes: 596904, md5: null,
+         sha256: "b3e6734e103d2e9eb9cd25943d8c4321fb1986f94caeb541024da8db0f040b47",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231015_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231016_v3-0-2.nc, bytes: 594420, md5: null,
+         sha256: "ee5f87cf8c8a35beec5db9016409d42dca1d64078c45487170cb3b6698c16c10",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231016_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231017_v3-0-2.nc, bytes: 594491, md5: null,
+         sha256: "7b008eb133bc873bf22f6c96f84992f59ca3275879a26d813d933edd08ebf4ae",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231017_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231018_v3-0-2.nc, bytes: 593745, md5: null,
+         sha256: "b61c261b347f22d10e82f2e3faf3c5f4874f0267d4fd2542cc07a267af85a8b4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231018_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231019_v3-0-2.nc, bytes: 592504, md5: null,
+         sha256: "6fdf15a14a557cb19d01f2fe1951f6740984f3cbdf94128dbab33aeb282c5395",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231019_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231020_v3-0-2.nc, bytes: 599862, md5: null,
+         sha256: "d81ac99c66e0a9dc036c4a16db558791473bfefefbb44a2cfe7fbea180bbf0af",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231020_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231021_v3-0-2.nc, bytes: 598409, md5: null,
+         sha256: "733e124ee99573a150863067611fcb629c69a95ca489be62cb0dffa0f7f41e40",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231021_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231022_v3-0-2.nc, bytes: 593756, md5: null,
+         sha256: "56ed31ea2bcc86b5fcfdbcc6aca6769015ca7a8b1863b08887e95ea26073a00f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231022_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231023_v3-0-2.nc, bytes: 586352, md5: null,
+         sha256: "698000e62c71da26589dc1df80cb87b367379398c2ee866858ba20714f8305dd",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231023_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231024_v3-0-2.nc, bytes: 586032, md5: null,
+         sha256: "b76aba46ac5d66727f0d6b6c1f4cc6e7f69603f79ccff0d7c42b915c7b6961d1",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231024_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231025_v3-0-2.nc, bytes: 585583, md5: null,
+         sha256: "f6567c2657473bf2184359ffacf5a38f6dc1732093d0c5ec0a7dd36c5b8a00dd",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231025_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231026_v3-0-2.nc, bytes: 585797, md5: null,
+         sha256: "d1f8ee5d9b723457915fa6eff9b51703d2d41f0c83bc8aca16d6995a44d3bcdc",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231026_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231027_v3-0-2.nc, bytes: 584116, md5: null,
+         sha256: "8c1e78082f5c46f0dedd17ec9b652c17ebf6546f24661cb50de161b680c5e306",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231027_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231028_v3-0-2.nc, bytes: 593333, md5: null,
+         sha256: "07585116d0b9b4f22dd84b610476def4e178e42c9c8c57bb39776711aabfb307",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231028_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231029_v3-0-2.nc, bytes: 598373, md5: null,
+         sha256: "f1f77f0da6acdd036733336256663ecc2b41e57526444906f968b469721c69f8",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231029_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231030_v3-0-2.nc, bytes: 598535, md5: null,
+         sha256: "04c581288d8b12e852f9465304318f1f1645c6ada8ce1f28f533d732cbd508d9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231030_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231031_v3-0-2.nc, bytes: 597940, md5: null,
+         sha256: "93d29886207e1ec4f9490110d88a243499ff4170aec1a09a51b3ba4055ca20fc",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/10/sci_sgps-l2-avg5m_g18_d20231031_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231101_v3-0-2.nc, bytes: 598648, md5: null,
+         sha256: "abf2dbda86797ec7d419bb7755448306ccef44c5c7618434fd0c711007a6e17c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231101_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231102_v3-0-2.nc, bytes: 596771, md5: null,
+         sha256: "b463efb1699afa80f3a6f39d62a7df54a6ad9234e20ade22ef214554417cf6cb",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231102_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231103_v3-0-2.nc, bytes: 600046, md5: null,
+         sha256: "3dc5374a091b438fd1314411a8c9648f4721e6d9495307768b4414a9cd8b8ecb",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231103_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231104_v3-0-2.nc, bytes: 604941, md5: null,
+         sha256: "0117b131ab8f80526e6d355d6fb6864bbe36dfd035284196e55612306573a0c5",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231104_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231105_v3-0-2.nc, bytes: 608769, md5: null,
+         sha256: "d3b09274ed813050d9a48196e59b7a7cc43ef238421bd874c35f7d6a4cfe82be",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231105_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231106_v3-0-2.nc, bytes: 598983, md5: null,
+         sha256: "23cb1c2a7a16279b8caa3d9be2d40503c3da8c5952cec3835bd4bd48f93c2df0",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231106_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231107_v3-0-2.nc, bytes: 597033, md5: null,
+         sha256: "346a4851047fcdd1e01cdad23c11045910c844d45d096eef35c7688b08fecba6",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231107_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231108_v3-0-2.nc, bytes: 598416, md5: null,
+         sha256: "71d751aa3f63c9a4e9d7217959a5551b5195b03edcd3d305e8baa1eb609a0d3c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231108_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231109_v3-0-2.nc, bytes: 595712, md5: null,
+         sha256: "70c7cd102dc4a2a36cd17d96218f71ee4ffcfe99d820e1a82f7357e31a9d3635",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231109_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231110_v3-0-2.nc, bytes: 614169, md5: null,
+         sha256: "595cd543b006ad6aed694ecfee2469c8149da3c4b4a5d5e09931e781c2c83ddf",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231110_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231111_v3-0-2.nc, bytes: 604894, md5: null,
+         sha256: "9cd5d47610ab43cdcc45fb59747ad7a5d7ab275bbb201fb3eec39ad9b1709de2",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231111_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231112_v3-0-2.nc, bytes: 598797, md5: null,
+         sha256: "c919d3e84cfafe790ab2f6e063c24e1e50a96c1520ae972718176ee6ae5aa531",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231112_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231113_v3-0-2.nc, bytes: 591342, md5: null,
+         sha256: "25adbc22a5b64fab35af6826d26cc131d6dcd0e36975a638b68ef4706ba2004c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231113_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231114_v3-0-2.nc, bytes: 587447, md5: null,
+         sha256: "5fed712b8346030c523576b41df6b18245babcfe747e2b493b7c074a7f808880",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231114_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231115_v3-0-2.nc, bytes: 596880, md5: null,
+         sha256: "45804955c0411fb02e2cea9b14cb579e8d9bd993d39a96900118d8c29a5dff00",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231115_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231116_v3-0-2.nc, bytes: 590393, md5: null,
+         sha256: "00a5f12ee89c687eedbf0e8b123c5a78ba066c54a563752669848c05576bc9ee",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231116_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231117_v3-0-2.nc, bytes: 586914, md5: null,
+         sha256: "adc9f6c740a6e235956e45fb3800975cf4c63b9628f837a663b744d80d3347d4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231117_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231118_v3-0-2.nc, bytes: 590286, md5: null,
+         sha256: "b51d51091a8d1d779c4e02a7f7072e911e80bb333f3e61d7ff98962f954d5c77",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231118_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231119_v3-0-2.nc, bytes: 588085, md5: null,
+         sha256: "567dac86d2c93850891ebde3b2b3a9c855655f1c0f77d1a88ba6c01918dcc583",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231119_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231120_v3-0-2.nc, bytes: 586640, md5: null,
+         sha256: "267eb940b0b1257cc691dfc4dfb17ff380d0258a20b2184d226088f71974d1ad",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231120_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231121_v3-0-2.nc, bytes: 585761, md5: null,
+         sha256: "2278fc068ee11a28568aedfa595d9c8635418621918f19f07a68f51c7fa20e5c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231121_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231122_v3-0-2.nc, bytes: 587609, md5: null,
+         sha256: "b1dfa8e3f731b26c5020005e5b642bca1867c75ccaef4f8f5bfc747a67c210af",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231122_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231123_v3-0-2.nc, bytes: 583918, md5: null,
+         sha256: "0891c0e190e13e75fc8390419fe7c456ac368128fce1181892da5e4bf407a757",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231123_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231124_v3-0-2.nc, bytes: 593991, md5: null,
+         sha256: "e1ef5333554f72b0bcbf02015a3e94d3d48c03967f3f73d7fe15210f1b3662a9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231124_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231125_v3-0-2.nc, bytes: 600162, md5: null,
+         sha256: "85ccc5127e72595517305824f6ae3482d2436a35dd178a9a6682b74ea977be7b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231125_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231126_v3-0-2.nc, bytes: 592913, md5: null,
+         sha256: "1e8f2b17df485a003b620bab41c4b5097a3fff5c94a0e7e245de7404177582bb",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231126_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231127_v3-0-2.nc, bytes: 590448, md5: null,
+         sha256: "4400141c2c1f5ee32d8b530e708264a58823c052b0238979d2a3f8e3dcf35b59",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231127_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231128_v3-0-2.nc, bytes: 595292, md5: null,
+         sha256: "724266703b0582bb06a0e66e4ccb2f1c7b68c032bfed05f1bb76a9c7e0105591",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231128_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231129_v3-0-2.nc, bytes: 603642, md5: null,
+         sha256: "dab3b11c70f6d2a274a7054527aa92f66828c28aa52ac31ca46b85e192a491a1",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231129_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231130_v3-0-2.nc, bytes: 604580, md5: null,
+         sha256: "6669ecb0cc080ca6c71a6c82bcbe5db19df88e2aa953cdf6ffc945e1c57bda3c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/11/sci_sgps-l2-avg5m_g18_d20231130_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231201_v3-0-2.nc, bytes: 617292, md5: null,
+         sha256: "f94308939fc891845a0bc98be9908fa820f77f331217dd1c72c8607fe2c84bce",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231201_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231202_v3-0-2.nc, bytes: 610096, md5: null,
+         sha256: "d53fe90576cb75e0f416356381950157269eab18c8013061b945a6b83e7f3dc8",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231202_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231203_v3-0-2.nc, bytes: 601600, md5: null,
+         sha256: "c12af3604b0d8675e1f7955cf4f8d0f098744c30b8279c1757b48716bf123a81",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231203_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231204_v3-0-2.nc, bytes: 601432, md5: null,
+         sha256: "44261062d4a3784b67e377949f9481885cae92ab5f150eef990c9c4d0df7d64f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231204_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231205_v3-0-2.nc, bytes: 598394, md5: null,
+         sha256: "1b572c0b5d6ebbac632d47335d9ac434580fab528e9d6f69b46328656dfbdd27",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231205_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231206_v3-0-2.nc, bytes: 595933, md5: null,
+         sha256: "3ecdbe42b50ad14ce4d484e3bbdc742b54889c69dbea99f175f54ed353475789",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231206_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231207_v3-0-2.nc, bytes: 597518, md5: null,
+         sha256: "1242ea866177699d178f05ba1b9de0b1b97d98c7811ee365e585eb1f843227e8",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231207_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231208_v3-0-2.nc, bytes: 599123, md5: null,
+         sha256: "cea49e2175c244c5e59650cc3f9711457ea9d272c35a377dbc4cf5947333cfdc",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231208_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231209_v3-0-2.nc, bytes: 596859, md5: null,
+         sha256: "c62af1eeac007580412ed8ff82a6e53995f76862b9917b5dbb4144667fa1b1b4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231209_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231210_v3-0-2.nc, bytes: 596705, md5: null,
+         sha256: "b86d745a57d69cee83c2b801e5e7c1fe69cbd9ce5c712be49ca43f93628cb9cb",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231210_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231211_v3-0-2.nc, bytes: 597912, md5: null,
+         sha256: "a2c9f9fb9c6ac1a020e696a5be96298b353f10472d658b79c7ca9351a909b717",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231211_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231212_v3-0-2.nc, bytes: 599230, md5: null,
+         sha256: "9fefa85c68b0c3d3366cef149790940aecd3009a977eb6906464dd83257ae0d1",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231212_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231213_v3-0-2.nc, bytes: 598638, md5: null,
+         sha256: "bd848a24f0fa27c741776180fcecaed3041c11869f401eee9fe0d6d66de6a1ad",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231213_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231214_v3-0-2.nc, bytes: 607977, md5: null,
+         sha256: "07fa553307b5d2eac6547a420d6b51385e12522871aaf52387b9c0df5df23579",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231214_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231215_v3-0-2.nc, bytes: 633825, md5: null,
+         sha256: "dfadcd34b47a64339d5b3435764abc61196e6e2fbffe7ae88ea24c10ca2c149d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231215_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231216_v3-0-2.nc, bytes: 632500, md5: null,
+         sha256: "3f270107ad7fcba3e36a25353c02915bd0fe898044d73d35889a6a84069d95d4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231216_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231217_v3-0-2.nc, bytes: 627290, md5: null,
+         sha256: "00caf66dc8ab09347d9267c45f8bafaf2665eee9934e6f64cc9a6f403c997261",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231217_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231218_v3-0-2.nc, bytes: 613418, md5: null,
+         sha256: "3d34380e17f1db603fb33c7aa6ba768e5c1c0743063bac5cd1aa92342280432b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231218_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231219_v3-0-2.nc, bytes: 597831, md5: null,
+         sha256: "9d831f895bdc5b05d29f0332370a6712f1c9b2073aad8500e77e409275666bee",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231219_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231220_v3-0-2.nc, bytes: 595622, md5: null,
+         sha256: "0aa1d3de9f44c5b69d8f367bbb8a61d81e4e6d49e13b9353c76e96bf569fae48",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231220_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231221_v3-0-2.nc, bytes: 595981, md5: null,
+         sha256: "c132594b4fe8f3a65839846984e65eaff9d871249ff58d6b928eb62080bf0121",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231221_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231222_v3-0-2.nc, bytes: 596673, md5: null,
+         sha256: "e5059afd90a8700b20bcdd6a7da27d65e379d585cf43cc4e6e5147e4f3bf3078",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231222_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231223_v3-0-2.nc, bytes: 596193, md5: null,
+         sha256: "dbcea6cda8c986f9720628a3cda37a91a8aad98b89f630ee8e2da224eb492e72",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231223_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231224_v3-0-2.nc, bytes: 592079, md5: null,
+         sha256: "189988e475d9631fa71b21782c42e504d717052f475d8363bf62a4363e2c6004",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231224_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231225_v3-0-2.nc, bytes: 598743, md5: null,
+         sha256: "16be61a85b37bd7fc0bdf5befcbcb3f1b572f3443c1207526b9c1795b6982ac4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231225_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231226_v3-0-2.nc, bytes: 612865, md5: null,
+         sha256: "ddd5c1fc83bf141f8ec0a6fdc49c57dfd403a557cee912f3f4cf3aa9c80dfa5d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231226_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231227_v3-0-2.nc, bytes: 611388, md5: null,
+         sha256: "d700e65df45e6ef96e9989be60373cc9809b79f09332de2bc9a453199fd1eabb",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231227_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231228_v3-0-2.nc, bytes: 609769, md5: null,
+         sha256: "d93f19775f130796717775f538eaf388fdb2234d545e74a2efd0dfcef97c0622",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231228_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231229_v3-0-2.nc, bytes: 611090, md5: null,
+         sha256: "a312e6720dfb15f32c726aa9fa019304098925c026a635d2bc8a579dccd60093",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231229_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231230_v3-0-2.nc, bytes: 604644, md5: null,
+         sha256: "f3aa55b1acf1525d4b9e4404bbc3bc9daee875845b08bebc1120fe305295cb77",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231230_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20231231_v3-0-2.nc, bytes: 604444, md5: null,
+         sha256: "8c305bb27cbcb30c2f91253dadab960e8eeea6130eead983e4b6330c61878d8d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2023/12/sci_sgps-l2-avg5m_g18_d20231231_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240101_v3-0-2.nc, bytes: 628159, md5: null,
+         sha256: "b16676e80313f08b7c74f8b90e439ae5d50c37ad621a28a5ed3131652515ee2e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240101_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240102_v3-0-2.nc, bytes: 629969, md5: null,
+         sha256: "1e2a29f115ad9e92c190d53fe5a1523678878070639f08b9879dd9f757475ef3",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240102_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240103_v3-0-2.nc, bytes: 634827, md5: null,
+         sha256: "317edd161ffd4dd937833ebcfd08ae3c43f1153741541175dea32a9946a5eb8c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240103_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240104_v3-0-2.nc, bytes: 635057, md5: null,
+         sha256: "30c5d740c7e1c1fd97869bc0cfcf0e3a6bbf0c6d6f5a9913bced62fbd42e2bce",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240104_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240105_v3-0-2.nc, bytes: 632927, md5: null,
+         sha256: "4f774e035cd949b2d0910ae9bb8290de69aa2ca0dd7a832a1b57cc112694f005",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240105_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240106_v3-0-2.nc, bytes: 628445, md5: null,
+         sha256: "82152ef473f159403c41c3b9150328606396ab0dc5158af2bf968998eb984d1a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240106_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240107_v3-0-2.nc, bytes: 627061, md5: null,
+         sha256: "ec31b3a1759d3ba24491c0685fd37de65654fc46675653c0c9e315265f057843",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240107_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240108_v3-0-2.nc, bytes: 625244, md5: null,
+         sha256: "fe14c79dbfcf70de87db681d1b4f9b7d39fc145ef2b867f0e21fc19ad63c67fd",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240108_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240109_v3-0-2.nc, bytes: 621682, md5: null,
+         sha256: "38ed50dc1235a4862eaf7390e872e9cdb27a99d11779b4a915a926a54b3e2fcf",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240109_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240110_v3-0-2.nc, bytes: 619323, md5: null,
+         sha256: "a8ec7d8bb207dc0e365093669907cd91ac2e6e942259d906ed3f220f127bf18a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240110_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240111_v3-0-2.nc, bytes: 614729, md5: null,
+         sha256: "2547fbbe25f31a6e5dab32a1d3e5df30430b6a3c0c4108e441ad3295e433a3c3",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240111_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240112_v3-0-2.nc, bytes: 607516, md5: null,
+         sha256: "040778ce9f27dc4a4eb5e0ff175cf4f709fc00f1ee1030a1a0ed21ad36174dfb",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240112_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240113_v3-0-2.nc, bytes: 606559, md5: null,
+         sha256: "bb7710f4f220cb48ddba7c42ddba400c67367bf153458021224898b7bb6ed1d8",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240113_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240114_v3-0-2.nc, bytes: 611420, md5: null,
+         sha256: "029780343fb56f19ffa437d4d8cf3c56c75cd000d824700bb3e815623bcb2db6",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240114_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240115_v3-0-2.nc, bytes: 613116, md5: null,
+         sha256: "0569269d5ebc414e14ba8005c82b9c349fe696c6ade51a2f4467df37da69922d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240115_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240116_v3-0-2.nc, bytes: 607552, md5: null,
+         sha256: "b7db7fd4dcc26303a81989cd0f0f6290a3917fe0eaa69e3c4dc47955d97d0bd4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240116_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240117_v3-0-2.nc, bytes: 599535, md5: null,
+         sha256: "15c31046f136e8f606f6834ed9fffe4b14a1b45cb7d6acf96492d89232abc832",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240117_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240118_v3-0-2.nc, bytes: 599212, md5: null,
+         sha256: "2493da4e50f131e43fdffb44447b85f451396e3612919dcefbad9a3da019b26c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240118_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240119_v3-0-2.nc, bytes: 594280, md5: null,
+         sha256: "f0a0592b4e667cf99ce2248833ab0cd23e9f3b12bfae3648d0b37b739e622961",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240119_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240120_v3-0-2.nc, bytes: 595162, md5: null,
+         sha256: "9669395471f1f142971f9b20da29e8d8da6111c0c04dcf47ce485c82f56549d6",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240120_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240121_v3-0-2.nc, bytes: 599698, md5: null,
+         sha256: "7dead7e765d0ed97ef4d310bbbcda605fc5099a59c4fcdd62d1b70ba4eabc983",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240121_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240122_v3-0-2.nc, bytes: 623327, md5: null,
+         sha256: "e26e20b5028ac995ae71355af4e751b2f7e1d733b3c764cdde440753f5703047",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240122_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240123_v3-0-2.nc, bytes: 626307, md5: null,
+         sha256: "c7d43b30a7d9fa20b63e56c37a30a206b1d031ffdec4f1cf8148995d8ed0660d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240123_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240124_v3-0-2.nc, bytes: 621074, md5: null,
+         sha256: "a3402c1dd24ac2f16a36c4a1ba8068a7b64318f8dbe2eb40d02997353e5dbaba",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240124_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240125_v3-0-2.nc, bytes: 613708, md5: null,
+         sha256: "f7d6e8cbc807394c09c1142bc01642a9fcb56e31ff337e5497bb56722501653c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240125_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240126_v3-0-2.nc, bytes: 608104, md5: null,
+         sha256: "d377f6e61eef7d1903f759bcc1eb56a0358109747fce62048114a738de334413",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240126_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240127_v3-0-2.nc, bytes: 606788, md5: null,
+         sha256: "bedbc771ac14f3ddf6ae983b579787f1aebe706118bf0a99c72b4bd428ff514f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240127_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240128_v3-0-2.nc, bytes: 604153, md5: null,
+         sha256: "3dad24516e9e157da66749246bdab4f0df4dcc3e08a25adb35dde6d74509ea45",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240128_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240129_v3-0-2.nc, bytes: 627818, md5: null,
+         sha256: "d559b4dae38132210b5951bdaf60c4ae7c27b84e86abe53f8cef9884e12c99e0",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240129_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240130_v3-0-2.nc, bytes: 633223, md5: null,
+         sha256: "52b1fad7bb03020844f944e2903133b9a621f017073f925f8960e59f4623ada8",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240130_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240131_v3-0-2.nc, bytes: 626874, md5: null,
+         sha256: "2a53d31cf0271138fc461ea50adfaae2737ff091ba4c01ae429218b9fd239e8a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/01/sci_sgps-l2-avg5m_g18_d20240131_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240201_v3-0-2.nc, bytes: 619412, md5: null,
+         sha256: "2b1292581e5f6e09b4bd1c37ab55fc1d350c91adf2c9259c8fa7d970b58bb343",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240201_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240202_v3-0-2.nc, bytes: 617498, md5: null,
+         sha256: "e75fe49565858fd1e221a163c2fae4cc5d3bc90ade1e8e539726a3f70e4b9fc0",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240202_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240203_v3-0-2.nc, bytes: 614586, md5: null,
+         sha256: "a12903b16f00b4e0bde3fcb44235175f6eacd1b76c26591f9af3b9c56f596e0b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240203_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240204_v3-0-2.nc, bytes: 611199, md5: null,
+         sha256: "7ec2034c968d1c9e9a2ff99049685d34ae8104d3e61b88a5c64fad1f088d856e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240204_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240205_v3-0-2.nc, bytes: 607584, md5: null,
+         sha256: "2ddff8452a7a9477efd925af7def2d66ccba4e2cf9a6005fb6b607262ca52742",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240205_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240206_v3-0-2.nc, bytes: 621882, md5: null,
+         sha256: "0e56da8f5f10eb335b041dd6ae43cf562fcc222b6e35a82f09d706764b54e77d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240206_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240207_v3-0-2.nc, bytes: 616527, md5: null,
+         sha256: "9eeffd605167ddf32e7721cb4ce59517bab1c6e29e743c96f8db5b32d8118a6b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240207_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240208_v3-0-2.nc, bytes: 616193, md5: null,
+         sha256: "2fd419142f3410f9066690a770d88612820ea675824a0c93c4df2a36a83204cc",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240208_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240209_v3-0-2.nc, bytes: 625741, md5: null,
+         sha256: "263b30c98dc36224ea50d64e12851ddb872a71486cbce71fd3abecc49741a5e3",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240209_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240210_v3-0-2.nc, bytes: 642981, md5: null,
+         sha256: "6667a87a420f196529afcb0711aea9501f1e2ea6f99749c2097cdf574391bcc9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240210_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240211_v3-0-2.nc, bytes: 638042, md5: null,
+         sha256: "e9031dcb3fbda5c1d8c261fa3b78e0d905b3ca8bf509e2ae14348a90fe760c1b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240211_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240212_v3-0-2.nc, bytes: 638994, md5: null,
+         sha256: "08f963195a13bee23e8c41382a9628eb37440d4a3253873a1bbf6c611ba00f49",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240212_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240213_v3-0-2.nc, bytes: 642399, md5: null,
+         sha256: "4189f22c13ce0f150dbc49309929821dbd76ec43a34b58ff4a68b428c4c4d100",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240213_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240214_v3-0-2.nc, bytes: 638352, md5: null,
+         sha256: "49c3786236b2de7202a796acb48bf55a188a096edce3fdec40368070b2fb5902",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240214_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240215_v3-0-2.nc, bytes: 632051, md5: null,
+         sha256: "8d182ad07d995bb6061597747ab645c69c9d55088a3d9b5aac96018a9f2b7936",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240215_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240216_v3-0-2.nc, bytes: 631923, md5: null,
+         sha256: "2b255446edc1fa25192839fa04bed395bc79d24c881edb06ce476e26b056222e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240216_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240217_v3-0-2.nc, bytes: 626320, md5: null,
+         sha256: "5e26f4bf91e9e2f90286410f3e50e0a522da798a0cf3363e7bf51a7536a5e4ff",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240217_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240218_v3-0-2.nc, bytes: 624443, md5: null,
+         sha256: "763258505bcdbe10788e61222eaca476459052c205469c47bf998e81c4fced8a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240218_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240219_v3-0-2.nc, bytes: 618065, md5: null,
+         sha256: "f2e2af8c084f5fee6d7a206109c4a62f2a129b50531dee175e8b7ab47000527f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240219_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240220_v3-0-2.nc, bytes: 621869, md5: null,
+         sha256: "19114c7d006c9958ef0edc653228529920ae53e62e31c31d249e3a7e27e82091",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240220_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240221_v3-0-2.nc, bytes: 617371, md5: null,
+         sha256: "9dfcd6d21daad330f59aff50a8cedbcf2013a194f301d8ad19004169e13a6006",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240221_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240222_v3-0-2.nc, bytes: 617093, md5: null,
+         sha256: "41e1fe43e6f80226c2487bda7ab6f397547157a82f32eba8cc2b7ac0b779efd1",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240222_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240223_v3-0-2.nc, bytes: 619037, md5: null,
+         sha256: "a74af68fdd2a685ae642fd502137f3f99e44647bce0ca6c7e74c3161005ded1d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240223_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240224_v3-0-2.nc, bytes: 620620, md5: null,
+         sha256: "a1ed5eec5cd84334dbaca4d85c2c59cd417bf81f6a5059ff19f5766346ad0cf6",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240224_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240225_v3-0-2.nc, bytes: 611819, md5: null,
+         sha256: "2a43c95a2050f64113ac9267fb3246ee2f39df29962da86a6b19e8154ad0fc9c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240225_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240226_v3-0-2.nc, bytes: 609233, md5: null,
+         sha256: "2719bd4b9c01656e48b838197fee141a920fb95fcac0b8d1368c27ba680ae174",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240226_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240227_v3-0-2.nc, bytes: 607393, md5: null,
+         sha256: "6eebd37ce8ab8490a325d7eac2924541f65b227f2a93d468e54d814236e06496",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240227_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240228_v3-0-2.nc, bytes: 603175, md5: null,
+         sha256: "9ca45d09d8d75fd3b2d11f3542abbb361fd8c9acdacf4b164450e009721b6c63",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240228_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240229_v3-0-2.nc, bytes: 605174, md5: null,
+         sha256: "fb2607c00119bded64d6f91b795b1ec2b482aef7c2130b525d1ec2c99bb9c3c8",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/02/sci_sgps-l2-avg5m_g18_d20240229_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240301_v3-0-2.nc, bytes: 608638, md5: null,
+         sha256: "a474d22f8db0acfbb9d9b6261c6dee2501f69877ebf0bb8dc4aef13b70155db7",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240301_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240302_v3-0-2.nc, bytes: 606387, md5: null,
+         sha256: "b519dd16bf9348b294c0e7e3d42c0a867aa416439efdd5253582925be5e06028",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240302_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240303_v3-0-2.nc, bytes: 606171, md5: null,
+         sha256: "ff2a9f5d8267f19b018b6e658980477c6ebe366875a83b1afd7296464c0933ad",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240303_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240304_v3-0-2.nc, bytes: 594536, md5: null,
+         sha256: "6ad3e1e3d3125ed0d0e08eac494bd9be035afe2a172e22832c8688c41dc71dde",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240304_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240305_v3-0-2.nc, bytes: 592814, md5: null,
+         sha256: "280d705491347aa5f52b05c17272ed5e5d42d1dbbcecc8b32bf0bc24d10b09c8",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240305_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240306_v3-0-2.nc, bytes: 594145, md5: null,
+         sha256: "2ee216e5a9263e4a02306b2cbba82371e740844064f7b2a8e693de19271ebf11",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240306_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240307_v3-0-2.nc, bytes: 593643, md5: null,
+         sha256: "f2e63b30737f5e2f36ec3a81eb5f9ffdb18a3ec04104b055a261adc398e10321",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240307_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240308_v3-0-2.nc, bytes: 591287, md5: null,
+         sha256: "358ea483fbb8aca7760d900dcd5eb44a4eef62c42b297a4e087429734b33f97c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240308_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240309_v3-0-2.nc, bytes: 591127, md5: null,
+         sha256: "a6c71366f841acfd59e469ae512faae51f4977dd7267198e9f85847cee7696a2",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240309_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240310_v3-0-2.nc, bytes: 594931, md5: null,
+         sha256: "6e0620d214f02c94d73692af530da3f859a0c26209808b8da1a97745326370df",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240310_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240311_v3-0-2.nc, bytes: 604891, md5: null,
+         sha256: "8d0cc654ce66ae732beab6ad4cf188b8a3c03a8af4727f6eaa0246641f45ec86",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240311_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240312_v3-0-2.nc, bytes: 602589, md5: null,
+         sha256: "e627a505f42676be998d3d5c18186f202a787021b858ddf9bd66bc5b7e3001f7",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240312_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240313_v3-0-2.nc, bytes: 597163, md5: null,
+         sha256: "e3e3e0407b68cbc31e5f85f5f237e9fc0d12d9ce563782261e51b37d52a95e88",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240313_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240314_v3-0-2.nc, bytes: 592873, md5: null,
+         sha256: "538f8e403fe8ede51bb5228f58409f24402acdd44eac0f48c9b38849536025f6",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240314_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240315_v3-0-2.nc, bytes: 617766, md5: null,
+         sha256: "07000848e1cee2c81430650b47dd53192c21b3c9d5e5637f8421aaf76937754d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240315_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240316_v3-0-2.nc, bytes: 629231, md5: null,
+         sha256: "1c8713dfaccbcf31cc7c4062d664fcdea0de11365128d689ddeba206358d405e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240316_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240317_v3-0-2.nc, bytes: 622189, md5: null,
+         sha256: "bb2150782275401796eb126bc4e3a0b29ac9df7fa2b94147009a36d52f18525a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240317_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240318_v3-0-2.nc, bytes: 622100, md5: null,
+         sha256: "95dcdd59a959e6c3ed5f281f8d683fbe60fa86fff61cddc0c3bfff3cea531500",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240318_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240319_v3-0-2.nc, bytes: 614643, md5: null,
+         sha256: "a456fc3b20fb19eba3df758200d3dbfd6e25e35de5c449f38d5bfd81fcaaef7d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240319_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240320_v3-0-2.nc, bytes: 611014, md5: null,
+         sha256: "9778a41b1926ffc9d294b2862ac4e99d7560df6d0895f1c95a02cd931f6a0a69",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240320_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240321_v3-0-2.nc, bytes: 607891, md5: null,
+         sha256: "649286418d3b4bfbb28168eb46399da0e9dbc9c8944dcc2cb2f701dce4e6d7c6",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240321_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240322_v3-0-2.nc, bytes: 604914, md5: null,
+         sha256: "57864aeb67da40b63a8516bc3bc281d63db06140d26e6c5ada18a104e9d5fb8f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240322_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240323_v3-0-2.nc, bytes: 631777, md5: null,
+         sha256: "5e377455e3e21cc22a9c8885fca4c940404e6a4070ab559acd815bff0fb69c26",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240323_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240324_v3-0-2.nc, bytes: 639036, md5: null,
+         sha256: "a98aed215e369e0444362341ae97ea0cae8a97e0d09000b193b4c03def48d833",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240324_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240325_v3-0-2.nc, bytes: 633400, md5: null,
+         sha256: "75745c628544a80c4966a16a1ed3fd25b0d1fdc932787d6952540c69929cfa66",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240325_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240326_v3-0-2.nc, bytes: 632002, md5: null,
+         sha256: "57b757ec831e2a0dcf5bc405effc742defe84164d46035a7251fa0e854438091",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240326_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240327_v3-0-2.nc, bytes: 628637, md5: null,
+         sha256: "eaac23d8ddb20da3f26d15153a01fc4b8d658abbadd0b85c9c2b10c7bda4b354",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240327_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240328_v3-0-2.nc, bytes: 628066, md5: null,
+         sha256: "997b5e398b4f678aed13d4a153e643d7b96a1651ac1b156d8505efa228cb4b5b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240328_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240329_v3-0-2.nc, bytes: 624549, md5: null,
+         sha256: "883a0ee3680e70efa19933ca44b3a02f9bbbb9645395ecbaa95364752d59e88d",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240329_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240330_v3-0-2.nc, bytes: 620485, md5: null,
+         sha256: "82e76a5dd3f525599b5fde3dfb82c13ebfc815da2236f86e94e18553d99a2515",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240330_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240331_v3-0-2.nc, bytes: 617266, md5: null,
+         sha256: "ae75be0da1b487c6039eafbf305e0e0fa812f0489d32fd5a8a777ee3b4105756",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/03/sci_sgps-l2-avg5m_g18_d20240331_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240401_v3-0-2.nc, bytes: 614308, md5: null,
+         sha256: "851ceae2299a98a62f71c9de32ac52334a3898e7dbed02d491b165f1ef9e5dd0",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240401_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240402_v3-0-2.nc, bytes: 610871, md5: null,
+         sha256: "ca37655deebd1d5225d9bc25c05fc6e7bca0de20ba5cda5d380b58fe9a4e0f7b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240402_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240403_v3-0-2.nc, bytes: 607523, md5: null,
+         sha256: "4e54a1054ee4be86c00a5e06a910cc218dd32ada04af4ed3ec124c9ac01dc42c",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240403_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240404_v3-0-2.nc, bytes: 608002, md5: null,
+         sha256: "e0760c401fbeb2ed8d07d21c421a83468270bc4afbb99dd2d37b394094773a46",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240404_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240405_v3-0-2.nc, bytes: 605314, md5: null,
+         sha256: "d093d1dd9fdc25a9cab836a3b6da8f46a225a611ad749aa134de315fde47db6e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240405_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240406_v3-0-2.nc, bytes: 601074, md5: null,
+         sha256: "2ce0c9cd1c6d2bf61ea4b8a9c839cd16aab552dac16d0832546b175befebaecf",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240406_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240407_v3-0-2.nc, bytes: 596775, md5: null,
+         sha256: "b4a07664254032e08cb4e87117014d34c05247ab5bd42016395d53fcff276b4f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240407_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240408_v3-0-2.nc, bytes: 598724, md5: null,
+         sha256: "b2a023ac340bfb7ecd63fe318d5f42a4c4665dd24c7dabfdcafcb5ff12bed72e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240408_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240409_v3-0-2.nc, bytes: 599304, md5: null,
+         sha256: "07f2478f3ce75310c7a7b3add65c66840d7fec70e1c05e3f15cd22807ec9f1c1",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240409_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240410_v3-0-2.nc, bytes: 598177, md5: null,
+         sha256: "26e36e04d795d1d7b1bb4293be31776c9c43a23bdef6c83de098d324a1ccc14f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240410_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240411_v3-0-2.nc, bytes: 596511, md5: null,
+         sha256: "6c1abda6d67667596be908482921bdb9424d4a730335679494a4492dcc89b202",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240411_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240412_v3-0-2.nc, bytes: 595380, md5: null,
+         sha256: "683f3464551bdd480dbedb6abc0695d6ec5d40c51f8890897be93403e57d5f48",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240412_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240413_v3-0-2.nc, bytes: 595060, md5: null,
+         sha256: "ed2f372137ddce9914af4e70e168d301b246ddf9c895fa0b3aece68dc7533014",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240413_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240414_v3-0-2.nc, bytes: 601457, md5: null,
+         sha256: "58d7aad4c523d2db43e9d9229a0c65534a0c60d77411a48e758a0acd14964205",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240414_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240415_v3-0-2.nc, bytes: 614604, md5: null,
+         sha256: "e52c01473be59ba39a80a78eed873c5a1945159f7bddb2837c6d8c9cbb183b4f",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240415_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240416_v3-0-2.nc, bytes: 614999, md5: null,
+         sha256: "2e980a2743f04d91c247079307f5131c2b08381f2f36c792c0944c313a1648f4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240416_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240417_v3-0-2.nc, bytes: 608446, md5: null,
+         sha256: "8d94a7d903f5c0c37208071f9d0d01b3240097800089480925857b530f723c82",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240417_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240418_v3-0-2.nc, bytes: 602216, md5: null,
+         sha256: "c9d39eb71dc12518d3edf4671d11f0c120dc6ad07bae138decba7a4ddf560e4e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240418_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240419_v3-0-2.nc, bytes: 604368, md5: null,
+         sha256: "15c213c82bf4bade8b6ddfb8c45095738c356a761edde8aaa90831a898bdfe85",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240419_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240420_v3-0-2.nc, bytes: 602509, md5: null,
+         sha256: "26b873ded5f5e9d92607ff96060fb8f8d32a90af6676174edfd1487f085ac45a",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240420_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240421_v3-0-2.nc, bytes: 600404, md5: null,
+         sha256: "c4c2934511f6558cd83c023a4f4f29d4da47fe0844e34435fffcf54d2e993814",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240421_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240422_v3-0-2.nc, bytes: 593770, md5: null,
+         sha256: "bfaefde74c6a50709c3571772575cc79e181ecc53cae7da88b9e46756ee584c7",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240422_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240423_v3-0-2.nc, bytes: 598208, md5: null,
+         sha256: "c1dcd813caa1b5b5c4bf1ec90b99a5cc09931546d9621851900f744b6e4a5dc9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240423_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240424_v3-0-2.nc, bytes: 608149, md5: null,
+         sha256: "aa2e7cc8c0148a99a2a958e757766be11b3bae3b3ebec7a30171144048a8acc4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240424_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240425_v3-0-2.nc, bytes: 600578, md5: null,
+         sha256: "02fb0ebdc58790c0dd5565401a6579f14519c86536858088c0592823abc190d4",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240425_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240426_v3-0-2.nc, bytes: 601451, md5: null,
+         sha256: "5a85516cbdf5071346a009ea370de86693e78228be2d43137f5e1782fc84bc6e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240426_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240427_v3-0-2.nc, bytes: 594116, md5: null,
+         sha256: "8aeca462c1bfaafa7db22d7d6c1b0f4e1f8654f4515e4d608724f54acaec7da9",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240427_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240428_v3-0-2.nc, bytes: 591181, md5: null,
+         sha256: "7dfc4b1c0219bc8554d6acbe70e56d0015a68f22f4e5e588319b772c3ccf972e",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240428_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240429_v3-0-2.nc, bytes: 592194, md5: null,
+         sha256: "e2d3e0fbdfa6c6297b35f32e24e967ab0e9c5c81477d3911504c494159b28239",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240429_v3-0-2.nc"}
+      - {name: sci_sgps-l2-avg5m_g18_d20240430_v3-0-2.nc, bytes: 594912, md5: null,
+         sha256: "7f52d7069a37183e89141902c0909e3453e66245168f1912609f644562cfe55b",
+         url: "https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/2024/04/sci_sgps-l2-avg5m_g18_d20240430_v3-0-2.nc"}
+
+  DS-09:
+    name: "NASA OMNI high-resolution 1-min data, Jan 2023 - Apr 2024 (forecast training)"
+    provider: "NASA/GSFC Space Physics Data Facility (OMNIWeb)"
+    doi: "10.48322/45bb-8792"
+    license: "NASA open data; citation and acknowledgement requested (omniweb.gsfc.nasa.gov/html/citing.html)"
+    files:
+      - name: omni_min202301.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202301.asc"
+        bytes: 13392000
+        md5: null
+        sha256: "5a3365b5bc1599e80723cb1a7d597b202a5424d3ccaac2e3392a14fc06ee9089"
+      - name: omni_min202302.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202302.asc"
+        bytes: 12096000
+        md5: null
+        sha256: "932f4a286529a74c149ddd39f59746483456edbf412ace9fc7267cbbab681184"
+      - name: omni_min202303.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202303.asc"
+        bytes: 13392000
+        md5: null
+        sha256: "c0f1171063d8ed1e00d5acd594da762798d0fedb5f7f429849545752999445ba"
+      - name: omni_min202304.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202304.asc"
+        bytes: 12960000
+        md5: null
+        sha256: "d45a5a2275136dbac18b64c93e7c35a5ef884ab6d038f8c65954ceb0b1004b3b"
+      - name: omni_min202305.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202305.asc"
+        bytes: 13392000
+        md5: null
+        sha256: "0d2ed0e01da91e57c42703854d55ca07f72022dbf082329612c7cf85ee57f9b6"
+      - name: omni_min202306.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202306.asc"
+        bytes: 12960000
+        md5: null
+        sha256: "bb2fa3e8fefa55c70c1b19783fb619dcf0bb21a8d111582a6e49613838fa264c"
+      - name: omni_min202307.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202307.asc"
+        bytes: 13392000
+        md5: null
+        sha256: "b3f59d86f85f8983387c28d30d8fb8c9cb2dac68c6c9c9ff912739d2d1d6c03a"
+      - name: omni_min202308.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202308.asc"
+        bytes: 13392000
+        md5: null
+        sha256: "1294c88ef8d44d7832905a8c82fead19d82026c7da40f1f82b4fe6218fd14bf2"
+      - name: omni_min202309.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202309.asc"
+        bytes: 12960000
+        md5: null
+        sha256: "dc3344ccbaa84fbf7d469b0b2b2c358ca2278b7d24278ea37f83625aa1f08222"
+      - name: omni_min202310.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202310.asc"
+        bytes: 13392000
+        md5: null
+        sha256: "ad4aa4f521300667a92b976a6f4b8f703131d0f118fe7d51c58d1fb49860d7a4"
+      - name: omni_min202311.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202311.asc"
+        bytes: 12960000
+        md5: null
+        sha256: "5ed54664dc6bfdbd309e412586cb331b5ac3585fe698c1ec7993556906c5f3b7"
+      - name: omni_min202312.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202312.asc"
+        bytes: 13392000
+        md5: null
+        sha256: "f0f15a40f30945e16527995dca97ca0ec078f5ad751cce6ab2fd0abe5ecc5e78"
+      - name: omni_min202401.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202401.asc"
+        bytes: 13392000
+        md5: null
+        sha256: "999f99218cbce4120a124ae602264a1e2e5b8706bf300bb264ad3f7143b601a8"
+      - name: omni_min202402.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202402.asc"
+        bytes: 12528000
+        md5: null
+        sha256: "cf613885f3a73285fa80b00b32dd5e49a0ecac81be963159ea7b7d0d5371545b"
+      - name: omni_min202403.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202403.asc"
+        bytes: 13392000
+        md5: null
+        sha256: "67280ed2a439a8e83b66174580eaeb6f550fddbad3684cec0e045ca58eacd677"
+      - name: omni_min202404.asc
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min202404.asc"
+        bytes: 12960000
+        md5: null
+        sha256: "dcef89032b717d50ae86034e687f10c6f24a44101b24de80a39d3999942eb19c"
