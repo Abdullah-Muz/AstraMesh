@@ -45,6 +45,27 @@ dev = [
     "types-pyyaml>=6.0.12",
 ]
 
+# Phase 4 machine-learning benchmark (DL-064). Kept out of the runtime dependencies:
+# the simulator and the agents never import them. PyTorch is the CPU-only build, needed
+# only by PyOD's MO-GAAL; xgboost-cpu avoids the CUDA libraries of plain xgboost.
+ml = [
+    "pyod>=3.6.7",
+    "scikit-learn>=1.9.1",
+    "torch>=2.14.1,<2.15",
+    "xgboost-cpu>=3.4.1",
+]
+
+[tool.uv]
+default-groups = ["dev", "ml"]
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
 [build-system]
 requires = ["uv_build>=0.13.5,<0.14"]
 build-backend = "uv_build"
@@ -87,6 +108,12 @@ warn_unreachable = true
 [[tool.mypy.overrides]]
 module = ["hypothesis.*"]
 follow_untyped_imports = true
+
+# scikit-learn, PyOD and XGBoost ship no complete type information either (DL-064).
+[[tool.mypy.overrides]]
+module = ["sklearn", "sklearn.*", "pyod", "pyod.*", "xgboost", "xgboost.*"]
+ignore_missing_imports = true
+follow_imports = "skip"
 
 # Astropy, pyerfa, NetworkX and SciPy ship no py.typed marker; treat them as untyped (Any) rather than
 # analysing its sources. Our wrappers convert its outputs to typed NumPy arrays.

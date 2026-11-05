@@ -52,10 +52,10 @@ All physical and numerical parameters are starting points that must be validated
 | Numerics & physics | NumPy, SciPy; Astropy for time, frames, and units |
 | Networking & discrete events | NetworkX, SimPy |
 | Data | pandas, PyArrow, Xarray |
-| Machine learning | scikit-learn (others only if justified) |
+| Machine learning | scikit-learn; PyOD, xgboost-cpu and CPU-only PyTorch for the Phase 4 anomaly benchmark (`ml` dependency group, DL-064) |
 | Visualization | Matplotlib, Plotly |
 | Testing | pytest, Hypothesis |
-| Later / optional | Basilisk (validation), CVXPY + OSQP, atmospheric models, PyTorch |
+| Later / optional | Basilisk (validation), CVXPY + OSQP, atmospheric models |
 
 Dependencies will be added incrementally, phase by phase, only when a tested requirement needs them (specification §11).
 
@@ -123,7 +123,7 @@ AstraMesh is a **simulation and research project**. It is **not** a real satelli
 |---|---|
 | [`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md) | Authoritative research and engineering specification (v1.0) |
 | [`docs/`](docs/) | Supporting documents: conventions, physics test plan, literature matrix, dataset registry, decision log, roadmap |
-| [`src/astramesh/`](src/astramesh/) | Python package (`core/` clock, RNG, events, config; `dynamics/` validated truth dynamics, frames, time scales; `evaluation/` runner and manifests; `science/` region access and science opportunities; `resources/` energy, storage and Δv ledgers; `agents/` isolated spacecraft agents; `faults/` simulator-side fault injection (truth only); `datasets/` pinned external-data fetch and verification; agent-side health beliefs and the protection supervisor in `agents/`; `planning/` external allocation (B0 static, B1 centralized reference); agent-side B2 auction and B3 CBBA in `agents/`; `communications/` messages and crosslink network; `scenarios/` runnable scenarios; `visualization/` diagnostic plots) |
+| [`src/astramesh/`](src/astramesh/) | Python package (`core/` clock, RNG, events, config; `dynamics/` validated truth dynamics, frames, time scales; `evaluation/` runner and manifests; `science/` region access and science opportunities; `resources/` energy, storage and Δv ledgers; `agents/` isolated spacecraft agents; `faults/` simulator-side fault injection (truth only); `datasets/` pinned external-data fetch, verification and the OPS-SAT-AD loader; `anomaly/` simulator-independent anomaly-detection benchmark on real telemetry; agent-side health beliefs and the protection supervisor in `agents/`; `planning/` external allocation (B0 static, B1 centralized reference); agent-side B2 auction and B3 CBBA in `agents/`; `communications/` messages and crosslink network; `scenarios/` runnable scenarios; `visualization/` diagnostic plots) |
 | [`scripts/studies/`](scripts/studies/) | Reference-error studies behind every physics test tolerance |
 | [`configs/`](configs/) | Scenario configuration files (YAML) |
 | [`tests/`](tests/) | Unit, integration, and regression tests |

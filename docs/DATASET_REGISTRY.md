@@ -103,6 +103,9 @@ event_labels: "`anomaly` (0/1) per segment: 434 anomalous of 2 123 (20.4%). The 
 channels: "9 channels CADC0872-CADC0894 (paper: 3 magnetometer, 6 photodiode). CADC0884 has no anomalous segments; CADC0886 and CADC0890 have 11 and 14 segments."
 official_split: "train = 1 594 segments (321 anomalous), test = 529 (113 anomalous); stratified random, interleaved in time (train/test alternate 4-234 times per channel)"
 leakage_risks: "The official split mixes time: neighbouring segments of the same channel fall on both sides. DL-062: report the official split (comparability) AND a per-channel time-ordered split; the gap is a possible leakage effect."
+time_split: "DL-064 (astramesh.datasets.opssat.time_split): per channel, the earliest ceil(0.75 n) segments by first-sample time train. Train 1 596 (258 anomalous, 16 %), test 527 (176 anomalous, 33 %). Every test segment of a channel starts after all its training segments; segments do not overlap. Test anomalies per channel: CADC0872 52/136, CADC0873 56/148, CADC0874 35/48, CADC0884 0/39, CADC0886 1/2, CADC0888 15/63, CADC0890 3/3, CADC0892 6/52, CADC0894 8/36."
+cross_validation: "Inside training only: 5 stratified random folds (official split) or 5 contiguous time blocks per channel (time split)."
+feature_check: "The published len, duration, mean, var (population), std, kurtosis and skew (SciPy defaults) match values recomputed from segments.csv for all 2 123 segments (tests/integration/test_opssat_data.py)."
 expected_storage_gb: 0.02
 expected_ram_gb: "< 0.5"
 ```
