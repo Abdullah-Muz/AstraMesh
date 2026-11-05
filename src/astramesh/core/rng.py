@@ -74,6 +74,16 @@ class RandomStreams:
         except KeyError:
             raise KeyError(f"unknown random stream {name!r}; valid: {list(STREAM_NAMES)}") from None
 
+    def substream(self, name: StreamName, sub: str) -> np.random.Generator:
+        """Independent generator derived from stream ``name``'s seed and the label ``sub``.
+
+        Drawing from it never advances ``self[name]``, so adding a sub-stream (e.g. a new
+        sensor) leaves every existing stream's draws unchanged.
+        """
+        seed = self._effective_seeds[name]
+        ss = np.random.SeedSequence(entropy=seed, spawn_key=(stream_key(name), stream_key(sub)))
+        return np.random.Generator(np.random.PCG64(ss))
+
     @property
     def effective_seeds(self) -> dict[str, int]:
         """Seed actually used by each stream (for the provenance manifest)."""

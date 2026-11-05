@@ -30,12 +30,18 @@ import numpy as np
 from numpy.typing import NDArray
 
 from astramesh.agents.agent import AgentSettings, SpacecraftAgent
-from astramesh.agents.health import AVAILABLE_BELIEFS, CONFIRMED, UNAVAILABLE_BELIEFS
+from astramesh.agents.health import (
+    AVAILABLE_BELIEFS,
+    CONFIRMED,
+    UNAVAILABLE_BELIEFS,
+    PayloadSettings,
+)
 from astramesh.agents.packets import (
     CatalogUplink,
     GroundNotice,
     Housekeeping,
     OwnTask,
+    PayloadCheck,
     PlannedObservation,
     PlanUplink,
     PublicSlot,
@@ -43,6 +49,7 @@ from astramesh.agents.packets import (
     RiskForecast,
 )
 from astramesh.agents.supervisor import MODES, NOMINAL, SCIENCE_MODES, SupervisorSettings
+from astramesh.anomaly.adapter import ScoreSensor
 from astramesh.core.clock import seconds_to_ns
 from astramesh.core.config import NominalOperationsScenario
 from astramesh.core.events import EventLog
@@ -251,6 +258,27 @@ def run_nominal_operations(
                    data={"algorithm": plan.algorithm, "n_tasks": len(catalog),
                          "note": "allocation decided by the agents"})  # fmt: skip
 
+    pc = config.agents.health.payload_check if config.agents.health is not None else None
+    sensor = None
+    if pc is not None:
+        sensor = ScoreSensor.load(
+            pc.sensor_file, pc.sensor_sha256, pc.sensor_split, pc.nominal_contamination_fraction
+        )
+    payload_settings = (
+        PayloadSettings(
+            interval_ns=seconds_to_ns(pc.interval_s),
+            mtbf_ns=seconds_to_ns(pc.mtbf_s),
+            repair_ns=seconds_to_ns(pc.repair_s),
+            train_prior=sensor.train_prior,
+            degraded_p=pc.degraded_probability,
+            clear_p=pc.clear_probability,
+            clip=pc.clip_probability,
+        )
+        if pc is not None and sensor is not None
+        else None
+    )
+    check_ns = payload_settings.interval_ns if payload_settings is not None else 0
+    sensor_rng = streams.substream("sensors", "payload_check")  # unused unless H-C
     settings = AgentSettings(
         status_interval_ns=seconds_to_ns(config.agents.status_interval_s),
         status_lifetime_ns=seconds_to_ns(config.agents.status_lifetime_s),
@@ -260,6 +288,7 @@ def run_nominal_operations(
         watch_status_interval_ns=seconds_to_ns(config.supervisor.watch_status_interval_s),
         recovery_nav_max_age_ns=seconds_to_ns(config.supervisor.recovery_nav_max_age_s),
         recovery_peer_heard_ns=seconds_to_ns(config.supervisor.recovery_peer_heard_s),
+        payload_check=payload_settings,
     )
     agents = {a: SpacecraftAgent(a, tuple(p for p in ids if p != a), settings) for a in ids}
     for a in ids:
@@ -333,6 +362,9 @@ def run_nominal_operations(
                 if config.environment is not None:
                     dims = ("radiation", "navcomms", "orbital")
                     agents[a].observe(RiskForecast(t, *(risk_ratio(config, a, d, t) for d in dims)))
+                if sensor is not None and t > 0 and t % check_ns == 0:  # H-C onboard detector
+                    bad = bool(faults) and not faults.payload_valid(a, t)
+                    agents[a].observe(PayloadCheck(t, sensor.draw(sensor_rng, bad)))
             if k == n_ticks - 1:
                 continue  # no step after the final tick
             cmd = None if down else agents[a].payload_command(t, step_ns, mb_per_step)
@@ -403,6 +435,10 @@ def run_nominal_operations(
 
     utility = sum(by_id[t].priority for t in completed)
     health = _health_metrics(agents, ids, faults, spec.duration_ns, step_ns)
+    if config.agents.health is not None:  # DL-066 runs only, so pinned summaries are unchanged
+        health["model"] = config.agents.health.model
+        health["payload_check"] = pc is not None
+        health["payload"] = _payload_metrics(agents, ids, faults, spec.duration_ns, step_ns)
     summary = dict(formation.summary)
     summary.update({
         "operations": {
@@ -499,6 +535,47 @@ def _health_metrics(
                 out["detection_latency_s"][f"{obs}->{peer}"] = (
                     None if hit is None else (hit - starts[peer]) / 1e9
                 )
+    return out
+
+
+def _payload_metrics(
+    agents: dict[str, SpacecraftAgent],
+    ids: list[str],
+    faults: FaultSchedule,
+    end_ns: int,
+    step: int,
+) -> dict[str, Any]:
+    """Own-payload beliefs (H-C) vs truth, sampled on the step grid while the spacecraft
+    is available: ``false_degraded_s`` (believed degraded, payload fine),
+    ``missed_degraded_s`` (degraded, believed fine), ``detection_latency_s`` per
+    ``payload_degraded`` fault (fault start to first DEGRADED belief; 0 if already
+    believed degraded at the start; None if never)."""
+    out: dict[str, Any] = {"false_degraded_s": 0.0, "missed_degraded_s": 0.0,
+                           "belief_changes": 0, "detection_latency_s": {}}  # fmt: skip
+    for a in ids:
+        hist = agents[a].payload_belief_history()
+        out["belief_changes"] += len(hist)
+        for t in range(0, end_ns, step):
+            if faults and faults.unavailable(a, t):
+                continue
+            believed = next((d for tt, d, _ in reversed(hist) if tt <= t), False)
+            bad = bool(faults) and not faults.payload_valid(a, t)
+            if believed and not bad:
+                out["false_degraded_s"] += step / 1e9
+            elif bad and not believed:
+                out["missed_degraded_s"] += step / 1e9
+    for f in faults.faults if faults else ():
+        if f.fault_type != "payload_degraded":
+            continue
+        for a in f.spacecraft:
+            hist = agents[a].payload_belief_history()
+            if next((d for tt, d, _ in reversed(hist) if tt <= f.start_ns), False):
+                hit: int | None = f.start_ns  # already believed degraded (false alarm)
+            else:
+                hit = next((tt for tt, d, _ in hist if d and tt >= f.start_ns), None)
+            out["detection_latency_s"][f"{f.fault_id}:{a}"] = (
+                None if hit is None else (hit - f.start_ns) / 1e9
+            )
     return out
 
 

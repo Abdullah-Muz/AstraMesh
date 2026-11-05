@@ -51,6 +51,20 @@ class Housekeeping:
 
 
 @dataclass(frozen=True, slots=True)
+class PayloadCheck:
+    """Own onboard anomaly detector output: calibrated P(payload anomalous) (DL-066)."""
+
+    t_ns: int
+    prob: float
+
+    def __post_init__(self) -> None:
+        if isinstance(self.t_ns, bool) or not isinstance(self.t_ns, int) or self.t_ns < 0:
+            raise ValueError("t_ns must be a non-negative int")
+        if not (isinstance(self.prob, float) and 0.0 <= self.prob <= 1.0):
+            raise ValueError("prob must be a float in [0, 1]")
+
+
+@dataclass(frozen=True, slots=True)
 class PlannedObservation:
     task_id: str
     start_ns: int  # first step starts here

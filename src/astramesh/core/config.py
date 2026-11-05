@@ -94,7 +94,13 @@ class _ScenarioBase(_Model):
     random: RandomConfig
 
     def canonical_dict(self) -> dict[str, Any]:
-        return self.model_dump(mode="json")
+        d = self.model_dump(mode="json")
+        # Optional blocks added after configs were pinned are omitted when absent, so
+        # their introduction does not change existing configuration hashes (DL-066).
+        ag = d.get("agents")
+        if isinstance(ag, dict) and ag.get("health") is None:
+            ag.pop("health", None)
+        return d
 
     def config_hash(self) -> str:
         return hashlib.sha256(canonical_json(self.canonical_dict()).encode("ascii")).hexdigest()
@@ -261,6 +267,69 @@ class NetworkConfig(_Model):
     duplicate_probability: float = Field(ge=0.0, le=1.0, allow_inf_nan=False)
 
 
+Probability = Annotated[float, Field(gt=0.0, lt=1.0, allow_inf_nan=False)]
+PositiveFloat_ = Annotated[float, Field(gt=0.0, allow_inf_nan=False)]
+
+
+class BayesHealthConfig(_Model):
+    """H-B silence model (DL-066); fixed before any scenario is run."""
+
+    mtbf_s: PositiveSeconds = Field(
+        default=30 * 86400.0, description="Prior mean time to unavailability [s]"
+    )
+    loss_prior_a: PositiveFloat_ = Field(default=1.0, description="Beta prior on message loss")
+    loss_prior_b: PositiveFloat_ = Field(default=30.0, description="Beta prior on message loss")
+    suspect_probability: Probability = 0.5
+    lost_probability: Probability = 0.95
+
+    @model_validator(mode="after")
+    def _order(self) -> BayesHealthConfig:
+        if not self.suspect_probability < self.lost_probability:
+            raise ValueError("bayes.suspect_probability must be < bayes.lost_probability")
+        return self
+
+
+class PayloadCheckConfig(_Model):
+    """H-C onboard payload detector, adapted from the OPS-SAT benchmark (DL-066)."""
+
+    interval_s: PositiveSeconds = Field(default=300.0, description="Detector check period [s]")
+    sensor_file: str = Field(
+        default="configs/data/opssat_score_sensor.json",
+        description="Empirical score distributions (repo-relative)",
+    )
+    sensor_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    sensor_split: Literal["time", "official"] = "time"
+    mtbf_s: PositiveSeconds = Field(
+        default=30 * 86400.0, description="Prior mean time to payload degradation [s]"
+    )
+    repair_s: PositiveSeconds = Field(
+        default=86400.0, description="Prior mean degradation duration [s]"
+    )
+    degraded_probability: Probability = 0.9
+    clear_probability: Probability = 0.1
+    clip_probability: Annotated[float, Field(gt=0.0, lt=0.5)] = 0.01
+    nominal_contamination_fraction: Annotated[float, Field(ge=0.0, lt=1.0)] = Field(
+        default=0.0,
+        description="Domain-shift stress: fraction of healthy checks drawn from anomalous scores",
+    )
+
+    @model_validator(mode="after")
+    def _order(self) -> PayloadCheckConfig:
+        if not self.clear_probability < self.degraded_probability:
+            raise ValueError(
+                "payload_check.clear_probability must be < payload_check.degraded_probability"
+            )
+        return self
+
+
+class HealthModelConfig(_Model):
+    """Health estimation model (spec §7.2): H-A timeout, H-B bayes, H-C bayes + detector."""
+
+    model: Literal["timeout", "bayes"]
+    bayes: BayesHealthConfig = BayesHealthConfig()
+    payload_check: PayloadCheckConfig | None = None
+
+
 class AgentsConfig(_Model):
     """Agent message timing and sensor noise (values PROVISIONAL)."""
 
@@ -277,6 +346,9 @@ class AgentsConfig(_Model):
     )
     health_recover_messages: int = Field(
         default=2, ge=1, le=100, description="Status messages after RECOVERING before HEALTHY"
+    )
+    health: HealthModelConfig | None = Field(
+        default=None, description="Absent: H-A timeout model (DL-052); see DL-066"
     )
 
     @model_validator(mode="after")
@@ -297,6 +369,9 @@ class AgentNetworkScenario(FormationScenarioBase):
     def _agent_timing_on_grid(self) -> AgentNetworkScenario:
         self._require_on_grid(self.agents.nav_fix_interval_s, "agents.nav_fix_interval_s")
         self._require_on_grid(self.agents.status_interval_s, "agents.status_interval_s")
+        h = self.agents.health
+        if h is not None and h.payload_check is not None:
+            self._require_on_grid(h.payload_check.interval_s, "payload_check.interval_s")
         seconds_to_ns(self.network.delay_s, name="network.delay_s")
         seconds_to_ns(self.agents.status_lifetime_s, name="agents.status_lifetime_s")
         return self
@@ -491,6 +566,9 @@ class NominalOperationsScenario(MissionScenarioBase):
         self._require_on_grid(self.agents.nav_fix_interval_s, "agents.nav_fix_interval_s")
         self._require_on_grid(self.agents.status_interval_s, "agents.status_interval_s")
         self._require_on_grid(self.operations.min_observation_s, "operations.min_observation_s")
+        h = self.agents.health
+        if h is not None and h.payload_check is not None:
+            self._require_on_grid(h.payload_check.interval_s, "payload_check.interval_s")
         seconds_to_ns(self.network.delay_s, name="network.delay_s")
         seconds_to_ns(self.agents.status_lifetime_s, name="agents.status_lifetime_s")
         return self

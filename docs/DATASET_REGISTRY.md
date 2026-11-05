@@ -106,6 +106,7 @@ leakage_risks: "The official split mixes time: neighbouring segments of the same
 time_split: "DL-064 (astramesh.datasets.opssat.time_split): per channel, the earliest ceil(0.75 n) segments by first-sample time train. Train 1 596 (258 anomalous, 16 %), test 527 (176 anomalous, 33 %). Every test segment of a channel starts after all its training segments; segments do not overlap. Test anomalies per channel: CADC0872 52/136, CADC0873 56/148, CADC0874 35/48, CADC0884 0/39, CADC0886 1/2, CADC0888 15/63, CADC0890 3/3, CADC0892 6/52, CADC0894 8/36."
 cross_validation: "Inside training only: 5 stratified random folds (official split) or 5 contiguous time blocks per channel (time split)."
 feature_check: "The published len, duration, mean, var (population), std, kurtosis and skew (SciPy defaults) match values recomputed from segments.csv for all 2 123 segments (tests/integration/test_opssat_data.py)."
+derived_files: "configs/data/opssat_score_sensor.json (DL-066): calibrated test-set anomaly probabilities of histogram gradient boosting (seed 0), by true label, for both splits, with the training anomaly rate. 527 + 529 numbers, no telemetry. Committed so CI and the simulation run without the raw data; regenerate with scripts/data/make_score_sensor.py. Attribution as for DS-02."
 expected_storage_gb: 0.02
 expected_ram_gb: "< 0.5"
 ```

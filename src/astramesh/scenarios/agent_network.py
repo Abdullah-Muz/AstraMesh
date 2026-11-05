@@ -24,7 +24,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from astramesh.agents.agent import AgentSettings, SpacecraftAgent
-from astramesh.agents.health import HealthSettings
+from astramesh.agents.health import BayesSettings, HealthSettings
 from astramesh.communications.network import LinkModel
 from astramesh.core.clock import seconds_to_ns
 from astramesh.core.config import AgentNetworkScenario
@@ -53,10 +53,22 @@ class AgentNetworkRun:
 
 def health_settings(config: AgentNetworkScenario | Any) -> HealthSettings:
     ag = config.agents
+    h = ag.health
+    bayes = None
+    if h is not None and h.model == "bayes":
+        bayes = BayesSettings(
+            status_interval_ns=seconds_to_ns(ag.status_interval_s),
+            mtbf_ns=seconds_to_ns(h.bayes.mtbf_s),
+            loss_a=h.bayes.loss_prior_a,
+            loss_b=h.bayes.loss_prior_b,
+            suspect_p=h.bayes.suspect_probability,
+            lost_p=h.bayes.lost_probability,
+        )
     return HealthSettings(
         suspect_ns=seconds_to_ns(ag.health_suspect_s),
         lost_ns=seconds_to_ns(ag.health_lost_s),
         recover_messages=ag.health_recover_messages,
+        bayes=bayes,
     )
 
 

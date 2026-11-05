@@ -38,12 +38,15 @@ from astramesh.agents.health import (
     UNAVAILABLE_BELIEFS,
     HealthSettings,
     HealthTracker,
+    PayloadBelief,
+    PayloadSettings,
 )
 from astramesh.agents.packets import (
     CatalogUplink,
     GroundNotice,
     Housekeeping,
     NavigationFix,
+    PayloadCheck,
     PlannedObservation,
     PlanUplink,
     PublicTask,
@@ -91,6 +94,7 @@ class AgentSettings:
     watch_status_interval_ns: int = 10 * 10**9  # STORM_WATCH monitoring (DL-056)
     recovery_nav_max_age_ns: int = 60 * 10**9
     recovery_peer_heard_ns: int = 90 * 10**9
+    payload_check: PayloadSettings | None = None  # H-C onboard detector (DL-066)
 
     def __post_init__(self) -> None:
         if self.status_interval_ns <= 0 or self.status_lifetime_ns <= 0:
@@ -109,6 +113,7 @@ class PeerRecord:
     reported_plan_version: int | None = None
     reported_r_m: tuple[float, ...] | None = None
     reported_mode: str | None = None
+    reported_payload: str | None = None  # "ok" / "degraded" (H-C status field)
 
 
 @dataclass(slots=True)
@@ -139,6 +144,7 @@ class SpacecraftAgent:
     _public: dict[str, PublicTask] = field(default_factory=dict)
     _finished: set[str] = field(default_factory=set)
     _declined: dict[str, str] = field(default_factory=dict)
+    _payload: PayloadBelief | None = None
 
     def __post_init__(self) -> None:
         if self.agent_id in self.peers:
@@ -146,6 +152,13 @@ class SpacecraftAgent:
         self._peer_table = {p: PeerRecord() for p in self.peers}
         self._health = HealthTracker(self.settings.health, self.peers)
         self._sup = Supervisor(self.settings.supervisor)
+        if self.settings.payload_check is not None:
+            self._payload = PayloadBelief(self.settings.payload_check)
+
+    @property
+    def payload_degraded(self) -> bool:
+        """Own belief that the payload is degraded (H-C only; always False otherwise)."""
+        return self._payload is not None and self._payload.degraded
 
     # -- inputs -----------------------------------------------------------------
     def observe(
@@ -155,7 +168,8 @@ class SpacecraftAgent:
         | PlanUplink
         | CatalogUplink
         | GroundNotice
-        | RiskForecast,
+        | RiskForecast
+        | PayloadCheck,
     ) -> None:
         if isinstance(packet, NavigationFix):
             if self._nav is None or packet.t_ns >= self._nav.t_ns:
@@ -200,6 +214,12 @@ class SpacecraftAgent:
         elif isinstance(packet, RiskForecast):
             if self._forecast is None or packet.t_ns >= self._forecast.t_ns:
                 self._forecast = packet
+        elif isinstance(packet, PayloadCheck):
+            if self._payload is None:
+                self._log.append({"kind": "payload_check_ignored", "t_ns": packet.t_ns})
+                return
+            if self._payload.update(packet.t_ns, packet.prob):
+                self._on_payload_belief(packet.t_ns)
         elif isinstance(packet, GroundNotice):
             assert self._health is not None
             for p in packet.confirmed_failed:
@@ -230,6 +250,13 @@ class SpacecraftAgent:
         if self._observing is not None and now_ns >= self._observing.stop_ns:
             self._finished.add(self._observing.task_id)
             self._observing = None
+        if self.payload_degraded:  # own detector says the payload is bad (DL-066)
+            if self._observing is not None:
+                obs, self._observing = self._observing, None
+                return self._decline(obs, "payload_degraded")
+            due = next((o for o in self._plan if o.start_ns <= now_ns < o.stop_ns
+                        and o.task_id not in self._declined), None)  # fmt: skip
+            return None if due is None else self._decline(due, "payload_degraded")
         if self._observing is not None:  # committed: finish it even if the plan changed
             current: PlannedObservation | None = self._observing
         else:
@@ -382,6 +409,13 @@ class SpacecraftAgent:
             rec.reported_plan_version = m.plan_version
             r = m.payload.get("r_m")
             rec.reported_r_m = tuple(float(x) for x in r) if isinstance(r, tuple) else None
+            pl = m.payload.get("payload")
+            if isinstance(pl, str):
+                was_pl = rec.reported_payload
+                rec.reported_payload = pl
+                if (pl == "degraded" and was_pl != "degraded"
+                        and self._plan_algorithm == "B4-rule-redistribution"):  # fmt: skip
+                    self._respond_to_loss(m.sender, d.delivered_ns)
             mode = m.payload.get("mode")
             if isinstance(mode, str):
                 was = rec.reported_mode
@@ -408,7 +442,7 @@ class SpacecraftAgent:
     def _allocation_round(self, now_ns: int) -> None:
         alloc = self._alloc
         if isinstance(alloc, CbbaState):
-            if self.mode in TASKING_MODES:  # protected, recovering or safe: no bids
+            if self.mode in TASKING_MODES and not self.payload_degraded:  # else: no bids
                 alloc.build_bundle(now_ns)
             self._refresh_plan(now_ns)
             self._outbox.append(self._message(now_ns, MessageType.PLAN_SYNC,
@@ -503,10 +537,41 @@ class SpacecraftAgent:
     def _can_take(self, sc: str, beliefs: dict[str, str]) -> bool:
         """B4: believed available for new tasks (health and reported mode)."""
         if sc == self.agent_id:
-            return self.mode in TASKING_MODES
+            return self.mode in TASKING_MODES and not self.payload_degraded
         rec = self._peer_table.get(sc)
         mode_ok = rec is None or rec.reported_mode in (None, *TASKING_MODES)
-        return beliefs.get(sc) in AVAILABLE_BELIEFS and mode_ok
+        payload_ok = rec is None or rec.reported_payload != "degraded"
+        return beliefs.get(sc) in AVAILABLE_BELIEFS and mode_ok and payload_ok
+
+    def _on_payload_belief(self, now_ns: int) -> None:
+        """Own payload belief changed (DL-066): the same response under every health model.
+
+        Degraded: stop observing; B3 releases its claims and stops bidding (peers
+        re-auction), B4 hands its tasks to peers by the fixed rule (peers do the same
+        when they receive the status). Recovered: B3 bids again; B4 has no handback.
+        """
+        assert self._payload is not None
+        degraded = self._payload.degraded
+        self._log.append({"kind": "payload_belief_changed", "degraded": degraded,
+                          "p": self._payload.p, "t_ns": now_ns})  # fmt: skip
+        if not degraded:
+            return
+        if isinstance(self._alloc, CbbaState):
+            self._alloc.release_all()
+            self._refresh_plan(now_ns)
+        elif self._plan_algorithm == "B4-rule-redistribution":
+            self._respond_to_loss(self.agent_id, now_ns)
+            kept = tuple(o for o in self._plan if (t := self._public.get(o.task_id)) is None
+                         or t.owner == self.agent_id)  # fmt: skip
+            if kept != self._plan:
+                self._plan = kept
+                self.plan_version += 1
+                self._last_plan_change_ns = now_ns
+                self._log.append({"kind": "plan_changed", "version": self.plan_version,
+                                  "n_observations": len(kept)})  # fmt: skip
+
+    def payload_belief_history(self) -> list[tuple[int, bool, float]]:
+        return list(self._payload.history) if self._payload is not None else []
 
     def mode_history(self) -> list[tuple[int, str, str, str]]:
         return list(self._sup.history) if self._sup is not None else []
@@ -527,6 +592,8 @@ class SpacecraftAgent:
             }
         payload["health"] = self._self_health()
         payload["mode"] = self.mode
+        if self._payload is not None:  # H-C only, so other runs' messages are unchanged
+            payload["payload"] = "degraded" if self._payload.degraded else "ok"
         msg = Message(
             sender=self.agent_id,
             seq=self._seq,

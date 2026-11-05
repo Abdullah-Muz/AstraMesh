@@ -65,8 +65,8 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | # | Increment | Status |
 |---|---|---|
 | 1 | Data registry and pinned fetch: OPS-SAT-AD, OMNI 1-min and GOES-18 SGPS for May 2024; ESA-ADB sized only | Implemented (DL-063) |
-| 2 | Anomaly-detection benchmark on OPS-SAT-AD, independent of the simulation; official and time-ordered splits | Implemented: code `c557c6b` (DL-064), results in [`docs/results/OPSSAT_BENCHMARK.md`](results/OPSSAT_BENCHMARK.md) (DL-065); awaiting owner review |
-| 3 | Calibrated probabilistic health model; adapter from detector scores to simulated beliefs; comparison with the timeout on S01/S03/S04 | Not started |
+| 2 | Anomaly-detection benchmark on OPS-SAT-AD, independent of the simulation; official and time-ordered splits | **Done**: code `c557c6b` (DL-064), results `f0760f8` in [`docs/results/OPSSAT_BENCHMARK.md`](results/OPSSAT_BENCHMARK.md) (DL-065); approved 2026-11-05 |
+| 3 | Calibrated probabilistic health model; adapter from detector scores to simulated beliefs; comparison with the timeout on S01/S03/S04 | Code implemented (DL-066); results pending a run from the committed code |
 | 4 | May 2024 storm replay (OMNI, GOES protons) as S11, no future-data leakage; bounded COSMIC-2/GloTEC context | Not started |
 | 5 | Gate P4 comparison write-up | Not started |
 
