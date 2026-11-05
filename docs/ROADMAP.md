@@ -65,15 +65,15 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | # | Increment | Status |
 |---|---|---|
 | 1 | Data registry and pinned fetch: OPS-SAT-AD, OMNI 1-min and GOES-18 SGPS for May 2024; ESA-ADB sized only | Implemented (DL-063) |
-| 2 | Anomaly-detection benchmark on OPS-SAT-AD, independent of the simulation; official and time-ordered splits | Code implemented (DL-064); results pending a run from the committed code |
+| 2 | Anomaly-detection benchmark on OPS-SAT-AD, independent of the simulation; official and time-ordered splits | Implemented: code `c557c6b` (DL-064), results in [`docs/results/OPSSAT_BENCHMARK.md`](results/OPSSAT_BENCHMARK.md) (DL-065); awaiting owner review |
 | 3 | Calibrated probabilistic health model; adapter from detector scores to simulated beliefs; comparison with the timeout on S01/S03/S04 | Not started |
 | 4 | May 2024 storm replay (OMNI, GOES protons) as S11, no future-data leakage; bounded COSMIC-2/GloTEC context | Not started |
 | 5 | Gate P4 comparison write-up | Not started |
 
 ## Gate P4 checklist (spec §13)
 
-- [ ] Data licences/provenance and train/test partitions documented (increment 1: licences, hashes and measured facts in `DATASET_REGISTRY.md`; partitions in increment 2)
-- [ ] Anomaly results independently benchmarked
+- [ ] Data licences/provenance and train/test partitions documented (increment 1: licences, hashes and measured facts in `DATASET_REGISTRY.md`; increment 2: OPS-SAT-AD official and time splits, per-channel counts and CV folds in the DS-02 record; storm-data partitions in increment 4)
+- [ ] Anomaly results independently benchmarked (increment 2: real OPS-SAT telemetry, independent of the simulation, reproduces the published results; official and time splits; DL-065)
 - [ ] Synthetic-vs-real interface explicit
 - [ ] Preliminary health/forecast comparisons complete with uncertainty
 

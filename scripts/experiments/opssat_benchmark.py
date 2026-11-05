@@ -128,6 +128,13 @@ def main() -> int:
             saved = list(csv.DictReader(fh))
         _write_csv(args.out / "opssat_benchmark_summary.csv", summarize(saved))
         return 0
+
+    def git(*a: str) -> str:
+        return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True,
+                              check=True).stdout.strip()  # fmt: skip
+
+    # Record the tree state before writing outputs: new result files would mark it dirty.
+    commit, dirty = git("rev-parse", "HEAD"), bool(git("status", "--porcelain"))
     seeds = list(range(args.seeds))
     jobs = [(s, m, seed) for s in SPLITS for m in METHODS for seed in seeds]
     t0 = time.time()
@@ -140,15 +147,11 @@ def main() -> int:
     _write_csv(args.out / "opssat_benchmark_summary.csv", summarize(rows))
     _write_csv(args.out / "opssat_reliability.csv", bins)
 
-    def git(*a: str) -> str:
-        return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True,
-                              check=True).stdout.strip()  # fmt: skip
-
     d = load()
     meta = {
         "experiment": "Phase 4 OPS-SAT-AD anomaly-detection benchmark (DL-064)",
-        "git_commit": git("rev-parse", "HEAD"),
-        "git_dirty": bool(git("status", "--porcelain")),
+        "git_commit": commit,
+        "git_dirty": dirty,
         "lockfile_sha256": hashlib.sha256((ROOT / "uv.lock").read_bytes()).hexdigest(),
         "data": {f.name: f.sha256 for f in load_sources()["DS-02"].files},
         "features": list(FEATURES),

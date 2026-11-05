@@ -1,0 +1,71 @@
+{
+  "experiment": "Phase 4 OPS-SAT-AD anomaly-detection benchmark (DL-064)",
+  "git_commit": "c557c6b034bde138b5a7cf2fb152f1016827f76d",
+  "git_dirty": false,
+  "lockfile_sha256": "89b2cfbfe0e7df34c2d0457e5a14468c50ac75a42e7e22e2a7713750cfa1aefa",
+  "data": {
+    "segments.csv": "d5201e9e751eb2a53a0ff7c11567dc4239f594ea4b479b2aa66fe67ddcbcb9ba",
+    "dataset.csv": "b524177da6f516d5c9f63c7acbc385341f0ad42046ef20c1bed2d25e51b98f02",
+    "LICENSE": "76d2ff9834ed2bb1356d9f7eb303c289817374bb1d5bbe5af86817e73e0f47d2"
+  },
+  "features": [
+    "mean",
+    "var",
+    "std",
+    "len",
+    "duration",
+    "len_weighted",
+    "gaps_squared",
+    "n_peaks",
+    "smooth10_n_peaks",
+    "smooth20_n_peaks",
+    "var_div_duration",
+    "var_div_len",
+    "diff_peaks",
+    "diff2_peaks",
+    "diff_var",
+    "diff2_var",
+    "kurtosis",
+    "skew"
+  ],
+  "methods": {
+    "robust_z": "classical",
+    "iforest": "unsupervised",
+    "lof": "unsupervised",
+    "ocsvm": "unsupervised",
+    "mo_gaal": "unsupervised",
+    "logreg": "supervised",
+    "random_forest": "supervised",
+    "hist_gbdt": "supervised",
+    "xgbod": "supervised"
+  },
+  "splits": {
+    "official": {
+      "n_train": 1594,
+      "n_test": 529,
+      "train_anomalies": 321,
+      "test_anomalies": 113
+    },
+    "time": {
+      "n_train": 1596,
+      "n_test": 527,
+      "train_anomalies": 258,
+      "test_anomalies": 176
+    }
+  },
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "variable_columns": [
+    "fit_cpu_s",
+    "score_cpu_ms_per_segment"
+  ],
+  "python": "3.12.3",
+  "machine": "x86_64",
+  "workers": 6,
+  "total_wall_s": 135.2
+}
