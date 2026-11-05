@@ -1,6 +1,6 @@
 # Roadmap and Gate Tracking
 
-> **Owner:** Abdullah Muzher · **Status:** ACTIVE · **Spec:** §13, §14, §17 · **Last updated:** 2026-11-03
+> **Owner:** Abdullah Muzher · **Status:** ACTIVE · **Spec:** §13, §14, §17 · **Last updated:** 2026-11-05
 
 Phase definitions and exit gates are defined in spec §13; this file tracks status only.
 
@@ -66,7 +66,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 |---|---|---|
 | 1 | Data registry and pinned fetch: OPS-SAT-AD, OMNI 1-min and GOES-18 SGPS for May 2024; ESA-ADB sized only | Implemented (DL-063) |
 | 2 | Anomaly-detection benchmark on OPS-SAT-AD, independent of the simulation; official and time-ordered splits | **Done**: code `c557c6b` (DL-064), results `f0760f8` in [`docs/results/OPSSAT_BENCHMARK.md`](results/OPSSAT_BENCHMARK.md) (DL-065); approved 2026-11-05 |
-| 3 | Calibrated probabilistic health model; adapter from detector scores to simulated beliefs; comparison with the timeout on S01/S03/S04 | Code implemented (DL-066); results pending a run from the committed code |
+| 3 | Calibrated probabilistic health model; adapter from detector scores to simulated beliefs; comparison with the timeout on S01/S03/S04 | Code `42c24a9` (DL-066); 440-run results in [`docs/results/HEALTH_COMPARISON.md`](results/HEALTH_COMPARISON.md) (DL-067), awaiting review |
 | 4 | May 2024 storm replay (OMNI, GOES protons) as S11, no future-data leakage; bounded COSMIC-2/GloTEC context | Not started |
 | 5 | Gate P4 comparison write-up | Not started |
 
@@ -74,8 +74,8 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 
 - [ ] Data licences/provenance and train/test partitions documented (increment 1: licences, hashes and measured facts in `DATASET_REGISTRY.md`; increment 2: OPS-SAT-AD official and time splits, per-channel counts and CV folds in the DS-02 record; storm-data partitions in increment 4)
 - [ ] Anomaly results independently benchmarked (increment 2: real OPS-SAT telemetry, independent of the simulation, reproduces the published results; official and time splits; DL-065)
-- [ ] Synthetic-vs-real interface explicit
-- [ ] Preliminary health/forecast comparisons complete with uncertainty
+- [ ] Synthetic-vs-real interface explicit (increment 3: the pinned score-sensor file is the only link from OPS-SAT data to the simulation; real and synthetic parts and the untested assumptions are listed in `HEALTH_COMPARISON.md`; the storm-data interface comes in increment 4)
+- [ ] Preliminary health/forecast comparisons complete with uncertainty (increment 3: H-A/H-B/H-C health comparison with 95 % t-intervals, n = 10, DL-067; the forecast comparison comes in increment 4)
 
 ## Gate P3 checklist (spec §13)
 

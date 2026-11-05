@@ -1,0 +1,158 @@
+{
+  "experiment": "Phase 4 health-model comparison H-A/H-B/H-C (DL-066)",
+  "git_commit": "42c24a997714eaf018807040e4152d6443baaa02",
+  "git_dirty": false,
+  "lockfile_sha256": "89b2cfbfe0e7df34c2d0457e5a14468c50ac75a42e7e22e2a7713750cfa1aefa",
+  "sensor_file": "configs/data/opssat_score_sensor.json",
+  "sensor_sha256": "a7a28cbe22e2bd93a651fb4e7f2da5d14849ca2d65c10933c63fc26833d958de",
+  "models": {
+    "H-A": {
+      "model": "timeout"
+    },
+    "H-B": {
+      "model": "bayes"
+    },
+    "H-C": {
+      "model": "bayes",
+      "payload_check": {
+        "sensor_sha256": "a7a28cbe22e2bd93a651fb4e7f2da5d14849ca2d65c10933c63fc26833d958de"
+      }
+    },
+    "H-C/official": {
+      "model": "bayes",
+      "payload_check": {
+        "sensor_sha256": "a7a28cbe22e2bd93a651fb4e7f2da5d14849ca2d65c10933c63fc26833d958de",
+        "sensor_split": "official"
+      }
+    },
+    "H-C/shift05": {
+      "model": "bayes",
+      "payload_check": {
+        "sensor_sha256": "a7a28cbe22e2bd93a651fb4e7f2da5d14849ca2d65c10933c63fc26833d958de",
+        "nominal_contamination_fraction": 0.05
+      }
+    },
+    "H-B/mtbf3d": {
+      "model": "bayes",
+      "bayes": {
+        "mtbf_s": 259200.0
+      }
+    },
+    "H-B/mtbf300d": {
+      "model": "bayes",
+      "bayes": {
+        "mtbf_s": 25920000.0
+      }
+    }
+  },
+  "plan": {
+    "H-A": [
+      "S00",
+      "S01",
+      "S03",
+      "S04"
+    ],
+    "H-B": [
+      "S00",
+      "S01",
+      "S03",
+      "S04"
+    ],
+    "H-C": [
+      "S00",
+      "S01",
+      "S03",
+      "S04"
+    ],
+    "H-C/official": [
+      "S00",
+      "S03"
+    ],
+    "H-C/shift05": [
+      "S00",
+      "S03"
+    ],
+    "H-B/mtbf3d": [
+      "S00",
+      "S01",
+      "S04"
+    ],
+    "H-B/mtbf300d": [
+      "S00",
+      "S01",
+      "S04"
+    ]
+  },
+  "planners": [
+    "cbba_b3_timeout",
+    "rule_b4"
+  ],
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "hours": 24.0,
+  "draws": {
+    "1": {
+      "a": "sc01",
+      "b": "sc02",
+      "t0_s": 14810
+    },
+    "2": {
+      "a": "sc01",
+      "b": "sc02",
+      "t0_s": 17720
+    },
+    "3": {
+      "a": "sc03",
+      "b": "sc00",
+      "t0_s": 26620
+    },
+    "4": {
+      "a": "sc00",
+      "b": "sc02",
+      "t0_s": 33470
+    },
+    "5": {
+      "a": "sc01",
+      "b": "sc02",
+      "t0_s": 30740
+    },
+    "6": {
+      "a": "sc03",
+      "b": "sc01",
+      "t0_s": 15340
+    },
+    "7": {
+      "a": "sc03",
+      "b": "sc01",
+      "t0_s": 26770
+    },
+    "8": {
+      "a": "sc03",
+      "b": "sc00",
+      "t0_s": 29110
+    },
+    "9": {
+      "a": "sc02",
+      "b": "sc00",
+      "t0_s": 19600
+    },
+    "10": {
+      "a": "sc02",
+      "b": "sc00",
+      "t0_s": 25690
+    }
+  },
+  "n_runs": 440,
+  "workers": 6,
+  "total_wall_s": 2288.9
+}
