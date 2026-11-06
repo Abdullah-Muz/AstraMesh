@@ -22,11 +22,12 @@ def _band_averages(g: float, scale: float = 1e20) -> np.ndarray:
         avg = np.log(HI / LO) / (HI - LO)
     else:
         avg = (HI ** (1 - g) - LO ** (1 - g)) / ((1 - g) * (HI - LO))
-    return scale * avg[None, :]
+    out: np.ndarray = scale * avg[None, :]
+    return out
 
 
 def _exact(g: float, scale: float = 1e20, a: float = 1e4, b: float = 5e5) -> float:
-    return scale * (np.log(b / a) if g == 1.0 else (b ** (1 - g) - a ** (1 - g)) / (1 - g))
+    return float(scale * (np.log(b / a) if g == 1.0 else (b ** (1 - g) - a ** (1 - g)) / (1 - g)))
 
 
 @given(st.floats(0.5, 6.0))
