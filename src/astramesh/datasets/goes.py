@@ -39,6 +39,7 @@ LOW_KEV = 10_000.0  # 10 MeV
 TOP_KEV = 500_000.0  # lower edge of the integral channel P11
 MIN_VALID_FRACTION = 0.5
 STEP_NS = 300 * 10**9
+P3 = 3  # channel index of P3 (spectral-hardness feature for the forecasts, DL-069)
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,6 +47,7 @@ class ProtonSeries:
     t_ns: npt.NDArray[np.int64]
     flux_ge10: FloatArray  # pfu, NaN = no valid unit
     flux_by_unit: FloatArray  # (n, 2), NaN where that unit is invalid
+    flux_p3: FloatArray  # P3 (about 3.4-6.5 MeV) band integral, pfu, larger valid unit
 
 
 def integral_above(lo: FloatArray, hi: FloatArray, j: FloatArray, low: float = LOW_KEV,
@@ -170,7 +172,13 @@ def _flux(r: _Raw) -> ProtonSeries:
         good = np.all(np.isfinite(j) & enough, axis=1) & np.isfinite(r.integ[:, u])
         flux = integral_above(r.e_lo[u, idx], r.e_hi[u, idx], np.where(good[:, None], j, 0.0))
         by_unit[:, u] = np.where(good, flux + np.maximum(r.integ[:, u], 0.0), np.nan)
-    return ProtonSeries(r.t_ns, np.fmax(by_unit[:, 0], by_unit[:, 1]), by_unit)
+    p3 = np.full((len(r.t_ns), 2), np.nan)
+    for u in range(2):
+        ok = np.isfinite(r.diff[:, u, P3]) & (r.valid[:, u, P3] >= need)
+        width = r.e_hi[u, P3] - r.e_lo[u, P3]
+        p3[:, u] = np.where(ok, np.maximum(r.diff[:, u, P3], 0.0) * width, np.nan)
+    return ProtonSeries(r.t_ns, np.fmax(by_unit[:, 0], by_unit[:, 1]), by_unit,
+                        np.fmax(p3[:, 0], p3[:, 1]))  # fmt: skip
 
 
 def read_file(path: Path) -> ProtonSeries:
@@ -208,4 +216,5 @@ def load(dataset: str, raw: Path = RAW) -> ProtonSeries:
                       np.concatenate([p.integ for p in g]), g[0].e_lo, g[0].e_hi))
            for g in groups]  # fmt: skip
     return ProtonSeries(t, np.concatenate([o.flux_ge10 for o in out]),
-                        np.concatenate([o.flux_by_unit for o in out]))  # fmt: skip
+                        np.concatenate([o.flux_by_unit for o in out]),
+                        np.concatenate([o.flux_p3 for o in out]))  # fmt: skip

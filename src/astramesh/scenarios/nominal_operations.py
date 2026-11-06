@@ -48,13 +48,21 @@ from astramesh.agents.packets import (
     PublicTask,
     RiskForecast,
 )
-from astramesh.agents.supervisor import MODES, NOMINAL, SCIENCE_MODES, SupervisorSettings
+from astramesh.agents.supervisor import (
+    MODES,
+    NOMINAL,
+    PROTECTIVE,
+    RECOVERY,
+    SCIENCE_MODES,
+    SupervisorSettings,
+)
 from astramesh.anomaly.adapter import ScoreSensor
 from astramesh.core.clock import seconds_to_ns
 from astramesh.core.config import NominalOperationsScenario
 from astramesh.core.events import EventLog
 from astramesh.core.rng import RandomStreams
 from astramesh.faults.schedule import Fault, FaultSchedule
+from astramesh.forecast.replay import StormSeries
 from astramesh.planning.centralized_b1 import EnergyModel, plan_centralized
 from astramesh.planning.plans import Assignment, Plan
 from astramesh.planning.static_b0 import plan_static
@@ -223,6 +231,23 @@ def risk_ratio(config: NominalOperationsScenario, sc: str, dim: str, t_ns: int) 
     return env.background_exposure_ratio
 
 
+def _ratio(x: float | None, tol: float) -> float | None:
+    return None if x is None else max(x, 0.0) / tol
+
+
+def replay_risks(config: NominalOperationsScenario, series: StormSeries,
+                 t_unix_ns: int) -> tuple[float | None, float | None, float | None]:  # fmt: skip
+    """(radiation, navcomms, orbital) ratios at ``t`` from the S11 storm replay (DL-069):
+    the chosen forecast over the radiation tolerance, AE and -SYM-H over theirs. The same
+    for every spacecraft (GOES is a GEO upper-bound proxy)."""
+    rp = config.environment.replay if config.environment is not None else None
+    assert rp is not None
+    sym, ae = series.indices(t_unix_ns)
+    return (_ratio(series.forecast(rp.forecast, t_unix_ns), rp.radiation_tolerance_pfu),
+            _ratio(ae, rp.navcomms_tolerance_nt),
+            _ratio(None if sym is None else -sym, rp.orbital_tolerance_nt))  # fmt: skip
+
+
 def run_nominal_operations(
     config: NominalOperationsScenario, streams: RandomStreams, log: EventLog
 ) -> OperationsRun:
@@ -327,6 +352,12 @@ def run_nominal_operations(
     storage = dict.fromkeys(ids, 0.0)
     min_wh = {a: batteries[a].stored_wh for a in ids}
     protection_violations = dict.fromkeys(ids, 0)
+    rp = config.environment.replay if config.environment is not None else None
+    series = StormSeries.load(rp.series_file, rp.series_sha256) if rp is not None else None
+    epoch_unix_ns = int(config.time.epoch_utc.timestamp()) * 10**9
+    storm = {k: dict.fromkeys(ids, 0.0) for k in
+             ("hazard_s", "exposed_s", "protected_in_hazard_s", "protected_outside_hazard_s",
+              "no_truth_s")}  # fmt: skip
     active: dict[str, Segment] = {}
     segments: list[Segment] = []
     faults = fault_schedule(config, ids)
@@ -359,7 +390,10 @@ def run_nominal_operations(
                 hk = Housekeeping(t, bat.stored_wh, sc.battery_capacity_wh, storage[a],
                                   sc.storage_capacity_mb, flags)  # fmt: skip
                 agents[a].observe(hk)
-                if config.environment is not None:
+                if series is not None:
+                    risks = replay_risks(config, series, epoch_unix_ns + t)
+                    agents[a].observe(RiskForecast(t, *risks))
+                elif config.environment is not None:
                     dims = ("radiation", "navcomms", "orbital")
                     agents[a].observe(RiskForecast(t, *(risk_ratio(config, a, d, t) for d in dims)))
                 if sensor is not None and t > 0 and t % check_ns == 0:  # H-C onboard detector
@@ -370,6 +404,19 @@ def run_nominal_operations(
             cmd = None if down else agents[a].payload_command(t, step_ns, mb_per_step)
             if cmd is not None and agents[a].mode not in SCIENCE_MODES:  # truth check (Gate P3)
                 protection_violations[a] += 1
+            if series is not None and rp is not None and not down:  # S11 truth (DL-069)
+                flux = series.truth(epoch_unix_ns + t)
+                if flux is None:
+                    storm["no_truth_s"][a] += step_s
+                else:
+                    hazard = flux >= rp.radiation_tolerance_pfu
+                    protected = agents[a].mode in (PROTECTIVE, RECOVERY)
+                    if hazard:
+                        storm["hazard_s"][a] += step_s
+                        storm["exposed_s"][a] += step_s if cmd is not None else 0.0
+                        storm["protected_in_hazard_s"][a] += step_s if protected else 0.0
+                    elif protected:
+                        storm["protected_outside_hazard_s"][a] += step_s
             if a in active and active[a].task_id != cmd:
                 close(a, k)
             if cmd is not None and a not in active:
@@ -474,6 +521,9 @@ def run_nominal_operations(
         },
         "health": health,
         "protection": _protection_summary(agents, ids, spec.duration_ns, protection_violations),
+        **({"storm": {"forecast": rp.forecast,
+                      "radiation_tolerance_pfu": rp.radiation_tolerance_pfu, **storm}}
+           if rp is not None else {}),
         "network": kernel.network_summary(),
         **kernel.agents_summary(),
     })  # fmt: skip

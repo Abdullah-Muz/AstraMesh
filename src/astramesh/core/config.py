@@ -100,6 +100,9 @@ class _ScenarioBase(_Model):
         ag = d.get("agents")
         if isinstance(ag, dict) and ag.get("health") is None:
             ag.pop("health", None)
+        env = d.get("environment")
+        if isinstance(env, dict) and env.get("replay") is None:
+            env.pop("replay", None)  # DL-069
         return d
 
     def config_hash(self) -> str:
@@ -483,13 +486,48 @@ class ForecastConfig(_Model):
         return self
 
 
+class StormReplayConfig(_Model):
+    """Real-data storm replay (S11, DL-069): every spacecraft's radiation, orbital and
+    nav/comms inputs come from the pinned May 2024 series instead of scheduled intervals.
+    The tolerances are synthetic modelled limits (ratio 1.0 = at the limit)."""
+
+    series_file: str = Field(
+        default="configs/data/s11_storm_series.json", description="Repo-relative series file"
+    )
+    series_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    forecast: Literal["P-A", "P-B/q50", "P-C/q50", "P-B/q90", "P-C/q90"] = Field(
+        description="Radiation input: P-A latest measurement, P-B/P-C 1 h forecasts"
+    )
+    radiation_tolerance_pfu: float = Field(
+        default=100.0, gt=0.0, allow_inf_nan=False,
+        description="GOES >= 10 MeV flux at the payload's modelled tolerance (GEO upper bound)",
+    )  # fmt: skip
+    orbital_tolerance_nt: float = Field(
+        default=250.0, gt=0.0, allow_inf_nan=False,
+        description="-SYM-H at which the orbital-disturbance ratio is 1.0",
+    )  # fmt: skip
+    navcomms_tolerance_nt: float = Field(
+        default=2000.0, gt=0.0, allow_inf_nan=False,
+        description="AE at which the nav/comms ratio is 1.0",
+    )  # fmt: skip
+
+
 class EnvironmentConfig(_Model):
-    """Synthetic environmental hazard forecasts (real data is Phase 4)."""
+    """Environmental hazard inputs: synthetic scheduled forecasts, or a real-data replay."""
 
     background_exposure_ratio: float = Field(
         ge=0.0, allow_inf_nan=False, description="Exposure ratio outside scheduled intervals"
     )
     forecasts: list[ForecastConfig] = Field(default_factory=list)
+    replay: StormReplayConfig | None = Field(
+        default=None, description="Real-data storm replay (S11); excludes scheduled forecasts"
+    )
+
+    @model_validator(mode="after")
+    def _one_source(self) -> EnvironmentConfig:
+        if self.replay is not None and self.forecasts:
+            raise ValueError("environment.replay and environment.forecasts are exclusive")
+        return self
 
 
 class SupervisorConfig(_Model):

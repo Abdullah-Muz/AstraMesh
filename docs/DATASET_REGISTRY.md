@@ -156,6 +156,7 @@ intended_experiment: "Phase 4 increment 4: proton environment for the S11 radiat
 caveats: "This product has no >10 MeV integral channel; a >=10 MeV flux must be integrated from the differential channels (method to be decided in increment 4). A 2025 NOAA/CIRES presentation reports a 2024 problem with SWPC proton integral fluxes; it concerns a different product but is recorded here. Temperature-corrected and observed fluxes are both provided."
 leakage_risks: "Same rule as DS-06"
 domain_transfer_caveats: "Geostationary orbit, not the AstraMesh LEO orbit: geomagnetic shielding differs, so GOES flux is an upper-bound proxy, not the dose at AstraMesh"
+derived_files: "configs/data/s11_storm_series.json (DL-069): the >= 10 MeV flux of each 5-min record, five 1 h forecasts of its maximum, and OMNI SYM-H and AE (DS-06) on the same grid, 8-15 May 2024; 2 304 rows, about 130 kB. Committed so CI and the simulation run without the raw data; regenerate with scripts/data/make_storm_series.py. Attribution as for DS-06 and DS-07."
 ```
 
 ### DS-08 — GOES-18 SEISS/SGPS L2 5-min averages (Jan 2023 – Apr 2024; forecast training)
