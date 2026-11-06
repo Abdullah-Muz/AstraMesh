@@ -77,7 +77,7 @@ def score(split: str, fold: str, h: int, q: float, y: Any, preds: dict[str, Any]
                              "pinball": round(pinball(y, p, q), 6),
                              "coverage": round(coverage(y, p), 6)}  # fmt: skip
         for thr in THRESHOLDS_PFU:
-            w = warnings(y, p, level, math.log10(thr))
+            w = warnings(y, p, level, math.log10(thr), horizon_steps=h // 300)
             tag = f"{int(thr)}pfu"
             r.update({f"pod_{tag}": round(w.pod, 6) if w.hits + w.misses else "",
                       f"far_{tag}": round(w.far, 6) if w.hits + w.false_alarms else "",

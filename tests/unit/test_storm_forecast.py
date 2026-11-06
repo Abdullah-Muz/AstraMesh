@@ -110,10 +110,22 @@ def test_warnings_count_onsets_and_lead_time() -> None:
     y[40:58] = 2.5
     pred = np.full(n, 0.0)
     pred[42:60] = 2.5  # first warning issued with record 42 = 40 min before record 50 starts
-    w = warnings(y, pred, level, 2.0)
+    w = warnings(y, pred, level, 2.0, horizon_steps=12)
     assert (w.onsets, w.onsets_warned) == (1, 1)
     assert w.lead_s == ((50 - 42 - LAG_STEPS) * 300.0,)
     assert (w.hits, w.misses, w.false_alarms) == (16, 2, 2)
     assert w.pod == pytest.approx(16 / 18)
-    late = warnings(y, np.where(np.arange(n) >= 49, 2.5, 0.0), level, 2.0)
+    late = warnings(y, np.where(np.arange(n) >= 49, 2.5, 0.0), level, 2.0, horizon_steps=12)
     assert late.onsets_warned == 0  # a warning issued after the record starts is no warning
+    early = warnings(y, np.where(np.arange(n) >= 30, 2.5, 0.0), level, 2.0, horizon_steps=12)
+    assert early.lead_s == (12 * 300.0,)  # credited only from one horizon before the onset
+
+
+def test_an_earlier_episode_is_not_a_warning_of_the_next() -> None:
+    level = np.zeros(100)
+    level[20:30] = 2.5
+    level[45:50] = 2.5  # second onset at 45 after 15 records below
+    persistence = level.copy()  # P-A: forecast = latest measurement
+    w = warnings(level, persistence, level, 2.0, horizon_steps=36)
+    assert w.onsets == 2
+    assert w.onsets_warned == 0  # persistence can never warn ahead of an onset

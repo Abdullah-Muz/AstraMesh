@@ -133,13 +133,14 @@ class Warnings:
 
 
 def warnings(y: FloatArray, pred: FloatArray, log_level: FloatArray, threshold_log: float,
-             step_s: float = 300.0, latency_steps: int = 2,
-             lookback_steps: int = 36) -> Warnings:  # fmt: skip
+             horizon_steps: int, step_s: float = 300.0,
+             latency_steps: int = 2) -> Warnings:  # fmt: skip
     """Row-wise contingency table for "the next-horizon maximum reaches the threshold",
     plus event onsets: a record at or above the threshold after at least 1 h below it.
-    An onset at record k is warned if some forecast issued in the 3 h before the record
-    starts (rows k - latency - lookback .. k - latency) reaches the threshold; the lead
-    time counts from the first such issue time to the start of record k."""
+    An onset at record k is warned if a forecast reaching the threshold was issued no
+    earlier than one horizon before the record starts and after the last record above
+    the threshold (so an earlier episode cannot count as a warning of the next); the lead
+    time runs from the first such issue time to the start of record k (DL-070)."""
     ok = np.isfinite(y) & np.isfinite(pred)
     event, warn = y >= threshold_log, pred >= threshold_log
     hits = int(np.sum(ok & event & warn))
@@ -152,7 +153,9 @@ def warnings(y: FloatArray, pred: FloatArray, log_level: FloatArray, threshold_l
     for k in range(12, len(above)):
         if above[k] and not above[k - 12 : k].any():
             onsets += 1
-            lo, hi = max(k - latency_steps - lookback_steps, 0), k - latency_steps
+            before = np.flatnonzero(above[:k])
+            lo = max(k - latency_steps - horizon_steps, int(before[-1]) + 1 if len(before) else 0)
+            hi = k - latency_steps
             w = np.flatnonzero(np.nan_to_num(pred[lo : hi + 1], nan=-np.inf) >= threshold_log)
             if len(w):
                 leads.append((k - (lo + w[0]) - latency_steps) * step_s)
