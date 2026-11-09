@@ -1,0 +1,58 @@
+{
+  "experiment": "Phase 4 proton forecast skill P-A/P-B/P-C (DL-069)",
+  "git_commit": "00372d986212e592d29be8c8d510f6d270037b93",
+  "git_dirty": false,
+  "lockfile_sha256": "7d11198b9e4f049aa22603e8ef79af7121171c998d57733892e2a66b54d6b1d4",
+  "train": "DS-08 + DS-09 (2023-01-01 .. 2024-04-30)",
+  "test": "DS-07 + DS-06 (2024-05-08 .. 2024-05-15)",
+  "features": [
+    "log_flux",
+    "d5",
+    "d15",
+    "d30",
+    "d60",
+    "d180",
+    "max3h",
+    "max24h",
+    "hardness",
+    "sym_h",
+    "sym_h_min3h",
+    "ae",
+    "ae_max3h",
+    "bz"
+  ],
+  "latency_s": 600,
+  "horizons_s": [
+    1800,
+    3600,
+    10800
+  ],
+  "quantiles": [
+    0.5,
+    0.9
+  ],
+  "thresholds_pfu": [
+    50.0,
+    100.0,
+    200.0
+  ],
+  "fold_starts": [
+    "2023-07-01",
+    "2023-10-01",
+    "2024-01-01",
+    "2024-04-01",
+    "2024-05-01"
+  ],
+  "pc_settings": {
+    "max_iter": 300,
+    "learning_rate": 0.05,
+    "max_leaf_nodes": 31,
+    "min_samples_leaf": 50,
+    "l2_regularization": 1.0,
+    "early_stopping": false,
+    "random_state": 0
+  },
+  "storm_rows": 2304,
+  "train_rows": 139968,
+  "total_wall_s": 225.6
+}

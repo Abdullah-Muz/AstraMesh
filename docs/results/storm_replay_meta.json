@@ -1,0 +1,91 @@
+{
+  "experiment": "Phase 4 S11 storm replay, protection P-A/P-B/P-C (DL-069)",
+  "git_commit": "fc27fa3bb2cd3cb02606a9437062414400c2c036",
+  "git_dirty": false,
+  "lockfile_sha256": "7d11198b9e4f049aa22603e8ef79af7121171c998d57733892e2a66b54d6b1d4",
+  "series_file": "configs/data/s11_storm_series.json",
+  "series_sha256": "0a85ddd42028b8d5718da13fa349f6685d3a7bbdd1255475708cc40661c021d4",
+  "epoch_utc": "2024-05-08T00:10:00Z",
+  "duration_s": 690600,
+  "variants": [
+    [
+      "QUIET",
+      null,
+      null
+    ],
+    [
+      "P-A",
+      "P-A",
+      100.0
+    ],
+    [
+      "P-B",
+      "P-B/q50",
+      100.0
+    ],
+    [
+      "P-C",
+      "P-C/q50",
+      100.0
+    ],
+    [
+      "P-B/q90",
+      "P-B/q90",
+      100.0
+    ],
+    [
+      "P-C/q90",
+      "P-C/q90",
+      100.0
+    ],
+    [
+      "P-A/tol50",
+      "P-A",
+      50.0
+    ],
+    [
+      "P-B/tol50",
+      "P-B/q50",
+      50.0
+    ],
+    [
+      "P-C/tol50",
+      "P-C/q50",
+      50.0
+    ],
+    [
+      "P-A/tol200",
+      "P-A",
+      200.0
+    ],
+    [
+      "P-B/tol200",
+      "P-B/q50",
+      200.0
+    ],
+    [
+      "P-C/tol200",
+      "P-C/q50",
+      200.0
+    ]
+  ],
+  "planners": [
+    "cbba_b3_timeout",
+    "rule_b4"
+  ],
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "n_runs": 240,
+  "workers": 6,
+  "total_wall_s": 64175.3
+}

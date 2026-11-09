@@ -67,15 +67,15 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 1 | Data registry and pinned fetch: OPS-SAT-AD, OMNI 1-min and GOES-18 SGPS for May 2024; ESA-ADB sized only | Implemented (DL-063) |
 | 2 | Anomaly-detection benchmark on OPS-SAT-AD, independent of the simulation; official and time-ordered splits | **Done**: code `c557c6b` (DL-064), results `f0760f8` in [`docs/results/OPSSAT_BENCHMARK.md`](results/OPSSAT_BENCHMARK.md) (DL-065); approved 2026-11-05 |
 | 3 | Calibrated probabilistic health model; adapter from detector scores to simulated beliefs; comparison with the timeout on S01/S03/S04 | **Done**: code `42c24a9` (DL-066), results `7f01b8e` in [`docs/results/HEALTH_COMPARISON.md`](results/HEALTH_COMPARISON.md) (DL-067); approved 2026-11-05 |
-| 4 | May 2024 storm replay (OMNI, GOES protons) as S11, no future-data leakage; bounded COSMIC-2/GloTEC context | In progress: design approved (DL-068); training data and loaders `a1e839c`; forecasts, skill benchmark and S11 replay implemented (DL-069); results pending a run from the committed code |
+| 4 | May 2024 storm replay (OMNI, GOES protons) as S11, no future-data leakage; bounded COSMIC-2/GloTEC context | **Results recorded, awaiting review**: design approved (DL-068); training data and loaders `a1e839c`; forecasts and S11 replay `fc27fa3` (DL-069); metric fix `00372d9` (DL-070); results in [`docs/results/STORM_FORECAST.md`](results/STORM_FORECAST.md) and [`docs/results/STORM_REPLAY.md`](results/STORM_REPLAY.md) (DL-071). COSMIC-2/GloTEC context not fetched: proposed to leave out (DL-071, owner decision) |
 | 5 | Gate P4 comparison write-up | Not started |
 
 ## Gate P4 checklist (spec §13)
 
-- [ ] Data licences/provenance and train/test partitions documented (increment 1: licences, hashes and measured facts in `DATASET_REGISTRY.md`; increment 2: OPS-SAT-AD official and time splits, per-channel counts and CV folds in the DS-02 record; storm-data partitions in increment 4)
+- [ ] Data licences/provenance and train/test partitions documented (increment 1: licences, hashes and measured facts in `DATASET_REGISTRY.md`; increment 2: OPS-SAT-AD official and time splits, per-channel counts and CV folds in the DS-02 record; increment 4: DS-08/DS-09 training-only, forward-chaining folds, May 2024 held out, in the DS-06 – DS-09 records and `STORM_FORECAST.md`)
 - [ ] Anomaly results independently benchmarked (increment 2: real OPS-SAT telemetry, independent of the simulation, reproduces the published results; official and time splits; DL-065)
-- [ ] Synthetic-vs-real interface explicit (increment 3: the pinned score-sensor file is the only link from OPS-SAT data to the simulation; real and synthetic parts and the untested assumptions are listed in `HEALTH_COMPARISON.md`; the storm-data interface comes in increment 4)
-- [ ] Preliminary health/forecast comparisons complete with uncertainty (increment 3: H-A/H-B/H-C health comparison with 95 % t-intervals, n = 10, DL-067; the forecast comparison comes in increment 4)
+- [ ] Synthetic-vs-real interface explicit (increment 3: the pinned score-sensor file is the only link from OPS-SAT data to the simulation; real and synthetic parts and the untested assumptions are listed in `HEALTH_COMPARISON.md`; increment 4: the pinned S11 series file is the only link from the storm data, listed in `STORM_REPLAY.md`)
+- [ ] Preliminary health/forecast comparisons complete with uncertainty (increment 3: H-A/H-B/H-C health comparison with 95 % t-intervals, n = 10, DL-067; increment 4: forecast skill on chronological folds and the held-out storm week, and the S11 P-A/P-B/P-C comparison, DL-071. The S11 runs are deterministic apart from message loss, which did not matter, so the uncertainty is stated as one storm plus sensitivity variants, not as intervals)
 
 ## Gate P3 checklist (spec §13)
 
