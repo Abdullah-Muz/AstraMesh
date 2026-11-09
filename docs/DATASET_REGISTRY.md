@@ -16,9 +16,9 @@
 |---|---|---|---|---|
 | DS-01 | ESA Anomaly Dataset (ESA-ADB) | CC BY 3.0 IGO per the `LICENSE` file in `github.com/esa/anomaly-dataset`; Zenodo record 12528696 carries **no** license field — **confirm the license applies to the data files** | No — sized only (DL-062: 11.6 GB compressed, more than the 14 GB RAM available in WSL once unpacked) | 4 |
 | DS-02 | ESA OPS-SAT-AD | CC BY 4.0 (Zenodo metadata) **and** MIT (the record's `LICENSE` file, © 2024 KP Labs); both permit use and require attribution — we meet both | **Yes** (19.5 MB, pinned 2026-11-04) | 4 |
-| DS-03 | NOAA GloTEC | UNVERIFIED | No | 4 |
+| DS-03 | NOAA GloTEC | UNVERIFIED | No | Left out of Phase 4 (DL-071) |
 | DS-04 | CelesTrak GP / OMM | UNVERIFIED | No | 1+ |
-| DS-05 | UCAR COSMIC-2 | UNVERIFIED (check data-use / citation policy) | No | 4 |
+| DS-05 | UCAR COSMIC-2 | UNVERIFIED (check data-use / citation policy) | No | Left out of Phase 4 (DL-071) |
 | DS-06 | NASA OMNI / SPDF | No restrictions stated; citation (DOI) and acknowledgement requested | **Yes** (May 2024 1-min, 13.4 MB, pinned 2026-11-04) | 4–5 |
 | DS-07 | NOAA NCEI GOES-18 SEISS/SGPS L2 | File metadata: "These data may be redistributed and used without restriction." | **Yes** (8–15 May 2024, 5-min, 5.0 MB, pinned 2026-11-04) | 4–5 |
 | DS-08 | NOAA NCEI GOES-18 SEISS/SGPS L2 (forecast training) | As DS-07 (same metadata statement in every file) | **Yes** (1 Jan 2023 – 30 Apr 2024, 5-min, 486 files, 293 MB, pinned 2026-11-05) | 4–5 |
@@ -208,7 +208,7 @@ leakage_risks: "As DS-08"
 
 ### DS-03, DS-04, DS-05
 
-Not yet started. Source URLs are listed in spec §8.1. Specific cautions recorded there:
+Not yet started. GloTEC and COSMIC-2 are left out of Phase 4 (DL-071, approved 2026-11-09): GloTEC cannot cover May 2024 and the COSMIC-2 licence is unverified. Source URLs are listed in spec §8.1. Specific cautions recorded there:
 
 - **GloTEC:** operational global product begins in 2025 (NCEI archive "2025-Feb to present"); it is an assimilated model product, not ground truth. Not usable as 2024 truth.
 - **CelesTrak GP:** general-perturbations elements are not exact inertial truth; prefer OMM over TLE-only. CelesTrak links its own usage policy; read it before any download.
