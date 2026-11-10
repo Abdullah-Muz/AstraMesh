@@ -485,4 +485,4 @@ Model: NRLMSIS 2.0 through `pymsis` 0.13 (academic, non-commercial licence), dri
 
 **Consequence for D1:** a quiet day in April 2024 (near solar maximum) decays 40.8 m per day under MSIS against 14.6 m under the USSA 1976 table, so the D1 drift study (DL-083) understates 2024 drift by a factor of about 3; with storm heating, more.
 
-Status: recorded; owner review pending.
+Status: recorded; approved by the owner 2026-11-10 (DL-085).

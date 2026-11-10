@@ -38,7 +38,7 @@ After 24 h the shifts are 0.17 km (±20 %), 0.42 km (×0.5) and 0.84 km (×2).
 
 ## Storm-time density (D2, NRLMSIS 2.0)
 
-> **Status:** recorded 2026-11-10 from clean commit `460ccaf` (`git_dirty: false`). Phase 5 increment 2 (DL-084, DL-085, DL-086). Awaiting owner review.
+> **Status:** recorded 2026-11-10 from clean commit `460ccaf` (`git_dirty: false`). Phase 5 increment 2 (DL-084, DL-085, DL-086). Approved 2026-11-10 (DL-086).
 
 - **Setup:** as above, but drag density from NRLMSIS 2.0 with DS-10 drivers (§B.10), over the S11 storm week: epoch 8 May 2024 00:10 UT, 690 600 s. Variants equal B and sc01 B ×0.8 / ×1.2, each at density scale 0.8, 1.0 and 1.25 (`density_scale_ratio`: the sensitivity to MSIS storm-time density error that DL-084 requires).
 - **Reproduce:** `uv run python scripts/experiments/drag_drift_study.py --msis --out <dir>` (about 18 min). Files: [`drag_drift_msis.csv`](drag_drift_msis.csv), [`drag_drift_msis_meta.json`](drag_drift_msis_meta.json).
