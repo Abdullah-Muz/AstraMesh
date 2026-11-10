@@ -1,6 +1,6 @@
 # Phase 4 comparison write-up (Gate P4)
 
-> **Status:** written 2026-11-10 from the recorded Phase 4 results; no new runs. Awaiting owner review (DL-075). Gate P4 sign-off is a separate decision. **Preliminary, not a research result:** every comparison that involves the simulation uses synthetic faults or a synthetic risk map, and the real data cover one mission and one storm. Phase 4 increment 5 (DL-062).
+> **Status:** written 2026-11-10 from the recorded Phase 4 results; no new runs. Approved 2026-11-10 (DL-075); Gate P4 signed off 2026-11-10 (DL-076). **Preliminary, not a research result:** every comparison that involves the simulation uses synthetic faults or a synthetic risk map, and the real data cover one mission and one storm. Phase 4 increment 5 (DL-062).
 
 This page checks the four Gate P4 criteria (spec §13) against the evidence, and sets the health and protection comparisons side by side. Every number here is quoted from the results files linked in each section; where a number is derived (for example, per spacecraft instead of summed), the derivation is stated.
 
