@@ -25,7 +25,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 5 | Deterministic clocks, random seeds, event logging, result manifests | Done |
 | 6 | Tiny deterministic scenario proving same-seed replay; basic CI | Done — replay verified on Windows, WSL2, and GitHub Actions |
 | 7 | First literature-matrix entries; initial physics-test design | Priority A metadata entered; physics test plan approved 2026-11-03 |
-| 8 | License/terms documentation for external data; no large downloads | Registry started; 2 of 7 licenses checked; nothing downloaded |
+| 8 | License/terms documentation for external data; no large downloads | Done in Phase 0 (registry started, no downloads); since Phase 4 every dataset used has verified terms (`DATASET_REGISTRY.md`) |
 
 ## Phase 1 increments
 
@@ -64,7 +64,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 
 | # | Increment | Status |
 |---|---|---|
-| 1 | Data registry and pinned fetch: OPS-SAT-AD, OMNI 1-min and GOES-18 SGPS for May 2024; ESA-ADB sized only | Implemented (DL-063) |
+| 1 | Data registry and pinned fetch: OPS-SAT-AD, OMNI 1-min and GOES-18 SGPS for May 2024; ESA-ADB sized only | **Done**: commit `5aa7e8b` (DL-062, DL-063); approved |
 | 2 | Anomaly-detection benchmark on OPS-SAT-AD, independent of the simulation; official and time-ordered splits | **Done**: code `c557c6b` (DL-064), results `f0760f8` in [`docs/results/OPSSAT_BENCHMARK.md`](results/OPSSAT_BENCHMARK.md) (DL-065); approved 2026-11-05 |
 | 3 | Calibrated probabilistic health model; adapter from detector scores to simulated beliefs; comparison with the timeout on S01/S03/S04 | **Done**: code `42c24a9` (DL-066), results `7f01b8e` in [`docs/results/HEALTH_COMPARISON.md`](results/HEALTH_COMPARISON.md) (DL-067); approved 2026-11-05 |
 | 4 | May 2024 storm replay (OMNI, GOES protons) as S11, no future-data leakage; bounded COSMIC-2/GloTEC context | **Done**: design DL-068; training data and loaders `a1e839c`; forecasts and S11 replay `fc27fa3` (DL-069); metric fix `00372d9` (DL-070); results `c8451ca` in [`docs/results/STORM_FORECAST.md`](results/STORM_FORECAST.md) and [`docs/results/STORM_REPLAY.md`](results/STORM_REPLAY.md) (DL-071); approved 2026-11-09. COSMIC-2/GloTEC context left out of Phase 4 (DL-071) |

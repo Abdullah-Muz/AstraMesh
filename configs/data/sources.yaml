@@ -12,7 +12,7 @@ datasets:
     name: "OPSSAT-AD: anomaly detection dataset for satellite telemetry"
     provider: "ESA OPS-SAT; dataset by B. Ruszczak et al. (Zenodo)"
     doi: "10.5281/zenodo.15108715"
-    license: "CC-BY-4.0"
+    license: "CC-BY-4.0 (Zenodo metadata) and MIT (LICENSE file in the record)"
     files:
       - name: segments.csv
         url: "https://zenodo.org/api/records/15108715/files/segments.csv/content"

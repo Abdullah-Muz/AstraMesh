@@ -89,7 +89,7 @@ AUC-ROC is used for the comparison because it does not depend on the anomaly rat
 
 Unsupervised rows for the official split, and the other unsupervised methods on the time split, are in the summary CSV. On the time split, robust z-score, Isolation Forest and LOF stay below the flag-everything F1 (0.501).
 
-- **The supervised models' probabilities are well calibrated on both splits:** ECE ≤ 0.05.
+- **The supervised models' probabilities are well calibrated on both splits:** ECE ≤ 0.05, except logistic regression on the time split (0.051).
 - **Thresholds chosen on training data do not adapt to the later period's anomaly rate.** On the time split, gradient boosting, random forest and XGBOD keep precision of at least 0.92 but miss 14–20 % of anomalies. In practice a deployed detector would need its threshold or prior re-estimated as the anomaly rate drifts.
 - **Calibration makes a weak detector's probabilities honest, not useful.** Robust z-score and Isolation Forest get low ECE on the official split (≤ 0.012) because isotonic regression maps their uninformative scores to roughly the base rate.
 - **MO-GAAL depends strongly on the seed.** On the time split, its five seeds give MCC from 0.20 to 0.68.

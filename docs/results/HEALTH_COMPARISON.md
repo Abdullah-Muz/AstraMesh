@@ -35,7 +35,7 @@
   - *Detection latency* is the slowest observer's time from the fault start to a LOST belief.
 - **Payload metrics:** summed over the four spacecraft.
   - *Payload detection latency* runs from the fault start to the first DEGRADED belief. It is 0 if a false alarm was already active at the fault start.
-- **Intervals:** 95 % t-intervals, n = 10. A single number means every seed gave the same value.
+- **Intervals:** 95 % t-intervals, n = 10. A single number means every seed gave the same value. Intervals are not clipped to the possible range: with one outlying seed (S03, B3 + T) they extend below 0 or above 1.
 - **Consistency check:** every H-A run (80) reproduces the corresponding run of the recorded fault comparison exactly: utility, completions, duplicates and messages. Making the timeout explicit changes nothing.
 - **Reproduce:** `uv run python scripts/experiments/health_comparison.py`. It takes about 38 min on 6 workers.
   - The recorded run wrote its outputs outside the repository, and the files were then copied in.
@@ -73,7 +73,7 @@
 | S00 | B4 | 1.000 / 1.000 / 1.000 | 0 / 0 / 0 | – | 0 |
 | S01 (loss) | B3 + T | 1.000 / 1.000 / 1.000 | 0 / 0 / 0 | loss: 300 / 108 [97, 119] / 108 [97, 119] | 0 |
 | S01 (loss) | B4 | 1.000 / 1.000 / 1.000 | 0 / 0 / 0 | loss: 296 [292, 300] / 104 [94, 114] / 104 [94, 114] | 0 |
-| S03 (payload) | B3 + T | 0.951 [0.841, 1.061] / same / **1.000** | 2.1 [0, 6.9] / same / **0** | payload: never / never / **733 [544, 922]** | 0 |
+| S03 (payload) | B3 + T | 0.951 [0.841, 1.061] / same / **1.000** | 2.1 [−2.7, 6.9] / same / **0** | payload: never / never / **733 [544, 922]** | 0 |
 | S03 (payload) | B4 | 0.876 [0.864, 0.889] / same / **1.000** | 5.4 [4.9, 5.9] / same / **0** | payload: never / never / **733 [544, 922]** | 0 |
 | S04 (radio off) | B3 + T | 1.000 / 1.000 / 1.000 | 0 / 0 / 0 | – | 6.1 [4.1, 8.1] |
 | S04 (radio off) | B4 | 1.000 / 1.000 / 1.000 | 0 / 0 / 0 | – | 33.1 [31.3, 34.9] |
@@ -89,7 +89,7 @@ Safety invariants held in all 440 runs: 0 payload steps in protected modes and 0
 | H-B/mtbf300d | prior mean time to unavailability 300 days | 0 | 120 / 116 | – | – | – |
 | H-C | (reference) | 0 | – | 733 [544, 922] | 1.000 / 1.000 | 1 423 [1 003, 1 843] |
 | H-C/official | sensor from the official split (training rate 20.1 %) | 0 | – | 583 [461, 705] | 1.000 / 1.000 | 913 [730, 1 096] |
-| H-C/shift05 | 5 % of healthy checks drawn from anomalous scores | 4 650 s [2 401, 6 899] payload false-degraded per day (600–9 300) | – | 665 [363, 966] | 0.997 [0.991, 1.004] / 1.000 | 5 045 [3 229, 6 861] |
+| H-C/shift05 | 5 % of healthy checks drawn from anomalous scores | 4 650 s [2 401, 6 899] payload false-degraded per day (600–9 300) | – | 665 [363, 967] | 0.997 [0.991, 1.004] / 1.000 | 5 045 [3 229, 6 861] |
 
 ## Findings
 

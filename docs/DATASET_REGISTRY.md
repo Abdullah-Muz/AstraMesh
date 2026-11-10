@@ -1,6 +1,6 @@
 # Dataset Registry
 
-> **Owner:** Abdullah Muzher · **Status:** Phase 4: five bounded datasets downloaded and pinned (DS-02, DS-06, DS-07; forecast training data DS-08, DS-09) · **Spec:** §8 · **Last updated:** 2026-11-05
+> **Owner:** Abdullah Muzher · **Status:** Phase 4: five bounded datasets downloaded and pinned (DS-02, DS-06, DS-07; forecast training data DS-08, DS-09); GloTEC and COSMIC-2 left out of Phase 4 (DL-071) · **Spec:** §8 · **Last updated:** 2026-11-09
 
 ## Rules (spec §8.2)
 
@@ -74,6 +74,8 @@ domain_transfer_caveats: "Separate real missions; not AstraMesh's four fictional
 ### DS-02 — ESA OPS-SAT-AD
 
 ```yaml
+# Recorded before download (2026-11-03); the measured record below supersedes
+# retrieved_utc, license_terms and license_verified_utc.
 id: DS-02
 name: "OPSSAT-AD - anomaly detection dataset for satellite telemetry"
 owner_provider: ESA OPS-SAT / dataset authors (see Zenodo record)
@@ -130,9 +132,15 @@ citation_required: "Papitashvili, N. E. and King, J. H. (2020), OMNI 1-min Data 
 sampling_interval: "1 min; 44 640 rows = 31 days x 1 440"
 units: "per the HRO format description (HROdocum.html); 46 whitespace-separated fields per row"
 time_conventions: "year, day of year, hour, minute (UT); time-shifted to the bow-shock nose"
+geospatial_conventions: "IMF Bz in GSM; solar-wind values at the bow-shock nose; AE and SYM/H are global geomagnetic indices (no position)"
 missingness_quality_flags: "fill values are runs of 9s (e.g. 9999.99, 99999.9), field-specific"
+event_labels: "none"
+expected_storage_gb: 0.013
+expected_ram_gb: "< 0.1 (four columns are kept)"
 intended_experiment: "Phase 4 increment 4: May 2024 storm environment replay (S11)"
+partitions: "Test only: the storm week 8-15 May 2024 is held out from all fitting, settings and feature choices (DL-068); training uses DS-09"
 leakage_risks: "A forecast at time t may use only rows with time <= t minus the stated data latency"
+domain_transfer_caveats: "Solar-wind values at the bow-shock nose and global geomagnetic indices: no position dependence. S11 applies them identically to all four spacecraft (DL-069), so they say nothing about differences in exposure between spacecraft"
 ```
 
 ### DS-07 — GOES-18 SEISS/SGPS L2 5-min averages (8–15 May 2024)
@@ -151,8 +159,14 @@ license_verified_utc: "2026-11-04"
 citation_required: "None specified ('references: TBD'); acknowledge NOAA NCEI and GOES-R SEISS"
 sampling_interval: "5 min (288 records per day); 2 sensor units (-X and +X look directions)"
 units: "differential proton flux protons/(cm^2 sr keV s) in 13 channels from 1 to 500 MeV; integral flux protons/(cm^2 sr s) for >500 MeV only"
+time_conventions: "seconds since 2000-01-01 12:00:00 UTC, start of each 5-min average (astramesh.datasets.goes checks the units string)"
+geospatial_conventions: "GOES-18 at geostationary orbit (137.2 deg W); two sensor units looking -X and +X; no position-dependent use (one GEO proxy, DL-068)"
 missingness_quality_flags: "per-average counts of valid 1-s samples and of dead-time, out-of-bounds and error DQFs; yaw-flip flag"
+event_labels: "none; hazard = derived >= 10 MeV flux at or above the payload tolerance (DL-068)"
+expected_storage_gb: 0.005
+expected_ram_gb: "< 0.1"
 intended_experiment: "Phase 4 increment 4: proton environment for the S11 radiation-risk replay"
+partitions: "Test only, as DS-06: never used for fitting or settings"
 caveats: "This product has no >10 MeV integral channel; a >=10 MeV flux must be integrated from the differential channels (method to be decided in increment 4). A 2025 NOAA/CIRES presentation reports a 2024 problem with SWPC proton integral fluxes; it concerns a different product but is recorded here. Temperature-corrected and observed fluxes are both provided."
 leakage_risks: "Same rule as DS-06"
 domain_transfer_caveats: "Geostationary orbit, not the AstraMesh LEO orbit: geomagnetic shielding differs, so GOES flux is an upper-bound proxy, not the dose at AstraMesh"
@@ -175,6 +189,11 @@ license_verified_utc: "2026-11-05"
 citation_required: "As DS-07"
 sampling_interval: "5 min; 139 968 records"
 units: "as DS-07"
+time_conventions: "as DS-07"
+geospatial_conventions: "as DS-07"
+event_labels: "as DS-07"
+expected_storage_gb: 0.29
+expected_ram_gb: "< 0.5 (files are read one at a time)"
 missingness_quality_flags: "as DS-07; 0.06 % of records have no valid >= 10 MeV flux under the DL-068 validity rule. v3-0-0 files write the time units without 'UTC' (same epoch; every stamp falls on the 5-min grid)"
 intended_experiment: "Phase 4 increment 4: training and calibration of the P-B and P-C radiation forecasts (DL-068). Never used to evaluate them"
 partitions: "Everything here is training data; chronological folds inside it for calibration. The test event is the May 2024 storm week (DS-07), which starts 8 days after this period ends"
@@ -200,10 +219,16 @@ license_verified_utc: "2026-11-05"
 citation_required: "As DS-06"
 sampling_interval: "1 min; 699 840 rows, contiguous"
 units: "as DS-06; columns used: Bz GSM, flow speed, AE, SYM/H (astramesh.datasets.omni)"
+time_conventions: "as DS-06"
+geospatial_conventions: "as DS-06"
 missingness_quality_flags: "AE and SYM/H complete; Bz GSM 10 % missing; flow speed 29 % missing"
+event_labels: "none"
+expected_storage_gb: 0.21
+expected_ram_gb: "< 0.5"
 intended_experiment: "Phase 4 increment 4: forecast features (DL-068)"
 partitions: "Training only, as DS-08"
 leakage_risks: "As DS-08"
+domain_transfer_caveats: "As DS-06"
 ```
 
 ### DS-03, DS-04, DS-05

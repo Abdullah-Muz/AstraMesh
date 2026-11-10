@@ -1,6 +1,6 @@
 # Proton forecasts P-A / P-B / P-C: skill on real data
 
-> **Status:** recorded 2026-11-05 from clean commit `00372d9` (`git_dirty: false`); awaiting owner review. Real data only, independent of the simulation. Phase 4 increment 4 (DL-068, DL-069, DL-070, DL-071). The protection comparison that uses these forecasts is in [`STORM_REPLAY.md`](STORM_REPLAY.md).
+> **Status:** recorded 2026-11-05 from clean commit `00372d9` (`git_dirty: false`); approved 2026-11-09 (DL-071). Real data only, independent of the simulation. Phase 4 increment 4 (DL-068, DL-069, DL-070, DL-071). The protection comparison that uses these forecasts is in [`STORM_REPLAY.md`](STORM_REPLAY.md).
 
 ## Setup (DL-068, DL-069)
 

@@ -1,11 +1,11 @@
 # S11: the May 2024 storm replay, protection P-A / P-B / P-C
 
-> **Status:** recorded 2026-11-06 from clean commit `fc27fa3` (`git_dirty: false`); awaiting owner review. The environment inputs are real data, but the risk map, payload tolerance and the identical exposure of all four spacecraft are assumptions (see "Synthetic-vs-real interface"). **Preliminary, not a research result.** Phase 4 increment 4 (DL-068, DL-069, DL-071). The forecast skill behind P-B and P-C is in [`STORM_FORECAST.md`](STORM_FORECAST.md).
+> **Status:** recorded 2026-11-06 from clean commit `fc27fa3` (`git_dirty: false`); approved 2026-11-09 (DL-071). The environment inputs are real data, but the risk map, payload tolerance and the identical exposure of all four spacecraft are assumptions (see "Synthetic-vs-real interface"). **Preliminary, not a research result.** Phase 4 increment 4 (DL-068, DL-069, DL-071). The forecast skill behind P-B and P-C is in [`STORM_FORECAST.md`](STORM_FORECAST.md).
 
 ## Setup (DL-068, DL-069)
 
 - **Question (spec §7.3):** given the same supervisor, does feeding it a forecast (P-B, P-C) instead of the latest measurement (P-A) reduce exposure to a defined radiation hazard, and what does it cost in science?
-- **Scenario S11:** the S00 base configuration (four spacecraft, 346 tasks), moved to 8 May 2024 00:10 UT and run to 16 May 00:00 (690 000 s). No faults.
+- **Scenario S11:** the S00 base configuration (four spacecraft, 346 tasks), moved to 8 May 2024 00:10 UT and run to 16 May 00:00 (690 600 s). No faults.
 - **Environment inputs** (from `configs/data/s11_storm_series.json`, sha256 pinned in every configuration), the same for all four spacecraft:
 
   | Supervisor input | Source | Ratio |
@@ -86,15 +86,15 @@ One B3 + timeout run (P-A/tol50, seed 7) had one duplicate observation; every ot
    - At 200 pfu the hazard is a single 5-min record. No median forecast reaches 200 pfu before it, so all three react late, and the forecasts add nothing.
    - What a payload can tolerate, which is synthetic here, decides most of the outcome.
 4. **The planner and message loss make no difference here.**
-   - B3 + timeout and B4 give identical results in every variant, and all seeds agree.
+   - B3 + timeout and B4 give identical results in every variant, and all seeds agree, except for one duplicate observation in one B3 + timeout run (P-A/tol50, seed 7).
    - All four spacecraft see the same inputs, so they enter PROTECTIVE together. A task whose slot falls in protection cannot move to a peer, because every peer is protected too. Every other task is completed under both planners.
    - A distributed mission can gain from forecasts only when the spacecraft see different risks (e.g. different positions in orbit). This replay cannot show that.
-5. **STORM_WATCH costs almost nothing.** Geomagnetic indices hold every spacecraft in STORM_WATCH for 42–51 h. At 200 pfu, where PROTECTIVE lasts about 1 h or less per spacecraft, retention is still 0.984–0.988.
+5. **STORM_WATCH costs almost nothing.** Geomagnetic indices hold every spacecraft in STORM_WATCH for 45–51 h at 200 pfu (36–51 h across all storm variants; time in PROTECTIVE is not counted as STORM_WATCH). At 200 pfu, where PROTECTIVE lasts about 1 h or less per spacecraft, retention is still 0.984–0.988.
 
 ## Limits
 
 - **One storm, one GEO proxy, common to all four spacecraft.** LEO flux is lower and depends on orbit position; with orbit-dependent inputs, both the hazard and the value of a forecast would differ between spacecraft. This is an upper-bound case.
-- **Exposure counts payload-on time only.** It depends on where the tasks fall: P-A's 2.67 h of unprotected hazard gave 60 s of exposure because the payload observes only a small fraction of the time. Unprotected hazard is the more robust measure. No damage model links exposure to lost science (DL-069, awaiting review).
+- **Exposure counts payload-on time only.** It depends on where the tasks fall: P-A's 2.67 h of unprotected hazard gave 60 s of exposure because the payload observes only a small fraction of the time. Unprotected hazard is the more robust measure. No damage model links exposure to lost science (DL-069, approved 2026-11-09).
 - **The cost side counts only tasks.** Utility does not charge for STORM_WATCH or the longer status traffic in it.
 - **No intervals.** The runs are deterministic apart from message loss, which did not matter (finding 4), so n = 10 seeds adds no information here. The uncertainty is in the one storm and the assumptions, not in the seeds.
-- **CBBA run time grows with run length.** B3 messages carry every claim made so far, including tasks finished days earlier; this is faithful to the published algorithm, which never prunes. Per-message cost grows through the run, so an 8-day run takes about 20 min against 46 s for 1 day. Message size only feeds the byte counter in this simulator, so no result is affected. Follow-up in the roadmap.
+- **CBBA run time grows with run length.** B3 messages carry every claim made so far, including tasks finished days earlier; this is faithful to the published algorithm, which never prunes. Per-message cost grows through the run, so an 8-day run takes about 20 min against 46 s for 1 day. Message size only feeds the byte counter in this simulator, so no result is affected. A faster encoding with identical behaviour is a later performance item (DL-071 (b)).

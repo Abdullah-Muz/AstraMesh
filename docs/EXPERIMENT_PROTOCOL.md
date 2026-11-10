@@ -1,6 +1,6 @@
 # Experiment Protocol
 
-> **Owner:** Abdullah Muzher · **Status:** PARTIAL — run artifacts implemented; statistical protocol not started · **Spec:** §10 · **Last updated:** 2026-11-03
+> **Owner:** Abdullah Muzher · **Status:** ACTIVE — run artifacts implemented; statistical design written 2026-11-09 (§3, DL-072) · **Spec:** §10 · **Last updated:** 2026-11-09
 
 ## 1. Run artifacts — IMPLEMENTED (Phase 0)
 
@@ -42,6 +42,67 @@ Diagnostic figures: `uv run astramesh plot <run_dir>` writes PNGs to `<run_dir>/
 - `tests/regression/test_nominal_ops_baseline.py`: pinned digests of the 24 h S00 nominal-operations baselines with B0, B1, B2 and B3 (events, plan, observations, summary, messages). B0's and B1's message traces must equal the agent-network baseline's; B2's and B3's executed observations must equal B1's.
 - `tests/regression/test_mission_geometry_baseline.py`: pinned digests of the 24 h mission-geometry baseline's events, `opportunities.json` and `summary.json` (resource accounting); its trajectory must equal the formation baseline's. The same scope applies (DL-029, DL-034).
 
-## 3. Scenarios, metrics, statistical design — NOT STARTED
+## 3. Scenarios, metrics, statistical design — WRITTEN 2026-11-09 (DL-072)
 
-To be written before any comparative experiment (spec §10.1–§10.3), including: frozen reference scenarios S00–S11, paired-run design, per-stream seeds, sample counts, confidence intervals, ablations, and rules for reporting negative results and solver failures.
+**Written late.** Spec §10.3 asks for this section before any comparative experiment. It was not written then. Instead, each comparison fixed its design in its own decision entry before it was run: S00 (DL-047), faults (DL-058), OPS-SAT-AD (DL-064), health (DL-066), forecasts and S11 (DL-068, DL-069). This section records the rules those entries followed, so they can be checked in one place. It binds every later experiment.
+
+### 3.1 Scenarios
+
+- **Reference scenarios** are those of spec §10.1. S00 is the 24 h nominal base configuration (`configs/experiments/nominal_ops_*`). Fault scenarios live in `configs/experiments/faults/` or are built by the comparison scripts from the S00 base. S11 is the 8–15 May 2024 storm week (DL-069). S06 is deferred (DL-061).
+- **Frozen:** each result's meta file records the config hash of every run. Changing a reference scenario after a result has been recorded needs a decision entry, and the affected results must be re-run.
+- **Real-data test sets:** the OPS-SAT-AD official test split and per-channel time split (DL-064), and the May 2024 storm week (DL-068). Each is used once, after every setting is fixed. No setting is chosen by looking at a test result.
+
+### 3.2 Pairing and random streams
+
+- **Five independent streams:** `tasks`, `comms`, `sensors`, `faults` and `algorithm` (`astramesh.core.rng`). Each is seeded from the run seed and the stream name, so adding a stream or changing the order of use leaves the others unchanged.
+- **Paired runs:** within one comparison, every method runs on the same configuration and the same seeds, and only the method under test differs. It sees the same tasks, faults and message-loss draws.
+- **Seeds:** simulation comparisons use seeds 1–10. Stochastic real-data methods use seeds 0–4 (OPS-SAT-AD).
+
+### 3.3 Sample counts and intervals
+
+Every table states its *n*. All intervals are at 95 %.
+
+| Kind of result | Interval |
+|---|---|
+| Simulation comparison, n = 10 seeds | Student-t interval of the mean (n − 1 degrees of freedom). Not clipped to the possible range. A single number means every seed agreed. |
+| Simulation runs that are deterministic apart from a stream that turns out not to matter (S11) | No interval; one value, and that is stated. The uncertainty is described through sensitivity variants instead. |
+| Real-data benchmark with one fixed test set (OPS-SAT-AD) | Mean ± sd over seeds for stochastic methods. No interval over the test set (a limitation, carried forward). |
+| Forecast skill on time series (pinball, coverage, POD, false-alarm ratio) | Paired percentile bootstrap over UTC days, 2 000 resamples, fixed seed (`astramesh.forecast.uncertainty`). Differences between models are resampled on the same days. |
+| Counts of rare events (onsets warned) | Clopper-Pearson exact interval for the fraction. |
+
+- **Comparing methods:** where the runs are paired, the difference is the quantity of interest. Overlapping marginal intervals are not read as "no difference" without a paired check.
+- **Small samples are named as such:** for example, 4 storm-week onsets, or one storm.
+
+### 3.4 Metrics
+
+- **Primary** (spec §10.2): raw science utility and retention relative to the healthy reference.
+- **Safety, in parallel:** a higher utility that breaks a safety invariant is never reported as better.
+  - Since Phase 3, every comparison checks two invariants in every run: no payload steps in protected modes, and no confirmed-failed belief about a spacecraft that is available.
+  - Separation and collision constraints are added when maneuvers exist (Phase 5).
+- **Secondary**, per experiment, as defined in its decision entry: duplicates, invalid observations, detection latency, messages and bytes, protected time inside and outside the hazard, exposure, and calibration (ECE, Brier, coverage).
+- **Truth metrics** use simulation or measured truth. They are never visible to the agents.
+
+### 3.5 Freezing, tuning and leakage
+
+- Model and method settings are fixed in a decision entry before the evaluation. Settings are not searched on test data.
+- Time-series data are split in time order. Training rows must have their whole target window before the test block starts (forward chaining).
+- A gap between a random split and a time-ordered split is reported as a possible leakage effect (DL-062).
+
+### 3.6 Reporting
+
+- Results are recorded only from a clean commit (`git_dirty: false`). The meta file records the commit, lockfile hash, config hashes and data versions.
+- **Negative results are reported:** for example, methods below the flag-everything F1, P-C's failure beyond its training range, and B3's tie-breaking loss on S03.
+- Computational failures and solver timeouts are recorded explicitly.
+- Corrections to recorded results get a new decision entry and a re-run (DL-059, DL-070), not a silent edit.
+- Previews from a dirty tree may be quoted in a decision entry, labelled as previews.
+
+### 3.7 Ablations
+
+Spec §10.3 asks for ablations of components "when those components exist".
+
+- **Done in Phase 4:**
+  - The health comparison H-A / H-B / H-C ablates health uncertainty and the detector.
+  - The forecast comparison P-A / P-B / P-C ablates forecasting.
+- **Later phases:**
+  - Ablations of protective hysteresis, plan reconciliation and maneuver feasibility belong to Phases 5–6, where those components are combined.
+  - Fleet size stays at 4 (spec §10.3).
