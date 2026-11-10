@@ -1,6 +1,6 @@
 # Roadmap and Gate Tracking
 
-> **Owner:** Abdullah Muzher · **Status:** ACTIVE · **Spec:** §13, §14, §17 · **Last updated:** 2026-11-09
+> **Owner:** Abdullah Muzher · **Status:** ACTIVE · **Spec:** §13, §14, §17 · **Last updated:** 2026-11-10
 
 Phase definitions and exit gates are defined in spec §13; this file tracks status only.
 
@@ -68,7 +68,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 2 | Anomaly-detection benchmark on OPS-SAT-AD, independent of the simulation; official and time-ordered splits | **Done**: code `c557c6b` (DL-064), results `f0760f8` in [`docs/results/OPSSAT_BENCHMARK.md`](results/OPSSAT_BENCHMARK.md) (DL-065); approved 2026-11-05 |
 | 3 | Calibrated probabilistic health model; adapter from detector scores to simulated beliefs; comparison with the timeout on S01/S03/S04 | **Done**: code `42c24a9` (DL-066), results `7f01b8e` in [`docs/results/HEALTH_COMPARISON.md`](results/HEALTH_COMPARISON.md) (DL-067); approved 2026-11-05 |
 | 4 | May 2024 storm replay (OMNI, GOES protons) as S11, no future-data leakage; bounded COSMIC-2/GloTEC context | **Done**: design DL-068; training data and loaders `a1e839c`; forecasts and S11 replay `fc27fa3` (DL-069); metric fix `00372d9` (DL-070); results `c8451ca` in [`docs/results/STORM_FORECAST.md`](results/STORM_FORECAST.md) and [`docs/results/STORM_REPLAY.md`](results/STORM_REPLAY.md) (DL-071); approved 2026-11-09. COSMIC-2/GloTEC context left out of Phase 4 (DL-071) |
-| 5 | Gate P4 comparison write-up | Not started |
+| 5 | Gate P4 comparison write-up | **Written, awaiting review**: [`docs/results/GATE_P4.md`](results/GATE_P4.md) (DL-075); no new runs |
 
 ## Gate P4 checklist (spec §13)
 
