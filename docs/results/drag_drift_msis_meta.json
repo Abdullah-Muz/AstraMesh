@@ -1,0 +1,48 @@
+{
+  "experiment": "Formation drift under nominal drag (DL-080, DL-081)",
+  "git_commit": "460ccaf155760ab1b6ead12a0a647be528287a64",
+  "git_dirty": false,
+  "lockfile_sha256": "cb23cc16440fa7f6e63a8d8b4c90ff80a418b91b421e6a9147e78fe10b1e84b4",
+  "base_config": "configs/experiments/formation_24h_j2.yaml",
+  "ballistic_nominal_m2pkg": 0.0092,
+  "variants": {
+    "equal_B": [
+      0.0092
+    ],
+    "sc01_B_x0.8": [
+      0.0092,
+      0.00736,
+      0.0092,
+      0.0092
+    ],
+    "sc01_B_x1.2": [
+      0.0092,
+      0.01104,
+      0.0092,
+      0.0092
+    ]
+  },
+  "durations_s": [
+    690600
+  ],
+  "density": "msis2 (NRLMSIS 2.0, DS-10 drivers)",
+  "msis_scales": [
+    0.8,
+    1.0,
+    1.25
+  ],
+  "epoch_utc": "2024-05-08T00:10:00Z",
+  "sample_interval_s": 600,
+  "config_hashes": {
+    "equal_B/scale0.8/690600": "e56afb4b0899011b882001feb04045d0ad49755ba858fad2159a1fcea4e1bb27",
+    "sc01_B_x0.8/scale0.8/690600": "1aa587c15bdd1354f467f0ed1ddc75b8c4827aa5d3d4b6e366e27d227dbd089b",
+    "sc01_B_x1.2/scale0.8/690600": "37074c13af5314636f186ee0958b234d3f471e5e196833d05e5ae9a8f1bc61e8",
+    "equal_B/scale1/690600": "a8b85f411072dafbea21750746cb7812b2077cc042e6f3bfabf9ab3ab649d103",
+    "sc01_B_x0.8/scale1/690600": "b64f947e656bee36a9ad56eb22ef477133c9b140c618984d7b5da49371b3ef63",
+    "sc01_B_x1.2/scale1/690600": "de8b6fcc9e9a7e04801c5f5d046b8faa5bb6dce3c44512788765c0e813aa91be",
+    "equal_B/scale1.25/690600": "aa81d6b473a8308145e6d5fd338c79cd8431f552e18092b3bb2febb3264a25d1",
+    "sc01_B_x0.8/scale1.25/690600": "874aa65cd4bc2414a7067a845a704cac01ab870726fd647e886beffcdf97c93c",
+    "sc01_B_x1.2/scale1.25/690600": "a39bb2287edce43db6b3bcfe9e0a39962cdf0f4abf6b813f935954590e04ef14"
+  },
+  "total_wall_s": 1085.2
+}
