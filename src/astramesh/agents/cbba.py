@@ -107,10 +107,13 @@ class CbbaState:
             return False
         if set(y) != set(z):
             return False
-        ok_y = all(isinstance(v, int | float) and not isinstance(v, bool) and v >= 0
+        # The ``type(v) is`` tests are fast paths only; the isinstance tests decide.
+        ok_y = all(v >= 0 if type(v) is float or type(v) is int
+                   else isinstance(v, int | float) and not isinstance(v, bool) and v >= 0
                    for v in y.values())  # fmt: skip
-        ok_z = all(isinstance(v, str) for v in z.values())
-        ok_s = all(isinstance(v, int) and not isinstance(v, bool) for v in s.values())
+        ok_z = all(type(v) is str or isinstance(v, str) for v in z.values())
+        ok_s = all(type(v) is int or (isinstance(v, int) and not isinstance(v, bool))
+                   for v in s.values())  # fmt: skip
         return ok_y and ok_z and ok_s
 
     def receive(self, k: str, p: Mapping[str, Any], now_ns: int) -> None:

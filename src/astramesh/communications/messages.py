@@ -11,14 +11,13 @@ Times are integer nanoseconds since the scenario epoch (CONVENTIONS §2).
 
 from __future__ import annotations
 
+import json
 import math
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import StrEnum
 from types import MappingProxyType
 from typing import Any
-
-from astramesh.core.events import canonical_json
 
 Frozen = None | bool | int | float | str | tuple[Any, ...] | Mapping[str, Any]
 
@@ -36,11 +35,47 @@ class MessageError(ValueError):
     """Raised when a message would violate the schema."""
 
 
+class _Invalid(Exception):
+    """Internal: ``_freeze_fast`` met data that ``freeze`` must reject."""
+
+
+def _freeze_fast(value: Any) -> Frozen:
+    """``freeze`` without building error paths; raises ``_Invalid`` on bad data."""
+    t = type(value)
+    if t is str or t is int or t is bool or value is None:
+        return value  # type: ignore[no-any-return]
+    if t is float:
+        if not math.isfinite(value):
+            raise _Invalid
+        return value  # type: ignore[no-any-return]
+    if t is dict:
+        out: dict[str, Any] = {}
+        for k, v in value.items():
+            if type(k) is not str:
+                raise _Invalid
+            out[k] = _freeze_fast(v)
+        return MappingProxyType(out)
+    if t is list or t is tuple:
+        return tuple(_freeze_fast(v) for v in value)
+    raise _Invalid  # anything else (subclasses, other mappings): the general path decides
+
+
 def freeze(value: Any, *, path: str = "payload") -> Frozen:
     """Deep-freeze JSON-like data: dict -> read-only mapping, list/tuple -> tuple.
 
-    Only str keys and None/bool/int/finite float/str leaves are allowed.
+    Only str keys and None/bool/int/finite float/str leaves are allowed. Plain
+    dicts, lists and scalars take a fast path; anything else, and any error, goes
+    through the general recursion, which names the offending path.
     """
+    if path == "payload":
+        try:
+            return _freeze_fast(value)
+        except _Invalid:
+            pass
+    return _freeze_general(value, path=path)
+
+
+def _freeze_general(value: Any, *, path: str) -> Frozen:
     if value is None or isinstance(value, bool | int | str):
         return value
     if isinstance(value, float):
@@ -52,10 +87,10 @@ def freeze(value: Any, *, path: str = "payload") -> Frozen:
         for k, v in value.items():
             if not isinstance(k, str):
                 raise MessageError(f"{path} has a non-string key {k!r}")
-            out[k] = freeze(v, path=f"{path}.{k}")
+            out[k] = _freeze_general(v, path=f"{path}.{k}")
         return MappingProxyType(out)
     if isinstance(value, list | tuple):
-        return tuple(freeze(v, path=f"{path}[{i}]") for i, v in enumerate(value))
+        return tuple(_freeze_general(v, path=f"{path}[{i}]") for i, v in enumerate(value))
     raise MessageError(f"{path} has unsupported type {type(value).__name__}")
 
 
@@ -112,8 +147,35 @@ class Message:
 
     @property
     def size_bytes(self) -> int:
-        """Encoded size (canonical JSON), used for packet/byte accounting."""
-        return len(canonical_json(self.to_dict()).encode("ascii"))
+        """Encoded size (canonical JSON, as ``canonical_json(self.to_dict())``), used for
+        packet/byte accounting. The frozen payload is encoded directly: the encoder
+        writes tuples as lists and turns read-only mappings into dicts as it meets
+        them, which gives the same text without first copying the whole payload."""
+        d = self._to_dict_frozen()
+        return len(_ENCODER.encode(d).encode("ascii"))
+
+    def _to_dict_frozen(self) -> dict[str, Any]:
+        """``to_dict`` with the payload left frozen (for encoding only)."""
+        return {
+            "sender": self.sender,
+            "seq": self.seq,
+            "created_ns": self.created_ns,
+            "expires_ns": self.expires_ns,
+            "type": str(self.msg_type),
+            "plan_version": self.plan_version,
+            "payload": self.payload,
+        }
+
+
+def _mapping_as_dict(o: Any) -> dict[str, Any]:
+    if isinstance(o, Mapping):
+        return dict(o)
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+
+
+# Same settings as ``core.events.canonical_json``, plus frozen mappings.
+_ENCODER = json.JSONEncoder(sort_keys=True, separators=(",", ":"), ensure_ascii=True,
+                            allow_nan=False, default=_mapping_as_dict)  # fmt: skip
 
 
 @dataclass(frozen=True, slots=True)

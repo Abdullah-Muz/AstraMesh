@@ -137,8 +137,9 @@ class AgentKernel:
         gs["max_edges"] = max(gs["max_edges"], n_edges)
         gs["min_edges"] = min(gs["min_edges"], n_edges)
         out = transmit(msg, now_ns=now, graph=g, peers=self.ids, links=self.links, rng=self.comms)
+        size = msg.size_bytes  # once per send: B3 payloads are large late in a run
         c["sent"] += 1
-        c["bytes_sent"] += msg.size_bytes
+        c["bytes_sent"] += size
         c["linked"] += len(out.deliveries) + len(out.lost_to)
         c["lost"] += len(out.lost_to)
         c["unreachable"] += len(out.out_of_range)
@@ -152,7 +153,7 @@ class AgentKernel:
                 c["in_flight_at_end"] += 1
             self.env.process(self._deliver(d))
         self.trace.append({"t_ns": now, "event": "send", "sender": msg.sender, "seq": msg.seq,
-                           "type": str(msg.msg_type), "bytes": msg.size_bytes,
+                           "type": str(msg.msg_type), "bytes": size,
                            "lost_to": list(out.lost_to),
                            "unreachable": list(out.out_of_range)})  # fmt: skip
 
