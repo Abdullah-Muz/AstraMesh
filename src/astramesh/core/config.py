@@ -103,6 +103,9 @@ class _ScenarioBase(_Model):
         env = d.get("environment")
         if isinstance(env, dict) and env.get("replay") is None:
             env.pop("replay", None)  # DL-069
+        dyn = d.get("dynamics")
+        if isinstance(dyn, dict) and dyn.get("drag") is None:
+            dyn.pop("drag", None)  # DL-081
         return d
 
     def config_hash(self) -> str:
@@ -131,12 +134,27 @@ class ToyHeartbeatScenario(_ScenarioBase):
 Degrees360 = Annotated[float, Field(ge=0.0, lt=360.0, allow_inf_nan=False)]
 
 
+class DragConfig(_Model):
+    """Nominal drag (D1, DL-080): USSA 1976 density, co-rotating atmosphere."""
+
+    ballistic_m2pkg: list[Annotated[float, Field(ge=0.0, le=1.0, allow_inf_nan=False)]] = Field(
+        min_length=1,
+        description="B = C_D A / m [m^2/kg]: one value for all spacecraft, or one per spacecraft",
+    )
+
+
+#: Largest step for runs with drag: RK4's own semi-major-axis drift is 0.003 m/day at
+#: 10 s but 23 m/day at 60 s, against ~15 m/day from drag (NUMERICAL_MISSION_DESIGN §B.9).
+MAX_DRAG_STEP_S = 10.0
+
+
 class DynamicsConfig(_Model):
-    """Truth gravity model (constants come from ``astramesh.dynamics.constants``)."""
+    """Truth force model (constants come from ``astramesh.dynamics.constants``)."""
 
     model: Literal["two_body", "j2"] = Field(
         description="two_body = D0 point mass; j2 = D1 point mass + J2 about the epoch pole"
     )
+    drag: DragConfig | None = Field(default=None, description="optional nominal drag (DL-080)")
 
 
 class ReferenceOrbitConfig(_Model):
@@ -173,6 +191,20 @@ class FormationScenarioBase(_ScenarioBase):
     reference_orbit: ReferenceOrbitConfig
     formation: FormationConfig
     output: OutputConfig
+
+    @model_validator(mode="after")
+    def _drag_settings(self) -> FormationScenarioBase:
+        drag = self.dynamics.drag
+        if drag is None:
+            return self
+        n_b, n_sc = len(drag.ballistic_m2pkg), self.formation.n_spacecraft
+        if n_b not in (1, n_sc):
+            raise ValueError(f"dynamics.drag needs 1 or {n_sc} ballistic coefficients, got {n_b}")
+        if self.time.time_step_s > MAX_DRAG_STEP_S:
+            raise ValueError(
+                f"runs with drag need time.time_step_s <= {MAX_DRAG_STEP_S:g} s (§B.9)"
+            )
+        return self
 
     @model_validator(mode="after")
     def _sampling_on_grid(self) -> FormationScenarioBase:

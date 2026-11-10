@@ -451,3 +451,21 @@ These are identities and round-off, so no physics tolerance needs approval beyon
 | Resource values (DL-035) and cold-gas propulsion (DL-036) | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | Resource ledger model and checks (§B.8), Part A Q4/Q5 conclusions | ☑ approved — Abdullah Muzher | 2026-11-03 |
 | **Gate P1 / Phase 1 complete** (DL-037) | ☑ signed off — Abdullah Muzher | 2026-11-03 |
+
+## B.9 Nominal drag (D1) validation (2026-11-10; Phase 5 increment 2; DL-080, DL-081)
+
+Model and sources in DL-080: USSA 1976 density (Table I, 480–700 km, log-linear between nodes), co-rotating atmosphere, altitude above the WGS 84 ellipsoid to first order in the flattening, modelled B = C_D A / m = 0.0092 m²/kg. Tests: `tests/physics_validation/test_drag.py`. All runs at the scenarios' 10 s step, with a drag-free run at the same step subtracted.
+
+| Check | Result | Tolerance |
+|---|---|---|
+| DR-01 table: source values at nodes; monotone; local scale height 61–85 km, largest jump between neighbouring intervals 1.6 km | pass | values 1e-12 relative; scale height in 60–90 km; jump < 2 km |
+| DR-02 circular 525 km, no J2, no rotation, 24 h: Δa = −14.6329 m against −14.6328 m from −ρ B √(μ a) | 5.5 × 10⁻⁶ relative | 1 % |
+| DR-03 specific-energy change against ∫ a_drag · v dt (inclined, co-rotating, 1 h) | pass | 1e-4 relative |
+| DR-04 step refinement 40/20/10 s, J2 + drag + rotation, 24 h | order 4.73; 10 s error ≈ 0.7 m | order in [3.5, 5.5] (PA-03 band) |
+| DR-05 co-rotation, equatorial prograde: decay ratio 0.87189 against (1 − ω r / v)² = 0.87190 | 1.4 × 10⁻⁵ relative | 1 % |
+| B per spacecraft: twice B gives 2.0× the decay | pass | 1 % |
+| Drag off: propagation bit-identical; model id unchanged | pass | exact |
+
+**Integrator drift found while building DR-02:** RK4 alone lowers the semi-major axis of a 525 km circular orbit by 0.003 m per day at 10 s, 0.02 m at 15 s, 0.7 m at 30 s and 23 m at 60 s. Drag lowers it by about 15 m per day. Every scenario uses 10 s (§B.2), where the drift is 0.02 % of the drag effect; **runs with drag must not use a step above 10 s** without re-checking this.
+
+Status: recorded; owner review pending.

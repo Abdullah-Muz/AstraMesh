@@ -26,6 +26,11 @@ WGS84_FLATTENING: Final[float] = 1.0 / WGS84_INV_FLATTENING
 #: WGS 84 first eccentricity squared e^2 = f (2 - f).
 WGS84_E2: Final[float] = WGS84_FLATTENING * (2.0 - WGS84_FLATTENING)
 
+#: Earth's nominal mean angular velocity (WGS 84 defining parameter) [rad/s].
+#: Used for the co-rotating atmosphere in the drag model (DL-080); verification
+#: against NGA.STND.0036 is pending with the other constants (DL-018).
+OMEGA_EARTH_RADPS: Final[float] = 7.292115e-5
+
 #: Astronomical unit (IAU 2012 Resolution B2, exact) [m].
 AU_M: Final[float] = 149_597_870_700.0
 

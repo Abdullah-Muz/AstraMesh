@@ -26,6 +26,7 @@ from numpy.typing import NDArray
 
 from astramesh.core.clock import NS_PER_S
 from astramesh.dynamics.constants import GM_EARTH_M3PS2, R_EARTH_EQ_M
+from astramesh.dynamics.drag import drag_acceleration
 from astramesh.dynamics.forces import D0_MODEL_ID, ForceModel, acceleration
 from astramesh.dynamics.state import (
     CartesianState,
@@ -45,7 +46,10 @@ def two_body_acceleration(r: NDArray[np.float64], mu: float) -> NDArray[np.float
 
 
 def _derivative(y: NDArray[np.float64], fm: ForceModel) -> NDArray[np.float64]:
-    return np.concatenate((y[:, 3:], acceleration(y[:, :3], fm)), axis=1)
+    a = acceleration(y[:, :3], fm)
+    if fm.drag is not None:  # DL-080; with drag off the gravity-only path is unchanged
+        a = a + drag_acceleration(y, fm.drag, fm.pole)
+    return np.concatenate((y[:, 3:], a), axis=1)
 
 
 def rk4_step(y: NDArray[np.float64], h_s: float, fm: ForceModel) -> NDArray[np.float64]:

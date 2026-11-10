@@ -19,7 +19,7 @@ baseline).
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 import numpy as np
@@ -28,6 +28,7 @@ from astramesh.core.clock import NS_PER_S, seconds_to_ns
 from astramesh.core.config import FormationScenarioBase
 from astramesh.core.events import EventLog
 from astramesh.dynamics.constants import GM_EARTH_M3PS2, J2_EARTH, R_EARTH_EQ_M
+from astramesh.dynamics.drag import DragModel
 from astramesh.dynamics.earth_frames import earth_pole_gcrs
 from astramesh.dynamics.elements import KeplerElements
 from astramesh.dynamics.forces import ForceModel
@@ -154,10 +155,12 @@ def run_formation_dynamics(
     epoch = config.time.epoch_utc
     spec = config.time.clock_spec()
     pole = earth_pole_gcrs(epoch)
-    forces = (
-        ForceModel.with_j2(pole, j2=J2_EARTH)
-        if config.dynamics.model == "j2"
-        else ForceModel(mu=GM_EARTH_M3PS2, j2=0.0, pole=pole)
+    drag = config.dynamics.drag
+    forces = ForceModel(
+        mu=GM_EARTH_M3PS2,
+        j2=J2_EARTH if config.dynamics.model == "j2" else 0.0,
+        pole=pole,
+        drag=None if drag is None else DragModel(tuple(drag.ballistic_m2pkg)),
     )
     log.record(
         tick=0,
@@ -172,7 +175,8 @@ def run_formation_dynamics(
             "pole_gcrs": list(pole),
         },
     )
-    initial = _initial_states(config, forces, log)
+    # Mean elements are defined under gravity only (§B.6); drag acts from t = 0 on.
+    initial = _initial_states(config, replace(forces, drag=None), log)
     traj = propagate(initial, step_ns=spec.step_ns, n_steps=spec.n_steps, forces=forces)
     stride = seconds_to_ns(config.output.trajectory_sample_interval_s) // spec.step_ns
     summary = _summary(config, traj, forces)

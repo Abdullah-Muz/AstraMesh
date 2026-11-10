@@ -1,4 +1,4 @@
-"""Gravity force models: point mass (D0) and point mass + J2 (D1).
+"""Force models: point mass (D0), point mass + J2 (D1), optional nominal drag (D1, DL-080).
 
 The J2 term is the degree-2 zonal harmonic about the Earth's figure axis. The
 axis is given explicitly as a unit vector ``pole`` in GCRS, so the potential is
@@ -27,6 +27,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from astramesh.dynamics.constants import GM_EARTH_M3PS2, J2_EARTH, R_EARTH_EQ_M
+from astramesh.dynamics.drag import DRAG_MODEL_SUFFIX, DragModel
 from astramesh.dynamics.state import NonPhysicalStateError, dot3, norm3
 
 D0_MODEL_ID = "D0-two-body-rk4"
@@ -41,13 +42,17 @@ class ForceModel:
         mu: Gravitational parameter [m^3 s^-2].
         j2: Unnormalized J2; ``0.0`` gives the point-mass (two-body) model.
         r_ref_m: Reference radius of the J2 coefficient [m].
-        pole: Unit vector of the J2 symmetry axis in GCRS.
+        pole: Unit vector of the J2 symmetry axis in GCRS (also the Earth's rotation
+            axis for the co-rotating atmosphere).
+        drag: Optional nominal drag (:mod:`astramesh.dynamics.drag`); ``None`` keeps
+            the gravity-only models bit-for-bit unchanged.
     """
 
     mu: float = GM_EARTH_M3PS2
     j2: float = 0.0
     r_ref_m: float = R_EARTH_EQ_M
     pole: tuple[float, float, float] = (0.0, 0.0, 1.0)
+    drag: DragModel | None = None
 
     def __post_init__(self) -> None:
         for name in ("mu", "j2", "r_ref_m"):
@@ -75,7 +80,8 @@ class ForceModel:
 
     @property
     def model_id(self) -> str:
-        return D0_MODEL_ID if self.j2 == 0.0 else D1_J2_MODEL_ID
+        base = D0_MODEL_ID if self.j2 == 0.0 else D1_J2_MODEL_ID
+        return base if self.drag is None else f"{base}+{DRAG_MODEL_SUFFIX}"
 
 
 def acceleration(r: NDArray[np.float64], fm: ForceModel) -> NDArray[np.float64]:
