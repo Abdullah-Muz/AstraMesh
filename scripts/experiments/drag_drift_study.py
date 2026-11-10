@@ -1,7 +1,8 @@
 """Along-track drift of the four-spacecraft formation under nominal drag (DL-080, DL-081).
 
 Runs ``configs/experiments/formation_24h_j2.yaml`` with drag over 24 h and 8 days:
-no drag (reference), equal B for all, and B x0.5 or x2 on sc01 only. Writes
+no drag (reference), equal B for all, and B x0.8, x1.2 (credible spread) or
+x0.5, x2 (stress) on sc01 only. Writes
 ``drag_drift.csv`` (adjacent spacings at every 10 s step: initial, final, min, max) and
 ``drag_drift_meta.json`` (commit, git_dirty, lockfile hash, config hashes) to ``--out``.
 
@@ -33,7 +34,9 @@ B = 0.0092  # DL-080 nominal [m^2/kg]
 VARIANTS: dict[str, list[float] | None] = {
     "no_drag": None,
     "equal_B": [B],
-    "sc01_B_x0.5": [B, 0.5 * B, B, B],
+    "sc01_B_x0.8": [B, 0.8 * B, B, B],  # credible spread for one design (DL-082)
+    "sc01_B_x1.2": [B, 1.2 * B, B, B],
+    "sc01_B_x0.5": [B, 0.5 * B, B, B],  # stress cases
     "sc01_B_x2": [B, 2.0 * B, B, B],
 }
 DURATIONS_S = (86_400, 8 * 86_400)
