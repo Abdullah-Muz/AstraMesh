@@ -11,7 +11,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 2 | Decentralized nominal science operations | **Complete**: Gate P2 signed off 2026-11-03 (DL-049); open follow-ups listed there |
 | 3 | Deterministic faults and protection supervisor | **Complete**: Gate P3 signed off 2026-11-04 (DL-061); open follow-ups listed there |
 | 4 | External data and probabilistic/ML experiments | **Complete**: Gate P4 signed off 2026-11-10 (DL-076); open follow-ups listed there |
-| 5 | Storm-aware distributed recovery | **Plan proposed** (DL-077), awaiting owner approval |
+| 5 | Storm-aware distributed recovery | **In progress** (DL-077) |
 | 6 | Research conclusion and public demonstration | Not started |
 
 ## Phase 0 deliverables (spec §17)
@@ -60,11 +60,11 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 4 | Full five-mode machine: STORM_WATCH, RECOVERY, three risk dimensions, hysteresis, dwell, invalid-input policy | **Done**: commit `e3c675f`, CI passing |
 | 5 | Fault-scenario comparison (S01–S10; S06 deferred) | **Done**: script `bb2ea8e`, B4 fix `311477a` (DL-059), 600-run results in [`docs/results/FAULT_COMPARISON.md`](results/FAULT_COMPARISON.md) (DL-060); reviewed and approved 2026-11-04 |
 
-## Phase 5 increments (proposed, DL-077)
+## Phase 5 increments (DL-077)
 
 | # | Increment | Status |
 |---|---|---|
-| 1 | Literature and design for the G3 candidate (decentralized protection-mode coordination); falsifiable hypothesis, baselines, scenarios, metrics and the tuning/test split fixed before any implementation | Not started |
+| 1 | Literature and design for the G3 candidate (decentralized protection-mode coordination); falsifiable hypothesis, baselines, scenarios, metrics and the tuning/test split fixed before any implementation | **In progress** |
 | 2 | Atmospheric drag: D1 nominal drag with validation tests; then D2 storm-time density (separate approval: new dependency and a new pinned F10.7/Ap dataset) | Not started |
 | 3 | Per-spacecraft radiation risk: GOES flux mapped to each spacecraft's position with a geomagnetic-cutoff model (modelled, labelled as such) | Not started |
 | 4 | Candidate method and baselines; combined scenarios (S11 with per-spacecraft risk, storm + partition, storm + critical fault, tighter schedule) | Not started |
