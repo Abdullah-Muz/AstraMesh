@@ -1,6 +1,6 @@
 # Formation drift under nominal drag (D1)
 
-> **Status:** recorded 2026-11-10 from clean commit `9cd0016` (`git_dirty: false`). Truth dynamics only: no agents, no maneuvers. Phase 5 increment 2 (DL-080, DL-081, DL-082). Awaiting owner review (DL-083).
+> **Status:** recorded 2026-11-10 from clean commit `9cd0016` (`git_dirty: false`). Truth dynamics only: no agents, no maneuvers. Phase 5 increment 2 (DL-080, DL-081, DL-082). Approved 2026-11-10 (DL-083).
 
 ## Setup
 

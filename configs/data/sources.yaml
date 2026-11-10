@@ -1626,3 +1626,19 @@ datasets:
         bytes: 12960000
         md5: null
         sha256: "dcef89032b717d50ae86034e687f10c6f24a44101b24de80a39d3999942eb19c"
+  DS-10:
+    name: "NASA OMNI2 hourly data, 2023-2024 (F10.7 and ap for the MSIS density model)"
+    provider: "NASA/GSFC Space Physics Data Facility (OMNIWeb)"
+    doi: null
+    license: "NASA open data; citation and acknowledgement requested (omniweb.gsfc.nasa.gov/html/citing.html)"
+    files:
+      - name: omni2_2023.dat
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/low_res_omni/omni2_2023.dat"
+        bytes: 2873280
+        md5: null
+        sha256: "df74e09c22b126841835c0add8c46933b93118c33a1978f7e977f9488cf7d743"
+      - name: omni2_2024.dat
+        url: "https://spdf.gsfc.nasa.gov/pub/data/omni/low_res_omni/omni2_2024.dat"
+        bytes: 2881152
+        md5: null
+        sha256: "41f3b5891ce3f1220719d5c1ea808f3014f28a1704557d3363eefb5ee7c249b1"

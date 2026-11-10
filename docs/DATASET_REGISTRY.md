@@ -1,6 +1,6 @@
 # Dataset Registry
 
-> **Owner:** Abdullah Muzher · **Status:** Phase 4: five bounded datasets downloaded and pinned (DS-02, DS-06, DS-07; forecast training data DS-08, DS-09); GloTEC and COSMIC-2 left out of Phase 4 (DL-071) · **Spec:** §8 · **Last updated:** 2026-11-09
+> **Owner:** Abdullah Muzher · **Status:** Phase 4: five bounded datasets downloaded and pinned (DS-02, DS-06, DS-07; forecast training data DS-08, DS-09); Phase 5: DS-10 (MSIS drivers); GloTEC and COSMIC-2 left out of Phase 4 (DL-071) · **Spec:** §8 · **Last updated:** 2026-11-10
 
 ## Rules (spec §8.2)
 
@@ -23,6 +23,7 @@
 | DS-07 | NOAA NCEI GOES-18 SEISS/SGPS L2 | File metadata: "These data may be redistributed and used without restriction." | **Yes** (8–15 May 2024, 5-min, 5.0 MB, pinned 2026-11-04) | 4–5 |
 | DS-08 | NOAA NCEI GOES-18 SEISS/SGPS L2 (forecast training) | As DS-07 (same metadata statement in every file) | **Yes** (1 Jan 2023 – 30 Apr 2024, 5-min, 486 files, 293 MB, pinned 2026-11-05) | 4–5 |
 | DS-09 | NASA OMNI / SPDF (forecast training) | As DS-06 | **Yes** (Jan 2023 – Apr 2024 1-min, 16 files, 210 MB, pinned 2026-11-05) | 4–5 |
+| DS-10 | NASA OMNI2 hourly (F10.7, ap) | As DS-06 | **Yes** (2023 and 2024, 2 files, 5.8 MB, pinned 2026-11-10) | 5 |
 
 ## Record template
 
@@ -229,6 +230,34 @@ intended_experiment: "Phase 4 increment 4: forecast features (DL-068)"
 partitions: "Training only, as DS-08"
 leakage_risks: "As DS-08"
 domain_transfer_caveats: "As DS-06"
+```
+
+### DS-10 — NASA OMNI2 hourly, 2023–2024 (F10.7 and ap for MSIS)
+
+```yaml
+id: DS-10
+name: "OMNI2 low-resolution (hourly) data, 2023 and 2024"
+owner_provider: "NASA/GSFC Space Physics Data Facility (OMNIWeb)"
+url: https://spdf.gsfc.nasa.gov/pub/data/omni/low_res_omni/
+doi: null
+version_or_date: "files as served on 2026-11-10 (omni2_2024.dat last modified 2025-12-10)"
+retrieved_utc: "2026-11-10"
+retrieved_files: "omni2_2023.dat, omni2_2024.dat (sha256 pinned in configs/data/sources.yaml)"
+license_terms: "As DS-06"
+license_verified_utc: "2026-11-10"
+citation_required: "As DS-06"
+sampling_interval: "1 h; 8 760 + 8 784 rows, contiguous; format omni2.text (55 whitespace-separated words)"
+units: "columns used: word 50 ap-index [nT] (3-hourly value repeated per hour), word 51 F10.7 [sfu] (daily value repeated per hour)"
+time_conventions: "UT; year, day of year, hour"
+geospatial_conventions: "none (global indices)"
+missingness_quality_flags: "no fill values (999, 999.9) in words 50-51 in either file"
+event_labels: "none"
+expected_storage_gb: 0.006
+expected_ram_gb: "< 0.1"
+intended_experiment: "Phase 5 increment 2: storm-time density D2 (NRLMSIS 2.0 inputs: daily F10.7, 81-day average, ap history; DL-084)"
+partitions: "Not a learning dataset; inputs only. For the forecast-tuning storm (2024 Q1) and the May 2024 test week the same file supplies the drivers."
+leakage_risks: "The 81-day centred F10.7 average uses 40 days after the epoch. The simulator uses this density as truth only (agents never see it), so this is not forecast leakage; it must not be used as an agent input."
+domain_transfer_caveats: "Global indices; MSIS is an empirical climatological model with its own uncertainty (DL-084)"
 ```
 
 ### DS-03, DS-04, DS-05
