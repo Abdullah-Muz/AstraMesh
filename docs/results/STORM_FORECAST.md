@@ -1,6 +1,6 @@
 # Proton forecasts P-A / P-B / P-C: skill on real data
 
-> **Status:** point values recorded 2026-11-05 from clean commit `00372d9` (`git_dirty: false`); approved 2026-11-09 (DL-071). Intervals and model differences (DL-072) recorded 2026-11-09 from clean commit `cedaec1` (`git_dirty: false`), with every point value unchanged; awaiting owner review (DL-073). Real data only, independent of the simulation. Phase 4 increment 4 (DL-068 – DL-073). The protection comparison that uses these forecasts is in [`STORM_REPLAY.md`](STORM_REPLAY.md).
+> **Status:** point values recorded 2026-11-05 from clean commit `00372d9` (`git_dirty: false`); approved 2026-11-09 (DL-071). Intervals and model differences (DL-072) recorded 2026-11-09 from clean commit `cedaec1` (`git_dirty: false`), with every point value unchanged; approved 2026-11-09 (DL-073). Real data only, independent of the simulation. Phase 4 increment 4 (DL-068 – DL-073). The protection comparison that uses these forecasts is in [`STORM_REPLAY.md`](STORM_REPLAY.md).
 
 ## Setup (DL-068, DL-069)
 
