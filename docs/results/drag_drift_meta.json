@@ -1,0 +1,58 @@
+{
+  "experiment": "Formation drift under nominal drag (DL-080, DL-081)",
+  "git_commit": "9cd00168102426062df8880180b5baef12015235",
+  "git_dirty": false,
+  "lockfile_sha256": "7d11198b9e4f049aa22603e8ef79af7121171c998d57733892e2a66b54d6b1d4",
+  "base_config": "configs/experiments/formation_24h_j2.yaml",
+  "ballistic_nominal_m2pkg": 0.0092,
+  "variants": {
+    "no_drag": null,
+    "equal_B": [
+      0.0092
+    ],
+    "sc01_B_x0.8": [
+      0.0092,
+      0.00736,
+      0.0092,
+      0.0092
+    ],
+    "sc01_B_x1.2": [
+      0.0092,
+      0.01104,
+      0.0092,
+      0.0092
+    ],
+    "sc01_B_x0.5": [
+      0.0092,
+      0.0046,
+      0.0092,
+      0.0092
+    ],
+    "sc01_B_x2": [
+      0.0092,
+      0.0184,
+      0.0092,
+      0.0092
+    ]
+  },
+  "durations_s": [
+    86400,
+    691200
+  ],
+  "sample_interval_s": 600,
+  "config_hashes": {
+    "no_drag/86400": "3701ecb202304d3f61d2c04c970f9b581ff85722808835bad11b110c5f365472",
+    "equal_B/86400": "e7dce071f7d975907c25759f62da46d960f77ffc84436a89dead376372022876",
+    "sc01_B_x0.8/86400": "ecbd95f791961921258fecc818b0e631c84002cecfefefb76749fcb917b883b5",
+    "sc01_B_x1.2/86400": "a22ab47331fa470ce661f0ec05e65c36c5ed459d9b29e046a0413919fc3866b7",
+    "sc01_B_x0.5/86400": "c5946b8e09c9d3ef513b6fbabecdff99df61bdea386f922601922237e21b7812",
+    "sc01_B_x2/86400": "f3480e3bbcb0f74851f2b553fc99638fb9c64462287b4529cadd767ac7480578",
+    "no_drag/691200": "138a1b1f88f6975f7869becb0287ccce3630ac34b3e7933e27d858f7ba9a3d4e",
+    "equal_B/691200": "83cc9795a4f358ff2239309b8fa0c24d7c8ef028e40ec2a4a358569ae8d13516",
+    "sc01_B_x0.8/691200": "b866f92f38faf043ae3fbcd8e3358f1cf11292d725871b13176df11aaf2f494a",
+    "sc01_B_x1.2/691200": "29aeb2bf9a0dec5cb878cf60b4af6906d556ccc574f75caa3f7e5a7f4b9e469b",
+    "sc01_B_x0.5/691200": "18a46ada7f926095397eb9df62804db23f9257c53fb3a016d9f77169e5108768",
+    "sc01_B_x2/691200": "355db99520dca2980dee12fa2caf399f240a2ee131ad2e827391e403d16d2739"
+  },
+  "total_wall_s": 277.2
+}
