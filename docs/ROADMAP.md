@@ -67,7 +67,8 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 1 | Literature and design for the G3 candidate (decentralized protection-mode coordination); falsifiable hypothesis, baselines, scenarios, metrics and the tuning/test split fixed before any implementation | **In progress** |
 | 2 | Atmospheric drag: D1 nominal drag with validation tests; then D2 storm-time density (separate approval: new dependency and a new pinned F10.7/Ap dataset) | Not started |
 | 3 | Per-spacecraft radiation risk: GOES flux mapped to each spacecraft's position with a geomagnetic-cutoff model (modelled, labelled as such) | Not started |
-| 4 | Candidate method and baselines; combined scenarios (S11 with per-spacecraft risk, storm + partition, storm + critical fault, tighter schedule) | Not started |
+| 4 | Candidate method (as a policy slot, DL-079) and baselines; combined scenarios (S11 with per-spacecraft risk, storm + partition, storm + critical fault, tighter schedule) | Not started |
+| 4b | RL policies (DL-079): task handover first, then early protection timing; algorithm, library and training budget fixed in an RL design entry; the supervisor keeps the final say | Not started |
 | 5 | Frozen comparison with ablations; Gate P5 write-up | Not started |
 
 Low-thrust maneuver optimization is deferred (DL-077); attitude-based drag control is out of scope (spec §16).
