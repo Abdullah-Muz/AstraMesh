@@ -65,3 +65,54 @@ def test_drag_run_decays_and_reports_its_model() -> None:
     e = specific_energy(run.trajectory.y[-1], gravity)
     e_ref = specific_energy(ref.trajectory.y[-1], gravity)
     assert np.all(e < e_ref)  # drag removed energy from every spacecraft
+
+
+def test_recorded_drift_hashes_are_unchanged() -> None:
+    """The DL-084 fields are omitted at their defaults, so DL-083's recorded hashes hold."""
+    import json
+
+    meta = json.loads((BASE.parents[2] / "docs/results/drag_drift_meta.json").read_text())
+    for key, b in (
+        ("equal_B/86400", [0.0092]),
+        ("sc01_B_x2/691200", [0.0092, 0.0184, 0.0092, 0.0092]),
+    ):
+        raw = _with_drag(b, duration_s=int(key.split("/")[1]))
+        raw["output"]["trajectory_sample_interval_s"] = 600
+        assert parse_scenario(raw).config_hash() == meta["config_hashes"][key]
+
+
+def test_msis2_settings_validation() -> None:
+    raw = _with_drag([0.0092])
+    raw["dynamics"]["drag"]["density"] = "msis2"
+    parse_scenario(raw)
+    raw["dynamics"]["drag"]["density_scale_ratio"] = 1.25
+    parse_scenario(raw)
+    bad = _with_drag([0.0092])
+    bad["dynamics"]["drag"]["density_scale_ratio"] = 1.25
+    with pytest.raises(ConfigError, match="density: msis2 only"):
+        parse_scenario(bad)
+
+
+def _have_ds10() -> bool:
+    from astramesh.datasets.sources import RAW, load_sources
+
+    return all(f.path(RAW).exists() for f in load_sources()["DS-10"].files)
+
+
+@pytest.mark.skipif(not _have_ds10(), reason="DS-10 (OMNI2 hourly) not downloaded")
+def test_msis2_run_decays_more_than_ussa76_in_2024() -> None:
+    pytest.importorskip("pymsis")
+    decays = {}
+    for dens in ("ussa76", "msis2"):
+        raw = _with_drag([0.0092], duration_s=7200)
+        raw["time"]["epoch_utc"] = "2024-04-20T00:00:00Z"  # quiet, near solar maximum
+        raw["output"]["trajectory_sample_interval_s"] = 600
+        raw["dynamics"]["drag"]["density"] = dens
+        cfg = parse_scenario(raw)
+        assert isinstance(cfg, FormationScenarioBase)
+        run = run_formation_dynamics(cfg, EventLog())
+        gravity = replace(run.trajectory.forces, drag=None)
+        e = specific_energy(run.trajectory.y, gravity)
+        decays[dens] = float(np.mean(e[0] - e[-1]))
+        assert run.trajectory.model_id.endswith(f"+drag-{dens}")
+    assert decays["msis2"] > decays["ussa76"] > 0

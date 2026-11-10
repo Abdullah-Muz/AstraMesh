@@ -469,3 +469,20 @@ Model and sources in DL-080: USSA 1976 density (Table I, 480–700 km, log-linea
 **Integrator drift found while building DR-02:** RK4 alone lowers the semi-major axis of a 525 km circular orbit by 0.003 m per day at 10 s, 0.02 m at 15 s, 0.7 m at 30 s and 23 m at 60 s. Drag lowers it by about 15 m per day. Every scenario uses 10 s (§B.2), where the drift is 0.02 % of the drag effect; **runs with drag must not use a step above 10 s** without re-checking this.
 
 Status: recorded; owner review pending.
+
+## B.10 Storm-time density (D2, NRLMSIS 2.0) validation (2026-11-10; DL-084, DL-085)
+
+Model: NRLMSIS 2.0 through `pymsis` 0.13 (academic, non-commercial licence), drivers from DS-10 (OMNI2 hourly F10.7 and ap), density evaluated at every RK4 stage (78 µs per 4-point call, about 22 s for an 8-day run). Tests: `tests/physics_validation/test_msis_density.py`, `tests/unit/test_drag_config.py`.
+
+| Check | Result | Tolerance |
+|---|---|---|
+| MS-01 geodetic conversion against Astropy (50 random points, 400–700 km); wrapper equals a direct pymsis call | pass | 1e-9° and 0.1 mm; 1e-12 relative |
+| MS-02 drivers on 2024-05-11 02 UT: F10.7 of the previous day 227.9 sfu, 81-day mean 180.5, daily Ap 270.75, 3-hour ap 400 | match the OMNI2 values by hand | exact |
+| MS-03 quiet (F10.7 150, ap 4) density at 525 km against USSA 1976 | ratio 1.26 | within a factor of 3 (sanity band) |
+| MS-04 density at 525 km for ap 4 / 50 / 200 | 4.43 / 6.81 / 11.8 × 10⁻¹³ kg/m³ | strictly increasing |
+| MS-05 24 h drag decay, 525 km circular, from 2024-05-10 12 UT (storm) and 2024-04-20 (quiet) | 74.7 and 40.8 m | storm > 1.5 × quiet |
+| MS-05 step refinement 40/20/10 s with MSIS density | order 4.73 | in [3.5, 5.5] |
+
+**Consequence for D1:** a quiet day in April 2024 (near solar maximum) decays 40.8 m per day under MSIS against 14.6 m under the USSA 1976 table, so the D1 drift study (DL-083) understates 2024 drift by a factor of about 3; with storm heating, more.
+
+Status: recorded; owner review pending.

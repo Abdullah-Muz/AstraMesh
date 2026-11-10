@@ -37,6 +37,12 @@ Repository = "https://github.com/Abdullah-Muz/AstraMesh"
 astramesh = "astramesh.cli:main"
 
 [dependency-groups]
+# Phase 5 storm-time density D2 (DL-084): NRLMSIS 2.0 through pymsis (MIT wrapper; the
+# compiled NRL model is licensed for academic, non-commercial use only: see
+# DATASET_REGISTRY/DL-084). Optional: the simulator defaults to D1 (USSA 1976) without it.
+atmosphere = [
+    "pymsis>=0.13.0,<0.14",
+]
 # Phase 4 storm-data pipeline (DL-062, DL-068): reads the GOES netCDF-4 (HDF5) files into
 # the committed derived series. The simulator never imports it.
 data = [
@@ -61,7 +67,7 @@ ml = [
 ]
 
 [tool.uv]
-default-groups = ["data", "dev", "ml"]
+default-groups = ["atmosphere", "data", "dev", "ml"]
 
 [tool.uv.sources]
 torch = [{ index = "pytorch-cpu" }]
@@ -116,7 +122,8 @@ follow_untyped_imports = true
 
 # scikit-learn, PyOD, XGBoost (DL-064) and h5py (DL-068) ship no complete type information either.
 [[tool.mypy.overrides]]
-module = ["sklearn", "sklearn.*", "pyod", "pyod.*", "xgboost", "xgboost.*", "h5py", "h5py.*"]
+module = ["sklearn", "sklearn.*", "pyod", "pyod.*", "xgboost", "xgboost.*", "h5py", "h5py.*",
+          "pymsis", "pymsis.*"]
 ignore_missing_imports = true
 follow_imports = "skip"
 

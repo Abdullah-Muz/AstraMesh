@@ -144,6 +144,28 @@ def _summary(config: FormationScenarioBase, traj: Trajectory, forces: ForceModel
     return out
 
 
+def _drag_model(config: FormationScenarioBase) -> DragModel | None:
+    """D1 (USSA 1976) or D2 (NRLMSIS 2.0 with the pinned DS-10 drivers), DL-080/084."""
+    drag = config.dynamics.drag
+    if drag is None:
+        return None
+    b = tuple(drag.ballistic_m2pkg)
+    if drag.density == "ussa76":
+        return DragModel(b)
+    from astramesh.datasets.sources import load_sources, require_pinned
+    from astramesh.dynamics.earth_frames import gcrs_to_itrs_matrices
+    from astramesh.dynamics.msis_density import MsisDensity, MsisDrivers
+
+    spec = config.time.clock_spec()
+    drivers = MsisDrivers.from_omni2([require_pinned(f) for f in load_sources()["DS-10"].files])
+    t_ns = spec.step_ns * np.arange(spec.n_steps + 1, dtype=np.int64)
+    msis = MsisDensity(
+        config.time.epoch_utc, spec.step_ns / 1e9,
+        gcrs_to_itrs_matrices(config.time.epoch_utc, t_ns), drivers, drag.density_scale_ratio,
+    )  # fmt: skip
+    return DragModel(b, density_fn=msis.density)
+
+
 def run_formation_dynamics(
     config: FormationScenarioBase, log: EventLog, *, end_event: bool = True
 ) -> FormationRun:
@@ -155,12 +177,11 @@ def run_formation_dynamics(
     epoch = config.time.epoch_utc
     spec = config.time.clock_spec()
     pole = earth_pole_gcrs(epoch)
-    drag = config.dynamics.drag
     forces = ForceModel(
         mu=GM_EARTH_M3PS2,
         j2=J2_EARTH if config.dynamics.model == "j2" else 0.0,
         pole=pole,
-        drag=None if drag is None else DragModel(tuple(drag.ballistic_m2pkg)),
+        drag=_drag_model(config),
     )
     log.record(
         tick=0,

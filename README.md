@@ -139,6 +139,7 @@ AstraMesh uses two licenses:
 
 - **Code — [MIT License](LICENSE).** Applies to all source code, tests, scripts, configuration files, and other software in this repository unless a file states otherwise.
 - **Documentation — [CC BY 4.0](LICENSE-DOCS).** Applies to [`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md), this README, the contents of `docs/`, and written reports, diagrams, and figures, unless a file states otherwise.
+- **Third-party, optional: NRLMSIS 2.0.** The `atmosphere` dependency group installs [`pymsis`](https://github.com/SWxTREC/pymsis) (MIT), which provides the NRL MSIS model. MSIS itself is licensed by the U.S. Naval Research Laboratory for **academic, non-commercial use only** (see its `MSIS2_LICENSE`); AstraMesh neither modifies nor redistributes it. It is needed only for storm-time density (`dynamics.drag.density: msis2`, DL-084); the default drag model and every other feature work without it.
 
 Copyright © 2026 Abdullah Muzher.
 

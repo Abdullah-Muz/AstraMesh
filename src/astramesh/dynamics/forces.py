@@ -27,7 +27,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from astramesh.dynamics.constants import GM_EARTH_M3PS2, J2_EARTH, R_EARTH_EQ_M
-from astramesh.dynamics.drag import DRAG_MODEL_SUFFIX, DragModel
+from astramesh.dynamics.drag import DragModel
 from astramesh.dynamics.state import NonPhysicalStateError, dot3, norm3
 
 D0_MODEL_ID = "D0-two-body-rk4"
@@ -81,7 +81,7 @@ class ForceModel:
     @property
     def model_id(self) -> str:
         base = D0_MODEL_ID if self.j2 == 0.0 else D1_J2_MODEL_ID
-        return base if self.drag is None else f"{base}+{DRAG_MODEL_SUFFIX}"
+        return base if self.drag is None else f"{base}+{self.drag.suffix}"
 
 
 def acceleration(r: NDArray[np.float64], fm: ForceModel) -> NDArray[np.float64]:

@@ -20,6 +20,7 @@ bit-exact digests across machines. With drag off, nothing here is evaluated.
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 from dataclasses import dataclass
 
 import numpy as np
@@ -51,6 +52,10 @@ H_MIN_M = float(_H_M[0])
 H_MAX_M = float(_H_M[-1])
 
 DRAG_MODEL_SUFFIX = "drag-ussa76"
+MSIS_MODEL_SUFFIX = "drag-msis2"
+
+#: Time-dependent density: (positions in GCRS (n, 3) [m], seconds since epoch) -> rho.
+DensityFunction = Callable[[NDArray[np.float64], float], NDArray[np.float64]]
 
 
 class DensityRangeError(ValueError):
@@ -86,11 +91,18 @@ class DragModel:
             per spacecraft, in the order of the propagated states.
         corotating: atmosphere co-rotates with the Earth (``False`` only for tests).
         omega_radps: Earth rotation rate [rad/s].
+        density_fn: optional time-dependent density (D2, e.g. NRLMSIS 2.0,
+            :mod:`astramesh.dynamics.msis_density`); ``None`` uses USSA 1976.
     """
 
     ballistic_m2pkg: tuple[float, ...]
     corotating: bool = True
     omega_radps: float = OMEGA_EARTH_RADPS
+    density_fn: DensityFunction | None = None
+
+    @property
+    def suffix(self) -> str:
+        return DRAG_MODEL_SUFFIX if self.density_fn is None else MSIS_MODEL_SUFFIX
 
     def __post_init__(self) -> None:
         b = tuple(float(x) for x in self.ballistic_m2pkg)
@@ -109,16 +121,16 @@ class DragModel:
 
 
 def drag_acceleration(
-    y: NDArray[np.float64], drag: DragModel, pole: tuple[float, float, float]
+    y: NDArray[np.float64], drag: DragModel, pole: tuple[float, float, float], t_s: float = 0.0
 ) -> NDArray[np.float64]:
-    """Drag acceleration [m/s^2] for stacked states ``y`` of shape (n, 6)."""
+    """Drag acceleration [m/s^2] for stacked states ``y`` of shape (n, 6) at ``t_s``."""
     r, v = y[:, :3], y[:, 3:]
     if drag.corotating:
         w = drag.omega_radps * np.array(pole)
         v_rel = v - np.cross(np.broadcast_to(w, r.shape), r)
     else:
         v_rel = v
-    rho = density(altitude(r, pole))
+    rho = density(altitude(r, pole)) if drag.density_fn is None else drag.density_fn(r, t_s)
     speed = norm3(v_rel)
     k = -0.5 * rho * drag.coefficients(y.shape[0]) * speed
     out: NDArray[np.float64] = k[:, np.newaxis] * v_rel

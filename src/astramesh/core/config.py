@@ -106,6 +106,12 @@ class _ScenarioBase(_Model):
         dyn = d.get("dynamics")
         if isinstance(dyn, dict) and dyn.get("drag") is None:
             dyn.pop("drag", None)  # DL-081
+        drag = dyn.get("drag") if isinstance(dyn, dict) else None
+        if isinstance(drag, dict):  # DL-084 fields omitted at their defaults
+            if drag.get("density") == "ussa76":
+                drag.pop("density", None)
+            if drag.get("density_scale_ratio") == 1.0:
+                drag.pop("density_scale_ratio", None)
         return d
 
     def config_hash(self) -> str:
@@ -141,6 +147,21 @@ class DragConfig(_Model):
         min_length=1,
         description="B = C_D A / m [m^2/kg]: one value for all spacecraft, or one per spacecraft",
     )
+    density: Literal["ussa76", "msis2"] = Field(
+        default="ussa76",
+        description="ussa76 = D1 mid-activity table; msis2 = D2 NRLMSIS 2.0 with DS-10 drivers "
+        "(needs the atmosphere dependency group; academic, non-commercial licence, DL-084)",
+    )
+    density_scale_ratio: float = Field(
+        default=1.0, gt=0.0, le=10.0, allow_inf_nan=False,
+        description="multiplies the msis2 density (uncertainty sensitivity, DL-084)",
+    )  # fmt: skip
+
+    @model_validator(mode="after")
+    def _scale_only_for_msis(self) -> DragConfig:
+        if self.density == "ussa76" and self.density_scale_ratio != 1.0:
+            raise ValueError("dynamics.drag.density_scale_ratio applies to density: msis2 only")
+        return self
 
 
 #: Largest step for runs with drag: RK4's own semi-major-axis drift is 0.003 m/day at

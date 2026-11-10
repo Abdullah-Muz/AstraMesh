@@ -45,19 +45,25 @@ def two_body_acceleration(r: NDArray[np.float64], mu: float) -> NDArray[np.float
     return acceleration(r, ForceModel.two_body(mu))
 
 
-def _derivative(y: NDArray[np.float64], fm: ForceModel) -> NDArray[np.float64]:
+def _derivative(y: NDArray[np.float64], fm: ForceModel, t_s: float) -> NDArray[np.float64]:
     a = acceleration(y[:, :3], fm)
     if fm.drag is not None:  # DL-080; with drag off the gravity-only path is unchanged
-        a = a + drag_acceleration(y, fm.drag, fm.pole)
+        a = a + drag_acceleration(y, fm.drag, fm.pole, t_s)
     return np.concatenate((y[:, 3:], a), axis=1)
 
 
-def rk4_step(y: NDArray[np.float64], h_s: float, fm: ForceModel) -> NDArray[np.float64]:
-    """One classical RK4 step for stacked states ``y`` of shape (n, 6)."""
-    k1 = _derivative(y, fm)
-    k2 = _derivative(y + (0.5 * h_s) * k1, fm)
-    k3 = _derivative(y + (0.5 * h_s) * k2, fm)
-    k4 = _derivative(y + h_s * k3, fm)
+def rk4_step(
+    y: NDArray[np.float64], h_s: float, fm: ForceModel, t_s: float = 0.0
+) -> NDArray[np.float64]:
+    """One classical RK4 step from time ``t_s`` for stacked states ``y`` of shape (n, 6).
+
+    Time enters only through a time-dependent drag density (D2); gravity and D1 drag
+    do not depend on it.
+    """
+    k1 = _derivative(y, fm, t_s)
+    k2 = _derivative(y + (0.5 * h_s) * k1, fm, t_s + 0.5 * h_s)
+    k3 = _derivative(y + (0.5 * h_s) * k2, fm, t_s + 0.5 * h_s)
+    k4 = _derivative(y + h_s * k3, fm, t_s + h_s)
     return y + (h_s / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
 
 
@@ -157,7 +163,7 @@ def propagate(
     h_s = step_ns / NS_PER_S
     y = y0
     for k in range(1, n_steps + 1):
-        y = rk4_step(y, h_s, forces)
+        y = rk4_step(y, h_s, forces, int(t_ns[k - 1]) / NS_PER_S)
         _check_physical(y, int(t_ns[k]))
         out[k] = y
     out.setflags(write=False)
