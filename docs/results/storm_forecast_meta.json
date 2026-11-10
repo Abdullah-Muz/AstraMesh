@@ -1,10 +1,28 @@
 {
-  "experiment": "Phase 4 proton forecast skill P-A/P-B/P-C (DL-069)",
-  "git_commit": "00372d986212e592d29be8c8d510f6d270037b93",
+  "experiment": "Phase 4 proton forecast skill P-A/P-B/P-C (DL-069), intervals (DL-072)",
+  "git_commit": "cedaec13b5f8ff1ac59188f0cb5add36ffadadab",
   "git_dirty": false,
   "lockfile_sha256": "7d11198b9e4f049aa22603e8ef79af7121171c998d57733892e2a66b54d6b1d4",
   "train": "DS-08 + DS-09 (2023-01-01 .. 2024-04-30)",
   "test": "DS-07 + DS-06 (2024-05-08 .. 2024-05-15)",
+  "data": {
+    "DS-06": {
+      "files": 1,
+      "sha256_of_pins": "f315a057b73dd6646c0e88099ce9a7d73e3525d015be3f74b9ec209f87a2429c"
+    },
+    "DS-07": {
+      "files": 8,
+      "sha256_of_pins": "46ac4e9d78dd4b0b6c38bac33b50851cf66541036e04138cc0c07812f0854b39"
+    },
+    "DS-08": {
+      "files": 486,
+      "sha256_of_pins": "9215677b4e962dc3631cbf0df5c5b7ba2fa017471816eb2ef3275bf3e3a3f9b4"
+    },
+    "DS-09": {
+      "files": 16,
+      "sha256_of_pins": "4388f09963beaa0a1c28d9441a7ce4cd17a64f5fbb1c8d6777d1838daf2714fa"
+    }
+  },
   "features": [
     "log_flux",
     "d5",
@@ -52,7 +70,14 @@
     "early_stopping": false,
     "random_state": 0
   },
+  "intervals": {
+    "level": 0.95,
+    "row_scores": "paired percentile bootstrap over UTC days",
+    "n_boot": 2000,
+    "seed": 20240510,
+    "onsets_warned": "Clopper-Pearson exact"
+  },
   "storm_rows": 2304,
   "train_rows": 139968,
-  "total_wall_s": 225.6
+  "total_wall_s": 177.9
 }
