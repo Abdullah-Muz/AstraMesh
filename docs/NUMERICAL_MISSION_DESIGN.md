@@ -468,7 +468,7 @@ Model and sources in DL-080: USSA 1976 density (Table I, 480–700 km, log-linea
 
 **Integrator drift found while building DR-02:** RK4 alone lowers the semi-major axis of a 525 km circular orbit by 0.003 m per day at 10 s, 0.02 m at 15 s, 0.7 m at 30 s and 23 m at 60 s. Drag lowers it by about 15 m per day. Every scenario uses 10 s (§B.2), where the drift is 0.02 % of the drag effect; **runs with drag must not use a step above 10 s** without re-checking this.
 
-Status: recorded; owner review pending.
+Status: recorded; approved by the owner 2026-11-10 (DL-081).
 
 ## B.10 Storm-time density (D2, NRLMSIS 2.0) validation (2026-11-10; DL-084, DL-085)
 
