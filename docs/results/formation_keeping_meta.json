@@ -1,0 +1,95 @@
+{
+  "experiment": "Closed-loop formation keeping over the S11 storm week (DL-087, DL-088)",
+  "git_commit": "d7ab81ae8cf5c52bdc5514b809103f3c86185c0f",
+  "git_dirty": false,
+  "lockfile_sha256": "cb23cc16440fa7f6e63a8d8b4c90ff80a418b91b421e6a9147e78fe10b1e84b4",
+  "base_config": "configs/experiments/mission_geometry_24h.yaml",
+  "ballistic_nominal_m2pkg": 0.0092,
+  "variants_b_multiplier_sc01": {
+    "equal_B": 1.0,
+    "sc01_B_x0.8": 0.8,
+    "sc01_B_x1.2": 1.2,
+    "sc01_B_x0.5": 0.5,
+    "sc01_B_x2": 2.0
+  },
+  "jobs": [
+    [
+      "equal_B",
+      1.0,
+      10.0
+    ],
+    [
+      "sc01_B_x0.8",
+      1.0,
+      10.0
+    ],
+    [
+      "sc01_B_x1.2",
+      1.0,
+      10.0
+    ],
+    [
+      "sc01_B_x0.5",
+      1.0,
+      10.0
+    ],
+    [
+      "sc01_B_x2",
+      1.0,
+      10.0
+    ],
+    [
+      "sc01_B_x0.8",
+      0.8,
+      10.0
+    ],
+    [
+      "sc01_B_x1.2",
+      0.8,
+      10.0
+    ],
+    [
+      "sc01_B_x0.8",
+      1.25,
+      10.0
+    ],
+    [
+      "sc01_B_x1.2",
+      1.25,
+      10.0
+    ],
+    [
+      "sc01_B_x1.2",
+      1.0,
+      0.0
+    ],
+    [
+      "sc01_B_x1.2",
+      1.0,
+      100.0
+    ]
+  ],
+  "density": "msis2 (NRLMSIS 2.0, DS-10 drivers)",
+  "epoch_utc": "2024-05-08T00:10:00Z",
+  "duration_s": 690600,
+  "pass_criteria_km": {
+    "band": 2.0,
+    "floor": 1.0,
+    "spacing": 20.0
+  },
+  "sample_interval_s": 600,
+  "config_hashes": {
+    "equal_B/scale1/nav10m": "d543afbe3dc6b0d11f6fcdadc4166d1811d97145b19b19777cc1efb794769cba",
+    "sc01_B_x0.8/scale1/nav10m": "19296144daf2109d981945f105778ae4c6b88889895ba87a1bb44973d112e64c",
+    "sc01_B_x1.2/scale1/nav10m": "1f5acb9174549a16c22a01c69d9c253ee106573dbf97f31f5056c851a0d84e22",
+    "sc01_B_x0.5/scale1/nav10m": "b171f06e76071ee4312080ad7f8f0424e934e67d52594b2fc1f5a592c94d07e6",
+    "sc01_B_x2/scale1/nav10m": "4074f2880d05746106f648f51675b24c930eeb97f7eec47e3874959db89d6d81",
+    "sc01_B_x0.8/scale0.8/nav10m": "477685b704d17780b6e5e0023fd719c41eb1bac05f5722816e5dd4bdbf95cf30",
+    "sc01_B_x1.2/scale0.8/nav10m": "ee1b5211f3e35b248a340cfeb47f8ba86c49b76d6a42d61fb7a7403c8cc7c027",
+    "sc01_B_x0.8/scale1.25/nav10m": "53beb5796def36a6783a1ace1e5046fe6f343e0180d6040f84726661e4a5fd7e",
+    "sc01_B_x1.2/scale1.25/nav10m": "2aabead2f06747891906a064105b3edc08287dc1e06c983d642054111b40d8a2",
+    "sc01_B_x1.2/scale1/nav0m": "887a8b8a1e46761e7ca9d6cf232d046258c7cba2f4efe5d07b59ea29dee98fc8",
+    "sc01_B_x1.2/scale1/nav100m": "e2eba1d05fa566644a1f3a6a8f9183fafe64d14ab5a1f04f88d505025a6f7800"
+  },
+  "total_wall_s": 1226.2
+}

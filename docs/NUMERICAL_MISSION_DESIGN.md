@@ -506,4 +506,4 @@ Model: `astramesh.control.formation_keeping`, run inside the truth propagation (
 
 **Previews (dirty tree; not recorded results).** 3 days, B ×2 on sc01, USSA 1976: navigation error 0 / 10 / 100 m gives Δv 0.019 / 0.019 / 0.021 m/s and largest slot errors 0.60 / 0.64 / 0.65 km; equal B commands nothing. S11 week with NRLMSIS (scale 1.0): B ×1.2 holds within 0.69 km for 0.039 m/s; B ×2 within 1.31 km for 0.20 m/s.
 
-Status: implemented; recorded study pending a clean commit (`scripts/experiments/formation_keeping_study.py`); owner review pending.
+Status: implemented and approved by the owner 2026-11-10 (DL-088); recorded study in [`docs/results/FORMATION_KEEPING.md`](results/FORMATION_KEEPING.md) (DL-089).
