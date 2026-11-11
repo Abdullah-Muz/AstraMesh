@@ -251,13 +251,15 @@ def replay_risks(config: NominalOperationsScenario, series: StormSeries,
 def run_nominal_operations(
     config: NominalOperationsScenario, streams: RandomStreams, log: EventLog
 ) -> OperationsRun:
-    formation = run_formation_dynamics(config, log, end_event=False)
+    ids = spacecraft_ids(config.formation.n_spacecraft)
+    faults = fault_schedule(config, ids)  # truth; also gates formation-keeping burns (DL-087)
+    formation = run_formation_dynamics(config, log, end_event=False, faults=faults)
     geo = geometry_products(config, formation)
     traj = formation.trajectory
     spec = config.time.clock_spec()
     step_ns, step_s = spec.step_ns, config.time.time_step_s
     n_ticks = len(traj.t_ns)
-    ids = spacecraft_ids(traj.n_spacecraft)
+    thrust_on = formation.keeping.thrust_on if formation.keeping is not None else None
     sc = config.spacecraft
     n_steps = seconds_to_ns(config.operations.min_observation_s) // step_ns
     mb_per_step = data_volume_mb(1, step_s, sc.payload_data_rate_kbps)
@@ -360,7 +362,6 @@ def run_nominal_operations(
               "no_truth_s")}  # fmt: skip
     active: dict[str, Segment] = {}
     segments: list[Segment] = []
-    faults = fault_schedule(config, ids)
     transitions = faults.transitions(spec.duration_ns)
     kernel = make_kernel(config, formation, agents, streams, log, faults)
 
@@ -428,6 +429,8 @@ def run_nominal_operations(
             if faults:
                 gen *= faults.generation_factor(a, t)
             load = sc.bus_power_w + (sc.payload_power_w if cmd is not None else 0.0)
+            if thrust_on is not None and thrust_on[k, j]:  # DL-087 burn during this step
+                load += sc.thruster_power_w
             supplied = bat.step(gen, load, step_s)
             min_wh[a] = min(min_wh[a], bat.stored_wh)
             if cmd is not None:

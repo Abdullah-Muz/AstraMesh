@@ -28,6 +28,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+from astramesh.control.formation_keeping import KeepingResult
 from astramesh.core.config import MissionGeometryScenario, MissionScenarioBase
 from astramesh.core.events import EventLog
 from astramesh.dynamics.earth_frames import gcrs_to_itrs_matrices, rotate
@@ -122,7 +123,7 @@ def run_mission_geometry(config: MissionGeometryScenario, log: EventLog) -> Miss
     geo = geometry_products(config, formation)
     sun, sunlit, regions, opportunities = geo.sun, geo.sunlit, geo.regions, geo.opportunities
     records = [o.to_record(traj.t_ns, step_ns) for o in opportunities]
-    resources = _account_resources(config, ids, sunlit, opportunities, records)
+    resources = _account_resources(config, ids, sunlit, opportunities, records, formation.keeping)
 
     # Events in time order: eclipse transitions, then opportunity open/close.
     pending: list[tuple[int, int, str, str, dict[str, Any]]] = []
@@ -186,6 +187,7 @@ def _account_resources(
     sunlit: NDArray[np.bool_],
     opportunities: list[Opportunity],
     records: list[dict[str, Any]],
+    keeping: KeepingResult | None = None,
 ) -> dict[str, Any]:
     """Fill task costs in ``records`` (in place) and return the resource summary."""
     sc = config.spacecraft
@@ -216,6 +218,8 @@ def _account_resources(
             generation_w=sc.solar_generation_w,
             bus_w=sc.bus_power_w,
             payload_w=sc.payload_power_w,
+            thruster_on=None if keeping is None else keeping.thrust_on[:, j],  # DL-087 burns
+            thruster_w=0.0 if keeping is None else sc.thruster_power_w,
         )
         return {
             "min_wh": r.min_wh,
@@ -259,7 +263,9 @@ def _account_resources(
         },
         "propulsion": {
             "delta_v_budget_mps": sc.delta_v_budget_mps,
-            "delta_v_used_mps": 0.0,
+            "delta_v_used_mps": 0.0
+            if keeping is None
+            else dict(zip(ids, keeping.delta_v_mps, strict=True)),
             "propellant_for_budget_kg": prop.propellant_kg(sc.delta_v_budget_mps),
             "thrust_time_for_budget_h": full_burn_s / 3600.0,
             "thruster_energy_for_budget_wh": sc.thruster_power_w * full_burn_s / 3600.0,

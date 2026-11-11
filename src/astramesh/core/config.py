@@ -106,6 +106,8 @@ class _ScenarioBase(_Model):
         dyn = d.get("dynamics")
         if isinstance(dyn, dict) and dyn.get("drag") is None:
             dyn.pop("drag", None)  # DL-081
+        if d.get("control", 0) is None:
+            d.pop("control")  # DL-087
         drag = dyn.get("drag") if isinstance(dyn, dict) else None
         if isinstance(drag, dict):  # DL-084 fields omitted at their defaults
             if drag.get("density") == "ussa76":
@@ -297,11 +299,50 @@ class SpacecraftConfig(_Model):
     delta_v_budget_mps: NonNegativeFloat = Field(description="Total delta-v budget [m/s]")
 
 
+class FormationKeepingConfig(_Model):
+    """Along-track formation keeping against differential drag (DL-087).
+
+    Leader-follower chain: spacecraft k keeps ``formation.along_track_spacing_km`` behind
+    spacecraft k-1 with tangential burns of the ``spacecraft`` thruster, decided once per
+    nominal orbit. Thrust, specific impulse, mass and budget come from ``spacecraft``.
+    """
+
+    deadband_km: PositiveFloat = Field(default=0.5, description="No burn while |error| <= this")
+    time_constant_s: PositiveFloat = Field(
+        default=86_400.0, description="Target drift rate = -error / time constant [s]"
+    )
+    max_drift_rate_mps: PositiveFloat = Field(
+        default=0.02, description="Limit on the target along-track drift rate [m/s]"
+    )
+    navigation_sigma_m: NonNegativeFloat = Field(
+        default=10.0, description="GNSS position error per axis, per spacecraft (modelled) [m]"
+    )
+    estimator_jerk_psd_m2ps5: PositiveFloat = Field(
+        default=1e-18,
+        description="Spacing filter process noise: white jerk spectral density [m^2/s^5]",
+    )
+
+
+class ControlConfig(_Model):
+    """Onboard control running inside the truth propagation (DL-087 option A)."""
+
+    formation_keeping: FormationKeepingConfig
+
+
 class MissionScenarioBase(FormationScenarioBase):
     """Formation + science regions + spacecraft resources (shared by mission scenarios)."""
 
     science: ScienceConfig
     spacecraft: SpacecraftConfig
+    control: ControlConfig | None = Field(
+        default=None, description="optional formation keeping (DL-087); omitted when absent"
+    )
+
+    @model_validator(mode="after")
+    def _control_needs_followers(self) -> MissionScenarioBase:
+        if self.control is not None and self.formation.n_spacecraft < 2:
+            raise ValueError("control.formation_keeping needs at least two spacecraft")
+        return self
 
 
 class MissionGeometryScenario(MissionScenarioBase):

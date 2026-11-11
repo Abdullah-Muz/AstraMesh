@@ -486,3 +486,24 @@ Model: NRLMSIS 2.0 through `pymsis` 0.13 (academic, non-commercial licence), dri
 **Consequence for D1:** a quiet day in April 2024 (near solar maximum) decays 40.8 m per day under MSIS against 14.6 m under the USSA 1976 table, so the D1 drift study (DL-083) understates 2024 drift by a factor of about 3; with storm heating, more.
 
 Status: recorded; approved by the owner 2026-11-10 (DL-085).
+
+## B.11 Formation keeping validation (2026-11-10; Phase 5 increment 2b; DL-087, DL-088)
+
+Model: `astramesh.control.formation_keeping`, run inside the truth propagation (DL-087 option A) for mission scenarios with `control.formation_keeping`. Followers keep slots behind the frontmost spacecraft they can hear (normally sc00); once per nominal orbit (571 steps of 10 s at 525 km) each estimates its spacing, drift rate and drift acceleration with a Kalman filter on orbit-sampled spacings and commands whole 10 s steps of tangential thrust (0.5 mN, cold gas, DL-036) when the slot error exceeds 0.5 km. Tests: `tests/physics_validation/test_formation_keeping.py`, `tests/unit/test_formation_keeping_config.py`.
+
+| Check | Result | Tolerance |
+|---|---|---|
+| MK-01 controller configured but idle (24 h, no drag): trajectory against the run without `control` | bit-identical; no thrust, zero Δv | exact |
+| MK-02 constant tangential thrust 4.17 × 10⁻⁵ m/s², two-body, 6 h: semi-major axis against d(a^−½)/dt = −a_t/√μ | ±1.6 km change, error 1.3 mm (8 × 10⁻⁷) | 1 % of the change |
+| MK-03 thrust switched every 600 s (prograde, coast, retrograde), steps 120/60/30 s | order 4.66 | in [3.5, 5.5] |
+| MK-04 Δv and propellant against an independent `PropulsionBudget` replay; thruster energy in the battery ledger (`mission_geometry`); 0.002 m/s budget | equal (1e-12 relative); energy difference = steps × 10 s × 2 W; 4 steps, then no burn | 1e-12 relative; 1e-9 |
+| MK-05 checks: thrust only in sunlight; none during a partition, comms outage, unavailability, critical fault or reduced generation of the follower; partition: followers switch reference to sc01 | no violation; held decisions counted | exact |
+| MK-05 closed loop, 24 h, B ×4 on sc01 (USSA 1976): uncontrolled drifts > 1 km, controlled stays within 20 ± 2 km; other followers do not burn | pass | 20 ± 2 km |
+
+**Measured inputs to the estimator.** In a gravity-only J2 run the osculating semi-major axes of neighbours differ by ±54 m (short-period J2 terms), which would read as a drift of several km per day, so the controller does not use them; spacings sampled once per nominal orbit scatter by only 0.55 – 0.64 m peak to peak over 2 days, so the measurement floor is 1 m.
+
+**String stability (DL-088).** DL-087's chain (each spacecraft follows the one directly ahead) amplified errors down the train in a 3-day preview with B ×2 on sc01 (Δv 0.019 / 0.043 / 0.090 m/s for sc01 / sc02 / sc03, errors up to 0.89 km at sc03), because each follower treated its predecessor's corrections as disturbances. With slots referenced to sc00, only sc01 burns (0.019 m/s) and the other spacings stay at 20.0 km.
+
+**Previews (dirty tree; not recorded results).** 3 days, B ×2 on sc01, USSA 1976: navigation error 0 / 10 / 100 m gives Δv 0.019 / 0.019 / 0.021 m/s and largest slot errors 0.60 / 0.64 / 0.65 km; equal B commands nothing. S11 week with NRLMSIS (scale 1.0): B ×1.2 holds within 0.69 km for 0.039 m/s; B ×2 within 1.31 km for 0.20 m/s.
+
+Status: implemented; recorded study pending a clean commit (`scripts/experiments/formation_keeping_study.py`); owner review pending.

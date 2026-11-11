@@ -9,7 +9,8 @@ Steps:
    ``two_body`` has no short-period terms, so mean = osculating and the
    two-body :func:`~astramesh.dynamics.formation.along_track_formation` is used
    (rotated into the same equatorial frame).
-3. Fixed-step RK4 propagation on the scenario clock grid.
+3. Fixed-step RK4 propagation on the scenario clock grid, with the optional
+   formation-keeping controller (DL-087) for mission scenarios with ``control``.
 
 Outputs are truth states only. No agent, science, or resource model is
 involved, and nothing here is a research result (it is a validated dynamics
@@ -24,9 +25,16 @@ from typing import Any
 
 import numpy as np
 
+from astramesh.control.formation_keeping import (
+    FormationKeeper,
+    KeepingParameters,
+    KeepingResult,
+    control_interval_steps,
+)
 from astramesh.core.clock import NS_PER_S, seconds_to_ns
-from astramesh.core.config import FormationScenarioBase
+from astramesh.core.config import FormationScenarioBase, MissionScenarioBase
 from astramesh.core.events import EventLog
+from astramesh.core.rng import RandomStreams
 from astramesh.dynamics.constants import GM_EARTH_M3PS2, J2_EARTH, R_EARTH_EQ_M
 from astramesh.dynamics.drag import DragModel
 from astramesh.dynamics.earth_frames import earth_pole_gcrs
@@ -35,7 +43,9 @@ from astramesh.dynamics.forces import ForceModel
 from astramesh.dynamics.formation import along_track_formation
 from astramesh.dynamics.mean_elements import equatorial_state, mean_matched_formation
 from astramesh.dynamics.state import CartesianState, Frame
+from astramesh.dynamics.sun import sun_direction_gcrs
 from astramesh.dynamics.twobody import Trajectory, propagate
+from astramesh.faults.schedule import FaultSchedule
 
 ALGORITHM_NAME = "none (truth dynamics only)"
 TRAJECTORY_FILE = "trajectory.csv"
@@ -51,6 +61,7 @@ class FormationRun:
     trajectory: Trajectory
     sample_stride: int
     summary: dict[str, Any]
+    keeping: KeepingResult | None = None  # formation keeping (DL-087), when configured
 
 
 def _initial_states(
@@ -166,13 +177,49 @@ def _drag_model(config: FormationScenarioBase) -> DragModel | None:
     return DragModel(b, density_fn=msis.density)
 
 
+def _keeper(config: FormationScenarioBase, faults: FaultSchedule | None) -> FormationKeeper | None:
+    """The DL-087 controller for a mission scenario with ``control``, else ``None``."""
+    if not isinstance(config, MissionScenarioBase) or config.control is None:
+        return None
+    fk, sc, spec = config.control.formation_keeping, config.spacecraft, config.time.clock_spec()
+    params = KeepingParameters(
+        spacing_m=config.formation.along_track_spacing_km * 1e3,
+        deadband_m=fk.deadband_km * 1e3,
+        time_constant_s=fk.time_constant_s,
+        max_drift_rate_mps=fk.max_drift_rate_mps,
+        navigation_sigma_m=fk.navigation_sigma_m,
+        jerk_psd_m2ps5=fk.estimator_jerk_psd_m2ps5,
+        control_interval_steps=control_interval_steps(
+            config.reference_orbit.mean_altitude_km, GM_EARTH_M3PS2, R_EARTH_EQ_M,
+            config.time.time_step_s,
+        ),
+        thrust_n=sc.thrust_mn * 1e-3,
+        mass_kg=sc.mass_kg,
+        specific_impulse_s=sc.specific_impulse_s,
+        budget_mps=sc.delta_v_budget_mps,
+    )  # fmt: skip
+    t_ns = spec.step_ns * np.arange(spec.n_steps + 1, dtype=np.int64)
+    streams = RandomStreams(config.random.seed, config.random.stream_seeds)
+    return FormationKeeper(
+        params, spacecraft_ids(config.formation.n_spacecraft), spec.step_ns,
+        sun_direction_gcrs(config.time.epoch_utc, t_ns), faults,
+        streams.substream("sensors", "gnss_navigation"),
+    )  # fmt: skip
+
+
 def run_formation_dynamics(
-    config: FormationScenarioBase, log: EventLog, *, end_event: bool = True
+    config: FormationScenarioBase,
+    log: EventLog,
+    *,
+    end_event: bool = True,
+    faults: FaultSchedule | None = None,
 ) -> FormationRun:
     """Initialize and propagate the formation.
 
     With ``end_event=False`` the caller records ``scenario_end`` itself (after
-    its own events, which must not precede earlier ticks).
+    its own events, which must not precede earlier ticks). ``faults`` (truth) gates
+    formation-keeping burns (DL-087); burns are returned in ``FormationRun.keeping``,
+    not logged, because the event log must stay in tick order for the caller.
     """
     epoch = config.time.epoch_utc
     spec = config.time.clock_spec()
@@ -198,12 +245,20 @@ def run_formation_dynamics(
     )
     # Mean elements are defined under gravity only (§B.6); drag acts from t = 0 on.
     initial = _initial_states(config, replace(forces, drag=None), log)
-    traj = propagate(initial, step_ns=spec.step_ns, n_steps=spec.n_steps, forces=forces)
+    keeper = _keeper(config, faults)
+    traj = propagate(
+        initial, step_ns=spec.step_ns, n_steps=spec.n_steps, forces=forces, controller=keeper
+    )
     stride = seconds_to_ns(config.output.trajectory_sample_interval_s) // spec.step_ns
     summary = _summary(config, traj, forces)
+    keeping = None
+    if keeper is not None:
+        assert isinstance(config, MissionScenarioBase)
+        keeping = keeper.result()
+        summary["formation_keeping"] = keeping.summary(config.spacecraft.thruster_power_w)
     if end_event:
         record_scenario_end(config, log)
-    return FormationRun(traj, int(stride), summary)
+    return FormationRun(traj, int(stride), summary, keeping)
 
 
 def record_scenario_end(config: FormationScenarioBase, log: EventLog) -> None:

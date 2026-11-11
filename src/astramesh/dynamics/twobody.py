@@ -4,7 +4,9 @@ Integrator: classical fixed-step 4th-order Runge-Kutta (RK4) on the scenario
 clock grid (integer-nanosecond time points, ``docs/CONVENTIONS.md`` §2.1).
 Each spacecraft is an independent point mass in the Earth's gravity field,
 given by a :class:`~astramesh.dynamics.forces.ForceModel`: point mass (D0) or
-point mass + J2 (D1). There is no drag, thrust, or interaction yet.
+point mass + J2 (D1), with optional drag (DL-080/084) and optional tangential
+thrust from an onboard controller (DL-087). There is no interaction between
+spacecraft.
 
 Determinism (PA-09): all arithmetic is elementwise NumPy (no BLAS, no
 reductions with platform-dependent ordering, no transcendental functions), so
@@ -20,6 +22,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Protocol
 
 import numpy as np
 from numpy.typing import NDArray
@@ -45,25 +48,49 @@ def two_body_acceleration(r: NDArray[np.float64], mu: float) -> NDArray[np.float
     return acceleration(r, ForceModel.two_body(mu))
 
 
-def _derivative(y: NDArray[np.float64], fm: ForceModel, t_s: float) -> NDArray[np.float64]:
+class ThrustController(Protocol):
+    """Onboard controller called before every step (DL-087).
+
+    ``thrust(k, t_ns, y)`` sees the states ``y`` (n, 6) at tick ``k`` and returns the
+    signed tangential acceleration of each spacecraft for the step k -> k+1 [m/s^2]
+    (positive along the inertial velocity), or ``None`` for no thrust at all.
+    """
+
+    def thrust(self, k: int, t_ns: int, y: NDArray[np.float64]) -> NDArray[np.float64] | None: ...
+
+
+def _derivative(
+    y: NDArray[np.float64],
+    fm: ForceModel,
+    t_s: float,
+    thrust: NDArray[np.float64] | None = None,
+) -> NDArray[np.float64]:
     a = acceleration(y[:, :3], fm)
     if fm.drag is not None:  # DL-080; with drag off the gravity-only path is unchanged
         a = a + drag_acceleration(y, fm.drag, fm.pole, t_s)
+    if thrust is not None:  # DL-087: along the inertial velocity of this stage's state
+        v = y[:, 3:]
+        a = a + (thrust / norm3(v))[:, np.newaxis] * v
     return np.concatenate((y[:, 3:], a), axis=1)
 
 
 def rk4_step(
-    y: NDArray[np.float64], h_s: float, fm: ForceModel, t_s: float = 0.0
+    y: NDArray[np.float64],
+    h_s: float,
+    fm: ForceModel,
+    t_s: float = 0.0,
+    thrust: NDArray[np.float64] | None = None,
 ) -> NDArray[np.float64]:
     """One classical RK4 step from time ``t_s`` for stacked states ``y`` of shape (n, 6).
 
     Time enters only through a time-dependent drag density (D2); gravity and D1 drag
-    do not depend on it.
+    do not depend on it. ``thrust`` (n,) is a tangential acceleration held for the
+    whole step, so the right-hand side stays smooth within the step.
     """
-    k1 = _derivative(y, fm, t_s)
-    k2 = _derivative(y + (0.5 * h_s) * k1, fm, t_s + 0.5 * h_s)
-    k3 = _derivative(y + (0.5 * h_s) * k2, fm, t_s + 0.5 * h_s)
-    k4 = _derivative(y + h_s * k3, fm, t_s + h_s)
+    k1 = _derivative(y, fm, t_s, thrust)
+    k2 = _derivative(y + (0.5 * h_s) * k1, fm, t_s + 0.5 * h_s, thrust)
+    k3 = _derivative(y + (0.5 * h_s) * k2, fm, t_s + 0.5 * h_s, thrust)
+    k4 = _derivative(y + h_s * k3, fm, t_s + h_s, thrust)
     return y + (h_s / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
 
 
@@ -135,11 +162,14 @@ def propagate(
     step_ns: int,
     n_steps: int,
     forces: ForceModel,
+    controller: ThrustController | None = None,
 ) -> Trajectory:
     """Propagate GCRS states of several spacecraft with fixed-step RK4.
 
     All initial states must be in GCRS at the same scenario time. The returned
-    trajectory has ``n_steps + 1`` time points starting at that time.
+    trajectory has ``n_steps + 1`` time points starting at that time. A
+    ``controller`` (DL-087) is asked for thrust before every step; when it returns
+    ``None`` the step is computed exactly as without a controller.
     """
     if not initial:
         raise ValueError("at least one initial state is required")
@@ -163,7 +193,9 @@ def propagate(
     h_s = step_ns / NS_PER_S
     y = y0
     for k in range(1, n_steps + 1):
-        y = rk4_step(y, h_s, forces, int(t_ns[k - 1]) / NS_PER_S)
+        t_prev = int(t_ns[k - 1])
+        thrust = None if controller is None else controller.thrust(k - 1, t_prev, y)
+        y = rk4_step(y, h_s, forces, t_prev / NS_PER_S, thrust)
         _check_physical(y, int(t_ns[k]))
         out[k] = y
     out.setflags(write=False)
