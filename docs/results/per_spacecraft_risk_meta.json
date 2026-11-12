@@ -1,0 +1,140 @@
+{
+  "experiment": "Per-spacecraft risk on the S11 storm week (DL-090, DL-091)",
+  "git_commit": "45430aa3ed7fbfbb1300480016ea5dab2f3ee630",
+  "git_dirty": false,
+  "lockfile_sha256": "cb23cc16440fa7f6e63a8d8b4c90ff80a418b91b421e6a9147e78fe10b1e84b4",
+  "series_sha256": "0a85ddd42028b8d5718da13fa349f6685d3a7bbdd1255475708cc40661c021d4",
+  "forecast": "P-B/q50",
+  "planner": "rule_b4",
+  "seed": 1,
+  "outage": {
+    "fault_id": "forecast_outage_sc01",
+    "type": "forecast_outage",
+    "spacecraft": [
+      "sc01"
+    ],
+    "start_s": 231000,
+    "end_s": 252600,
+    "cause": "missed forecast uplinks (DL-090)",
+    "observability": "effects_only",
+    "consequences": "sc01's inputs expire after 3600 s"
+  },
+  "tolerances_pfu": [
+    100.0,
+    100.0,
+    50.0,
+    200.0
+  ],
+  "stormer_invariant_cutoff_deg": 71.95,
+  "cases": {
+    "phase4": {
+      "access": null,
+      "tolerances_pfu": 100.0,
+      "outage": false
+    },
+    "position": {
+      "access": {},
+      "tolerances_pfu": 100.0,
+      "outage": false
+    },
+    "position+tolerances": {
+      "access": {},
+      "tolerances_pfu": [
+        100.0,
+        100.0,
+        50.0,
+        200.0
+      ],
+      "outage": false
+    },
+    "position+outage": {
+      "access": {},
+      "tolerances_pfu": 100.0,
+      "outage": true
+    },
+    "main": {
+      "access": {},
+      "tolerances_pfu": [
+        100.0,
+        100.0,
+        50.0,
+        200.0
+      ],
+      "outage": true
+    },
+    "main/cap8": {
+      "access": {
+        "max_shift_deg": 8.0
+      },
+      "tolerances_pfu": [
+        100.0,
+        100.0,
+        50.0,
+        200.0
+      ],
+      "outage": true
+    },
+    "main/nocap": {
+      "access": {
+        "max_shift_deg": null
+      },
+      "tolerances_pfu": [
+        100.0,
+        100.0,
+        50.0,
+        200.0
+      ],
+      "outage": true
+    },
+    "main/slope0.5": {
+      "access": {
+        "storm_slope_deg_per_nt": 0.026164311878597593
+      },
+      "tolerances_pfu": [
+        100.0,
+        100.0,
+        50.0,
+        200.0
+      ],
+      "outage": true
+    },
+    "main/slope1.5": {
+      "access": {
+        "storm_slope_deg_per_nt": 0.07849293563579278
+      },
+      "tolerances_pfu": [
+        100.0,
+        100.0,
+        50.0,
+        200.0
+      ],
+      "outage": true
+    },
+    "main/stormer_noshift": {
+      "access": {
+        "quiet_cutoff_deg": 71.95,
+        "storm_slope_deg_per_nt": 0.0
+      },
+      "tolerances_pfu": [
+        100.0,
+        100.0,
+        50.0,
+        200.0
+      ],
+      "outage": true
+    }
+  },
+  "config_hashes": {
+    "phase4": "34086c2214f96d0209432e225660cf95758d9a08e8d4f4ea6150e619ecda0d41",
+    "position": "ea20a5e806cb29b724a9a977003cd1a10fbe6fa948785ea71cf1ebe247886724",
+    "position+tolerances": "3a37489b313feff414c7022504de6d3f3b07cbb2020bb4ec773e79eb92c56882",
+    "position+outage": "927ee94f120dbeaa7e2bf8c6f31f52aeec6fa798799fb717e7b8a2f38264259d",
+    "main": "8ac45e5c37d71b92cd67a50a385addb369c6e5b7ef868fed4fd942bf0e3b5974",
+    "main/cap8": "f78d959cfb2310d3e43c95ea56b03af50f10d5f8a7ba52c168337dbc3731e387",
+    "main/nocap": "2887916aea4e3723424daa4ba946e443e80d7190db16a28ff541d3e400256b28",
+    "main/slope0.5": "01695baec25e62fdbcdd3fa148cafd2e1604cd4a7d0427be7e7bf7f107281126",
+    "main/slope1.5": "a0f6ae83df7d463a0e49c7779619544474191c149bf9c72f1d02786166c4a33c",
+    "main/stormer_noshift": "935486aeee649f57df5d4a1de0bed119880b45527bd244e453e2e404fc9f6c09"
+  },
+  "total_wall_s": 140.5
+}
