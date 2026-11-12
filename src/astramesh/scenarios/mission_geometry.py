@@ -94,6 +94,7 @@ class GeometryProducts:
     sunlit: NDArray[np.bool_]  # (n_t, n_sc)
     regions: list[Region]
     opportunities: list[Opportunity]
+    r_itrs: NDArray[np.float64]  # (n_t, n_sc, 3) Earth-fixed positions [m]
 
 
 def geometry_products(config: MissionScenarioBase, formation: FormationRun) -> GeometryProducts:
@@ -112,7 +113,7 @@ def geometry_products(config: MissionScenarioBase, formation: FormationRun) -> G
     opportunities = find_opportunities(
         regions, ids, r_itrs, sunlit, config.science.min_elevation_deg
     )
-    return GeometryProducts(sun, sunlit, regions, opportunities)
+    return GeometryProducts(sun, sunlit, regions, opportunities, r_itrs)
 
 
 def run_mission_geometry(config: MissionGeometryScenario, log: EventLog) -> MissionGeometryRun:

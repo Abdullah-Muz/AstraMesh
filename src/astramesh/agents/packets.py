@@ -160,6 +160,7 @@ class RiskForecast:
     radiation: float | None
     navcomms: float | None
     orbital: float | None
+    issued_ns: int | None = None  # when the inputs were issued (DL-090); None = unknown
 
     def __post_init__(self) -> None:
         for r in (self.radiation, self.navcomms, self.orbital):

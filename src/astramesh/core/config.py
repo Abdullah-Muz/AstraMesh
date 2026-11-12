@@ -108,6 +108,14 @@ class _ScenarioBase(_Model):
             dyn.pop("drag", None)  # DL-081
         if d.get("control", 0) is None:
             d.pop("control")  # DL-087
+        for f in d.get("faults") or ():  # DL-090: forecast_delay only
+            if isinstance(f, dict) and f.get("delay_s", 0) is None:
+                f.pop("delay_s")
+        rp = env.get("replay") if isinstance(env, dict) else None
+        if isinstance(rp, dict):  # DL-090 blocks omitted when absent
+            for key in ("access", "forecast_max_age_s"):
+                if rp.get(key, 0) is None:
+                    rp.pop(key)
         drag = dyn.get("drag") if isinstance(dyn, dict) else None
         if isinstance(drag, dict):  # DL-084 fields omitted at their defaults
             if drag.get("density") == "ussa76":
@@ -506,6 +514,8 @@ class FaultConfig(_Model):
         "payload_degraded",
         "power_degraded",
         "critical_fault",
+        "forecast_outage",
+        "forecast_delay",
     ]
     spacecraft: list[Identifier] = Field(
         default_factory=list, description="Affected spacecraft (not used for partition)"
@@ -526,6 +536,9 @@ class FaultConfig(_Model):
     consequences: str = Field(min_length=1, description="Expected consequences (free text)")
     ground_confirmation_s: NonNegativeFloat | None = Field(
         default=None, description="Ground confirms the failure to all agents at this time [s]"
+    )
+    delay_s: PositiveFloat | None = Field(
+        default=None, description="forecast_delay: extra delivery latency [s] (DL-090)"
     )
 
     @model_validator(mode="after")
@@ -551,6 +564,9 @@ class FaultConfig(_Model):
             raise ValueError(f"{self.fault_id}: ground_confirmation_s before start_s")
         if self.type != "power_degraded" and self.severity_fraction != 1.0:
             raise ValueError(f"{self.fault_id}: severity_fraction applies to power_degraded only")
+        if (self.type == "forecast_delay") != (self.delay_s is not None):
+            raise ValueError(f"{self.fault_id}: delay_s is required for, and only for, "
+                             "forecast_delay")  # fmt: skip
         return self
 
     @property
@@ -580,6 +596,28 @@ class ForecastConfig(_Model):
         return self
 
 
+class PositionAccessConfig(_Model):
+    """Position-based proton access (DL-090 option A, values DL-091): flux reaches a
+    spacecraft only at or above the invariant-latitude cutoff for 10 MeV protons,
+    quiet - slope * max(-SYM-H, 0), the shift capped at ``max_shift_deg``. A model."""
+
+    quiet_cutoff_deg: float = Field(
+        default=65.2, gt=0.0, le=90.0, allow_inf_nan=False,
+        description="Cutoff invariant latitude at SYM-H >= 0 (R08)",
+    )  # fmt: skip
+    storm_slope_deg_per_nt: float = Field(
+        default=1.0 / 19.11, ge=0.0, allow_inf_nan=False,
+        description="Equatorward shift per nT of negative SYM-H (R08: Dst / 19.11)",
+    )  # fmt: skip
+    max_shift_deg: float | None = Field(
+        default=15.0, ge=0.0, allow_inf_nan=False,
+        description="Cap on the shift (R08's extrapolation to Dst ~ -300 nT); null = none",
+    )  # fmt: skip
+    horizon_s: PositiveSeconds = Field(
+        default=3600.0, description="Look-ahead along the own track for the risk input"
+    )
+
+
 class StormReplayConfig(_Model):
     """Real-data storm replay (S11, DL-069): every spacecraft's radiation, orbital and
     nav/comms inputs come from the pinned May 2024 series instead of scheduled intervals.
@@ -592,10 +630,14 @@ class StormReplayConfig(_Model):
     forecast: Literal["P-A", "P-B/q50", "P-C/q50", "P-B/q90", "P-C/q90"] = Field(
         description="Radiation input: P-A latest measurement, P-B/P-C 1 h forecasts"
     )
-    radiation_tolerance_pfu: float = Field(
-        default=100.0, gt=0.0, allow_inf_nan=False,
-        description="GOES >= 10 MeV flux at the payload's modelled tolerance (GEO upper bound)",
-    )  # fmt: skip
+    radiation_tolerance_pfu: (
+        Annotated[float, Field(gt=0.0, allow_inf_nan=False)]
+        | list[Annotated[float, Field(gt=0.0, allow_inf_nan=False)]]
+    ) = Field(
+        default=100.0,
+        description="GOES >= 10 MeV flux at the payload's modelled tolerance (GEO upper "
+        "bound); one value, or one per spacecraft (DL-090)",
+    )
     orbital_tolerance_nt: float = Field(
         default=250.0, gt=0.0, allow_inf_nan=False,
         description="-SYM-H at which the orbital-disturbance ratio is 1.0",
@@ -604,6 +646,17 @@ class StormReplayConfig(_Model):
         default=2000.0, gt=0.0, allow_inf_nan=False,
         description="AE at which the nav/comms ratio is 1.0",
     )  # fmt: skip
+    access: PositionAccessConfig | None = Field(
+        default=None, description="Position-based access (DL-090); absent = GEO proxy for all"
+    )
+    forecast_max_age_s: PositiveSeconds | None = Field(
+        default=None,
+        description="Agents treat inputs issued longer ago than this as invalid (DL-090)",
+    )
+
+    def tolerance_pfu(self, index: int) -> float:
+        tol = self.radiation_tolerance_pfu
+        return tol[index] if isinstance(tol, list) else tol
 
 
 class EnvironmentConfig(_Model):
@@ -689,6 +742,13 @@ class NominalOperationsScenario(MissionScenarioBase):
         self._require_on_grid(
             self.supervisor.watch_status_interval_s, "supervisor.watch_status_interval_s"
         )
+        rp = self.environment.replay if self.environment is not None else None
+        tol = rp.radiation_tolerance_pfu if rp is not None else None
+        if isinstance(tol, list) and len(tol) != self.formation.n_spacecraft:
+            raise ValueError("radiation_tolerance_pfu needs one value per spacecraft")
+        for f in self.faults:  # only replay inputs carry issue times (age rule, DL-090)
+            if f.type in ("forecast_outage", "forecast_delay") and rp is None:
+                raise ValueError(f"{f.fault_id}: {f.type} needs environment.replay")
         if self.environment is not None:
             for fc in self.environment.forecasts:
                 if set(fc.spacecraft) - ids:

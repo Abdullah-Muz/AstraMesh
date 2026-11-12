@@ -61,7 +61,9 @@ from astramesh.core.clock import seconds_to_ns
 from astramesh.core.config import NominalOperationsScenario
 from astramesh.core.events import EventLog
 from astramesh.core.rng import RandomStreams
+from astramesh.dynamics.geomagnetic import decimal_year, dipole_axis, invariant_latitude_deg
 from astramesh.faults.schedule import Fault, FaultSchedule
+from astramesh.forecast.access import CutoffModel, forward_window_max
 from astramesh.forecast.replay import StormSeries
 from astramesh.planning.centralized_b1 import EnergyModel, plan_centralized
 from astramesh.planning.plans import Assignment, Plan
@@ -195,11 +197,18 @@ def fault_schedule(config: NominalOperationsScenario, ids: list[str]) -> FaultSc
                 ground_confirmation_ns=(
                     None if f.ground_confirmation_s is None else ns(f.ground_confirmation_s)
                 ),
+                delay_ns=0 if f.delay_s is None else ns(f.delay_s),
             )
             for f in config.faults
         ],
         ids,
     )
+
+
+def _forecast_max_age_ns(config: NominalOperationsScenario) -> int | None:
+    rp = config.environment.replay if config.environment is not None else None
+    age = rp.forecast_max_age_s if rp is not None else None
+    return None if age is None else seconds_to_ns(age)
 
 
 def supervisor_settings(config: NominalOperationsScenario) -> SupervisorSettings:
@@ -236,14 +245,16 @@ def _ratio(x: float | None, tol: float) -> float | None:
 
 
 def replay_risks(config: NominalOperationsScenario, series: StormSeries,
-                 t_unix_ns: int) -> tuple[float | None, float | None, float | None]:  # fmt: skip
+                 t_unix_ns: int, index: int = 0,
+                 ) -> tuple[float | None, float | None, float | None]:  # fmt: skip
     """(radiation, navcomms, orbital) ratios at ``t`` from the S11 storm replay (DL-069):
-    the chosen forecast over the radiation tolerance, AE and -SYM-H over theirs. The same
-    for every spacecraft (GOES is a GEO upper-bound proxy)."""
+    the chosen forecast over spacecraft ``index``'s radiation tolerance (DL-090), AE and
+    -SYM-H over theirs. GOES is a GEO upper-bound proxy; position-based access, when
+    configured, is applied by the caller."""
     rp = config.environment.replay if config.environment is not None else None
     assert rp is not None
     sym, ae = series.indices(t_unix_ns)
-    return (_ratio(series.forecast(rp.forecast, t_unix_ns), rp.radiation_tolerance_pfu),
+    return (_ratio(series.forecast(rp.forecast, t_unix_ns), rp.tolerance_pfu(index)),
             _ratio(ae, rp.navcomms_tolerance_nt),
             _ratio(None if sym is None else -sym, rp.orbital_tolerance_nt))  # fmt: skip
 
@@ -316,6 +327,7 @@ def run_nominal_operations(
         recovery_nav_max_age_ns=seconds_to_ns(config.supervisor.recovery_nav_max_age_s),
         recovery_peer_heard_ns=seconds_to_ns(config.supervisor.recovery_peer_heard_s),
         payload_check=payload_settings,
+        forecast_max_age_ns=_forecast_max_age_ns(config),
     )
     agents = {a: SpacecraftAgent(a, tuple(p for p in ids if p != a), settings) for a in ids}
     for a in ids:
@@ -360,6 +372,17 @@ def run_nominal_operations(
     storm = {k: dict.fromkeys(ids, 0.0) for k in
              ("hazard_s", "exposed_s", "protected_in_hazard_s", "protected_outside_hazard_s",
               "no_truth_s")}  # fmt: skip
+    acc = rp.access if rp is not None else None
+    cutoff = track_max = in_access = None
+    if acc is not None and series is not None:  # DL-090 option A, values DL-091
+        cutoff = CutoffModel(acc.quiet_cutoff_deg, acc.storm_slope_deg_per_nt, acc.max_shift_deg)
+        lam = invariant_latitude_deg(geo.r_itrs, dipole_axis(decimal_year(config.time.epoch_utc)))
+        track_max = forward_window_max(lam, seconds_to_ns(acc.horizon_s) // step_ns + 1)
+        truth_cut = np.array([cutoff.cutoff_deg(series.sym_h_truth(epoch_unix_ns + int(t)))
+                              for t in traj.t_ns])  # fmt: skip
+        in_access = lam >= truth_cut[:, None]
+        storm["in_access_s"] = {a: float(in_access[:, j].sum()) * step_s
+                                for j, a in enumerate(ids)}  # fmt: skip
     active: dict[str, Segment] = {}
     segments: list[Segment] = []
     transitions = faults.transitions(spec.duration_ns)
@@ -391,12 +414,27 @@ def run_nominal_operations(
                 hk = Housekeeping(t, bat.stored_wh, sc.battery_capacity_wh, storage[a],
                                   sc.storage_capacity_mb, flags)  # fmt: skip
                 agents[a].observe(hk)
-                if series is not None:
-                    risks = replay_risks(config, series, epoch_unix_ns + t)
-                    agents[a].observe(RiskForecast(t, *risks))
-                elif config.environment is not None:
+                delivered = not faults or faults.forecast_delivered(a, t)  # DL-090
+                if series is not None and delivered:
+                    tu = epoch_unix_ns + t - (faults.forecast_delay_ns(a, t) if faults else 0)
+                    rad, nav, orb = replay_risks(config, series, tu, j)
+                    if (
+                        cutoff is not None
+                        and track_max is not None
+                        and rad is not None
+                        and track_max[k, j] < cutoff.cutoff_deg(series.indices(tu)[0])
+                    ):
+                        rad = 0.0  # own track stays below the cutoff over the horizon
+                    issued = series.issued_ns(tu)
+                    agents[a].observe(
+                        RiskForecast(
+                            t, rad, nav, orb, None if issued is None else issued - epoch_unix_ns
+                        )
+                    )
+                elif series is None and config.environment is not None:  # scheduled forecasts
                     dims = ("radiation", "navcomms", "orbital")
-                    agents[a].observe(RiskForecast(t, *(risk_ratio(config, a, d, t) for d in dims)))
+                    r_rad, r_nav, r_orb = (risk_ratio(config, a, d, t) for d in dims)
+                    agents[a].observe(RiskForecast(t, r_rad, r_nav, r_orb))
                 if sensor is not None and t > 0 and t % check_ns == 0:  # H-C onboard detector
                     bad = bool(faults) and not faults.payload_valid(a, t)
                     agents[a].observe(PayloadCheck(t, sensor.draw(sensor_rng, bad)))
@@ -410,7 +448,9 @@ def run_nominal_operations(
                 if flux is None:
                     storm["no_truth_s"][a] += step_s
                 else:
-                    hazard = flux >= rp.radiation_tolerance_pfu
+                    if in_access is not None and not in_access[k, j]:
+                        flux = 0.0  # below the cutoff: no access (DL-090)
+                    hazard = flux >= rp.tolerance_pfu(j)
                     protected = agents[a].mode in (PROTECTIVE, RECOVERY)
                     if hazard:
                         storm["hazard_s"][a] += step_s
@@ -525,7 +565,8 @@ def run_nominal_operations(
         "health": health,
         "protection": _protection_summary(agents, ids, spec.duration_ns, protection_violations),
         **({"storm": {"forecast": rp.forecast,
-                      "radiation_tolerance_pfu": rp.radiation_tolerance_pfu, **storm}}
+                      "radiation_tolerance_pfu": rp.radiation_tolerance_pfu, **storm,
+                      **({"access": acc.model_dump(mode="json")} if acc is not None else {})}}
            if rp is not None else {}),
         "network": kernel.network_summary(),
         **kernel.agents_summary(),

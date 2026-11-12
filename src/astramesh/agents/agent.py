@@ -95,10 +95,13 @@ class AgentSettings:
     recovery_nav_max_age_ns: int = 60 * 10**9
     recovery_peer_heard_ns: int = 90 * 10**9
     payload_check: PayloadSettings | None = None  # H-C onboard detector (DL-066)
+    forecast_max_age_ns: int | None = None  # environment inputs expire (DL-090)
 
     def __post_init__(self) -> None:
         if self.status_interval_ns <= 0 or self.status_lifetime_ns <= 0:
             raise ValueError("intervals must be positive")
+        if self.forecast_max_age_ns is not None and self.forecast_max_age_ns <= 0:
+            raise ValueError("forecast_max_age_ns must be positive")
         if not 0.0 <= self.battery_reserve_fraction < 1.0:
             raise ValueError("battery_reserve_fraction must be in [0, 1)")
 
@@ -287,6 +290,17 @@ class SpacecraftAgent:
     def mode(self) -> str:
         return self._sup.mode if self._sup is not None else NOMINAL
 
+    def _risks(self, now_ns: int) -> dict[str, float | None]:
+        """Own environment inputs; expired ones (issued more than ``forecast_max_age_ns``
+        ago, DL-090) are invalid, never zero risk."""
+        fc = self._forecast
+        if fc is None:
+            return {}
+        age_limit = self.settings.forecast_max_age_ns
+        if age_limit is not None and fc.issued_ns is not None and now_ns - fc.issued_ns > age_limit:
+            return dict.fromkeys(fc.as_mapping())
+        return fc.as_mapping()
+
     def _supervise(self, now_ns: int) -> bool:
         """Update the supervisor from own housekeeping and forecast; True if science allowed."""
         sup = self._sup
@@ -298,7 +312,7 @@ class SpacecraftAgent:
             now_ns,
             battery_fraction=frac,
             critical_flags=hk.critical_flags if hk else (),
-            risks=self._forecast.as_mapping() if self._forecast else {},
+            risks=self._risks(now_ns),
             forecast_enabled=self._forecast is not None,
             recovery_checks_ok=self._recovery_checks_ok(now_ns),
         )

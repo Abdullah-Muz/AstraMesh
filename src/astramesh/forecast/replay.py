@@ -77,6 +77,18 @@ class StormSeries:
         """Latest forecast of the next-hour maximum available at ``t`` (pfu)."""
         return self._at(self.forecast_pfu[name], t_unix_ns, self.latency_ns)
 
+    def issued_ns(self, t_unix_ns: int) -> int | None:
+        """Unix time at which the latest record available at ``t`` became available
+        (its issue time, DL-090); None before the first record or after the last."""
+        i = (t_unix_ns - self.start_ns - self.latency_ns) // self.step_ns
+        if i < 0 or i >= len(self.truth_pfu):
+            return None
+        return self.start_ns + i * self.step_ns + self.latency_ns
+
+    def sym_h_truth(self, t_unix_ns: int) -> float | None:
+        """SYM-H of the record covering ``t`` [nT]; evaluation (truth access) only."""
+        return self._at(self.sym_h_nt, t_unix_ns, 0)
+
     def indices(self, t_unix_ns: int) -> tuple[float | None, float | None]:
         """Latest available (SYM-H, AE) at ``t`` [nT]."""
         return (self._at(self.sym_h_nt, t_unix_ns, self.latency_ns),

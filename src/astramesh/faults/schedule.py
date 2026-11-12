@@ -22,6 +22,12 @@ Fault types and their *truth* effects while active (``start_ns <= t < end_ns``):
     A critical local subsystem fault (thermal/attitude abstraction): the
     spacecraft's *own* housekeeping carries a critical flag while it is active,
     which drives its supervisor to SAFE (DL-054).
+``forecast_outage``
+    No environment input (risk forecast and indices) reaches the spacecraft: a
+    missed uplink, with no ground-station model (DL-090). Peer messages are
+    unaffected.
+``forecast_delay``
+    Environment inputs reach the spacecraft ``delay_ns`` later than nominal.
 
 Agents learn of faults only through effects (missing messages, housekeeping),
 never from this module (enforced by the agent import rule).
@@ -40,6 +46,8 @@ FAULT_TYPES = (
     "payload_degraded",
     "power_degraded",
     "critical_fault",
+    "forecast_outage",
+    "forecast_delay",
 )
 
 
@@ -57,6 +65,7 @@ class Fault:
     recoverable: bool
     consequences: str
     ground_confirmation_ns: int | None = None  # ground notice to all agents (DL-052)
+    delay_ns: int = 0  # forecast_delay only (DL-090)
 
     def active(self, t_ns: int) -> bool:
         return self.start_ns <= t_ns and (self.end_ns is None or t_ns < self.end_ns)
@@ -75,6 +84,7 @@ class Fault:
             "recoverable": self.recoverable,
             "consequences": self.consequences,
             "ground_confirmation_ns": self.ground_confirmation_ns,
+            **({"delay_ns": self.delay_ns} if self.fault_type == "forecast_delay" else {}),
         }
 
 
@@ -86,6 +96,8 @@ class FaultSchedule:
         self.spacecraft = list(spacecraft)
         known = set(spacecraft)
         for f in self.faults:
+            if (f.fault_type == "forecast_delay") != (f.delay_ns > 0):
+                raise ValueError(f"{f.fault_id}: delay_ns > 0 for, and only for, forecast_delay")
             if f.fault_type not in FAULT_TYPES:
                 raise ValueError(f"{f.fault_id}: unknown fault type {f.fault_type!r}")
             unknown = set(f.spacecraft) - known
@@ -132,6 +144,17 @@ class FaultSchedule:
             if sc in f.spacecraft:
                 factor = min(factor, f.severity_fraction)
         return factor
+
+    def forecast_delivered(self, sc: str, t_ns: int) -> bool:
+        """False while a forecast_outage covers ``sc`` (or it is unavailable)."""
+        if self.unavailable(sc, t_ns):
+            return False
+        return not any(sc in f.spacecraft for f in self._active("forecast_outage", t_ns))
+
+    def forecast_delay_ns(self, sc: str, t_ns: int) -> int:
+        """Extra delivery latency of environment inputs for ``sc`` at ``t_ns``."""
+        return max((f.delay_ns for f in self._active("forecast_delay", t_ns)
+                    if sc in f.spacecraft), default=0)  # fmt: skip
 
     def transitions(self, end_ns: int) -> list[tuple[int, str, Fault]]:
         """(time, 'fault_started' | 'fault_ended', fault) within [0, end_ns], time-ordered."""
