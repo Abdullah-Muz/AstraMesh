@@ -1,6 +1,6 @@
 # Per-spacecraft risk over the storm week
 
-> **Status:** recorded 2026-11-11 from clean commit `45430aa` (`git_dirty: false`). Phase 5 increment 3 (DL-090, DL-091, DL-092, DL-093). Agents with the protection supervisor; position-based access is a model, not a measurement. Awaiting owner review.
+> **Status:** recorded 2026-11-11 from clean commit `45430aa` (`git_dirty: false`). Phase 5 increment 3 (DL-090, DL-091, DL-092, DL-093). Agents with the protection supervisor; position-based access is a model, not a measurement. Approved by the owner 2026-11-11.
 
 ## Setup
 
