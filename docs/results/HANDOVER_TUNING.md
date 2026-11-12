@@ -1,6 +1,6 @@
 # Forecast-handover tuning on the February 2024 storm
 
-> **Status:** recorded 2026-11-11 from clean commit `a7b2046` (`git_dirty: false`). Phase 5 increment 4 (DL-094, DL-095, DL-096). Tuning only: May 2024 is not touched here. Awaiting owner review.
+> **Status:** recorded 2026-11-11 from clean commit `a7b2046` (`git_dirty: false`). Phase 5 increment 4 (DL-094, DL-095, DL-096). Tuning only: May 2024 is not touched here. Approved by the owner 2026-11-12.
 
 ## Setup
 

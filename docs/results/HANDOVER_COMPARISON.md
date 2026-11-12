@@ -1,6 +1,6 @@
 # Forecast handover against the reactive baseline, May 2024
 
-> **Status:** recorded 2026-11-12 from clean commit `fd5abc3` (`git_dirty: false`; 229 runs, 4.7 h on 8 workers). Phase 5 increment 4 (DL-078, DL-094 – DL-097). The held-out storm, used once with the setting frozen in DL-096 (θ = 0.9, L = 30 min). Awaiting owner review.
+> **Status:** recorded 2026-11-12 from clean commit `fd5abc3` (`git_dirty: false`; 229 runs, 4.7 h on 8 workers). Phase 5 increment 4 (DL-078, DL-094 – DL-097). The held-out storm, used once with the setting frozen in DL-096 (θ = 0.9, L = 30 min). Approved by the owner 2026-11-12.
 
 ## Setup
 
