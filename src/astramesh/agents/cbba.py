@@ -48,6 +48,7 @@ class CbbaState:
     s: dict[str, int] = field(default_factory=dict)
     _own: dict[str, OwnTask] = field(default_factory=dict)
     _order: dict[str, int] = field(default_factory=dict)
+    window_end_ns: int = 0  # no bids on tasks starting before this (handover, DL-094)
 
     def __post_init__(self) -> None:
         self._own = {t.task_id: t for t in self.catalog.own}
@@ -60,6 +61,8 @@ class CbbaState:
     def _score(self, tid: str, now_ns: int) -> float:
         t = self._own.get(tid)
         if t is None or t.start_ns <= now_ns or tid in self.bundle:
+            return 0.0
+        if t.start_ns < self.window_end_ns:  # inside the own announced window
             return 0.0
         data = t.data_mb
         for b in self.bundle:
@@ -191,6 +194,16 @@ class CbbaState:
             if self.z[tid] == self.me:
                 self.y[tid], self.z[tid] = 0.0, None
         self.bundle.clear()
+
+    def release_before(self, end_ns: int) -> tuple[str, ...]:
+        """Give up own claims on tasks starting before ``end_ns`` (announced window,
+        DL-094); scores are priorities, so the rest of the bundle stays valid."""
+        gone = tuple(t for t in self.bundle if self.z[t] == self.me
+                     and self._own[t].start_ns < end_ns)  # fmt: skip
+        for tid in gone:
+            self.y[tid], self.z[tid] = 0.0, None
+        self.bundle[:] = [t for t in self.bundle if t not in gone]
+        return gone
 
     def forget_peer(self, peer: str) -> None:
         """B3 + timeout (DL-052): drop every claim by a peer believed lost, so the tasks

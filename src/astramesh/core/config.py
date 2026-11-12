@@ -100,6 +100,8 @@ class _ScenarioBase(_Model):
         ag = d.get("agents")
         if isinstance(ag, dict) and ag.get("health") is None:
             ag.pop("health", None)
+        if isinstance(ag, dict) and ag.get("handover", 0) is None:
+            ag.pop("handover")  # DL-094
         env = d.get("environment")
         if isinstance(env, dict) and env.get("replay") is None:
             env.pop("replay", None)  # DL-069
@@ -435,6 +437,18 @@ class HealthModelConfig(_Model):
     payload_check: PayloadCheckConfig | None = None
 
 
+class HandoverConfig(_Model):
+    """Forecast-handover candidate (DL-078, DL-094): announce [now, now + lead] while the
+    own radiation ratio >= ``window_threshold_ratio`` or while protected, and release own
+    tasks starting inside it. Absent = the reactive baseline."""
+
+    window_threshold_ratio: PositiveFloat = Field(description="Own radiation ratio (option A)")
+    lead_s: PositiveSeconds = Field(description="Window length [s]")
+    share_window: bool = Field(
+        default=True, description="Announce the window in status (false: no-sharing ablation)"
+    )
+
+
 class AgentsConfig(_Model):
     """Agent message timing and sensor noise (values PROVISIONAL)."""
 
@@ -454,6 +468,9 @@ class AgentsConfig(_Model):
     )
     health: HealthModelConfig | None = Field(
         default=None, description="Absent: H-A timeout model (DL-052); see DL-066"
+    )
+    handover: HandoverConfig | None = Field(
+        default=None, description="Forecast-handover candidate (DL-094); absent = baseline"
     )
 
     @model_validator(mode="after")

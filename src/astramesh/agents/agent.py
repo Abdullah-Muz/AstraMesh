@@ -33,6 +33,7 @@ from typing import Any
 
 from astramesh.agents.auction import AuctionState
 from astramesh.agents.cbba import CbbaState
+from astramesh.agents.handover import HandoverAction, HandoverObservation, HandoverPolicy
 from astramesh.agents.health import (
     AVAILABLE_BELIEFS,
     UNAVAILABLE_BELIEFS,
@@ -96,6 +97,8 @@ class AgentSettings:
     recovery_peer_heard_ns: int = 90 * 10**9
     payload_check: PayloadSettings | None = None  # H-C onboard detector (DL-066)
     forecast_max_age_ns: int | None = None  # environment inputs expire (DL-090)
+    handover: HandoverPolicy | None = None  # None = reactive baseline (DL-094)
+    share_window: bool = True  # announce the window in status (False: ablation)
 
     def __post_init__(self) -> None:
         if self.status_interval_ns <= 0 or self.status_lifetime_ns <= 0:
@@ -117,6 +120,7 @@ class PeerRecord:
     reported_r_m: tuple[float, ...] | None = None
     reported_mode: str | None = None
     reported_payload: str | None = None  # "ok" / "degraded" (H-C status field)
+    window_end_ns: int | None = None  # announced handover window end (DL-094)
 
 
 @dataclass(slots=True)
@@ -148,6 +152,7 @@ class SpacecraftAgent:
     _finished: set[str] = field(default_factory=set)
     _declined: dict[str, str] = field(default_factory=dict)
     _payload: PayloadBelief | None = None
+    _window_end_ns: int | None = None  # own announced window end (DL-094)
 
     def __post_init__(self) -> None:
         if self.agent_id in self.peers:
@@ -323,6 +328,8 @@ class SpacecraftAgent:
             if leaving and isinstance(self._alloc, CbbaState):
                 self._alloc.release_all()  # stop claiming; peers re-auction (DL-054)
                 self._refresh_plan(now_ns)
+            elif leaving and self._plan_algorithm == "B4-rule-redistribution":
+                self._b4_hand_on(now_ns)  # DL-094: hand tasks on, as for a bad payload
         self._sup_seen = len(sup.history)
         for t, note in sup.notes:
             self._log.append({"kind": "supervisor_note", "note": note, "t_ns": t})
@@ -430,6 +437,15 @@ class SpacecraftAgent:
                 if (pl == "degraded" and was_pl != "degraded"
                         and self._plan_algorithm == "B4-rule-redistribution"):  # fmt: skip
                     self._respond_to_loss(m.sender, d.delivered_ns)
+            w = m.payload.get("window_end_ns", None)
+            if isinstance(w, int) and not isinstance(w, bool):
+                old_w = rec.window_end_ns
+                rec.window_end_ns = w
+                if ((old_w is None or w > old_w) and w > d.delivered_ns
+                        and self._plan_algorithm == "B4-rule-redistribution"):  # fmt: skip
+                    self._respond_to_loss(m.sender, d.delivered_ns, before_ns=w)
+            elif "window_end_ns" in m.payload:
+                rec.window_end_ns = None
             mode = m.payload.get("mode")
             if isinstance(mode, str):
                 was = rec.reported_mode
@@ -444,6 +460,8 @@ class SpacecraftAgent:
         if self._health is not None:
             self._health.tick(now_ns)
             self._after_health_change(now_ns)
+        if self.settings.handover is not None:
+            self._handover(now_ns)
         if now_ns >= self._next_status_ns:
             self._outbox.append(self._status(now_ns))
             interval = (self.settings.watch_status_interval_ns if self.mode == STORM_WATCH
@@ -452,6 +470,35 @@ class SpacecraftAgent:
         self._allocation_round(now_ns)
         out, self._outbox = self._outbox, []
         return out
+
+    def _handover(self, now_ns: int) -> None:
+        """Consult the handover policy (DL-094); release own tasks inside the window."""
+        policy = self.settings.handover
+        assert policy is not None
+        risks = self._risks(now_ns)
+        obs = HandoverObservation(
+            now_ns, risks.get("radiation"), self.mode, self._plan,
+            {p: r.window_end_ns for p, r in self._peer_table.items()
+             if r.window_end_ns is not None and r.window_end_ns > now_ns},
+        )  # fmt: skip
+        act: HandoverAction = policy.decide(obs)
+        old = self._window_end_ns
+        self._window_end_ns = act.window_end_ns
+        alloc = self._alloc
+        if isinstance(alloc, CbbaState):
+            alloc.window_end_ns = act.window_end_ns or 0
+        end = act.window_end_ns
+        if end is None or (old is not None and end <= old):
+            return
+        if isinstance(alloc, CbbaState):
+            if alloc.release_before(end):
+                self._log.append({"kind": "window_release", "until_ns": end, "t_ns": now_ns})
+                self._refresh_plan(now_ns)
+        elif self._plan_algorithm == "B4-rule-redistribution":
+            n = len(self._plan)
+            self._b4_hand_on(now_ns, before_ns=end)
+            if len(self._plan) != n:
+                self._log.append({"kind": "window_release", "until_ns": end, "t_ns": now_ns})
 
     def _allocation_round(self, now_ns: int) -> None:
         alloc = self._alloc
@@ -512,7 +559,7 @@ class SpacecraftAgent:
             if belief in UNAVAILABLE_BELIEFS and self._plan_algorithm in REDISTRIBUTING:
                 self._respond_to_loss(peer, now_ns)
 
-    def _respond_to_loss(self, peer: str, now_ns: int) -> None:
+    def _respond_to_loss(self, peer: str, now_ns: int, before_ns: int | None = None) -> None:
         if isinstance(self._alloc, CbbaState):  # B3 + timeout: re-auction the peer's claims
             self._alloc.forget_peer(peer)
             self._log.append({"kind": "claims_forgotten", "peer": peer})
@@ -526,7 +573,9 @@ class SpacecraftAgent:
             if t.owner != peer:  # owner moves with each hand-off, so chains work
                 continue
             slots = {s.spacecraft: s for s in t.slots if s.start_ns > now_ns}
-            ok = [sc for sc in sorted(slots) if self._can_take(sc, beliefs)]
+            if before_ns is not None and (peer not in slots or slots[peer].start_ns >= before_ns):
+                continue  # window hand-on: only tasks the owner would start inside it
+            ok = [sc for sc in sorted(slots) if self._can_take(sc, beliefs, slots[sc].start_ns)]
             if not ok:
                 continue
             winner = ok[0]
@@ -548,14 +597,19 @@ class SpacecraftAgent:
             self._log.append({"kind": "plan_changed", "version": self.plan_version,
                               "n_observations": len(self._plan)})  # fmt: skip
 
-    def _can_take(self, sc: str, beliefs: dict[str, str]) -> bool:
-        """B4: believed available for new tasks (health and reported mode)."""
+    def _can_take(self, sc: str, beliefs: dict[str, str], start_ns: int | None = None) -> bool:
+        """B4: believed available for new tasks (health, reported mode, and no announced
+        window covering the slot start, DL-094)."""
         if sc == self.agent_id:
-            return self.mode in TASKING_MODES and not self.payload_degraded
+            in_window = (start_ns is not None and self._window_end_ns is not None
+                         and start_ns < self._window_end_ns)  # fmt: skip
+            return self.mode in TASKING_MODES and not self.payload_degraded and not in_window
         rec = self._peer_table.get(sc)
         mode_ok = rec is None or rec.reported_mode in (None, *TASKING_MODES)
         payload_ok = rec is None or rec.reported_payload != "degraded"
-        return beliefs.get(sc) in AVAILABLE_BELIEFS and mode_ok and payload_ok
+        window_ok = (rec is None or rec.window_end_ns is None or start_ns is None
+                     or start_ns >= rec.window_end_ns)  # fmt: skip
+        return beliefs.get(sc) in AVAILABLE_BELIEFS and mode_ok and payload_ok and window_ok
 
     def _on_payload_belief(self, now_ns: int) -> None:
         """Own payload belief changed (DL-066): the same response under every health model.
@@ -574,15 +628,21 @@ class SpacecraftAgent:
             self._alloc.release_all()
             self._refresh_plan(now_ns)
         elif self._plan_algorithm == "B4-rule-redistribution":
-            self._respond_to_loss(self.agent_id, now_ns)
-            kept = tuple(o for o in self._plan if (t := self._public.get(o.task_id)) is None
-                         or t.owner == self.agent_id)  # fmt: skip
-            if kept != self._plan:
-                self._plan = kept
-                self.plan_version += 1
-                self._last_plan_change_ns = now_ns
-                self._log.append({"kind": "plan_changed", "version": self.plan_version,
-                                  "n_observations": len(kept)})  # fmt: skip
+            self._b4_hand_on(now_ns)
+
+    def _b4_hand_on(self, now_ns: int, before_ns: int | None = None) -> None:
+        """B4: hand own tasks on by the fixed rule and drop those now owned by a peer
+        (degraded payload, DL-066; leaving the tasking modes or an announced window,
+        DL-094). ``before_ns``: only tasks whose own slot starts before it."""
+        self._respond_to_loss(self.agent_id, now_ns, before_ns)
+        kept = tuple(o for o in self._plan if (t := self._public.get(o.task_id)) is None
+                     or t.owner == self.agent_id)  # fmt: skip
+        if kept != self._plan:
+            self._plan = kept
+            self.plan_version += 1
+            self._last_plan_change_ns = now_ns
+            self._log.append({"kind": "plan_changed", "version": self.plan_version,
+                              "n_observations": len(kept)})  # fmt: skip
 
     def payload_belief_history(self) -> list[tuple[int, bool, float]]:
         return list(self._payload.history) if self._payload is not None else []
@@ -608,6 +668,9 @@ class SpacecraftAgent:
         payload["mode"] = self.mode
         if self._payload is not None:  # H-C only, so other runs' messages are unchanged
             payload["payload"] = "degraded" if self._payload.degraded else "ok"
+        if self.settings.handover is not None and self.settings.share_window:  # DL-094
+            w = self._window_end_ns
+            payload["window_end_ns"] = w if w is not None and w > now_ns else None
         msg = Message(
             sender=self.agent_id,
             seq=self._seq,

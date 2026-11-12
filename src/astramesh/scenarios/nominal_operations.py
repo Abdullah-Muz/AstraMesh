@@ -30,6 +30,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from astramesh.agents.agent import AgentSettings, SpacecraftAgent
+from astramesh.agents.handover import ForecastWindowRule
 from astramesh.agents.health import (
     AVAILABLE_BELIEFS,
     CONFIRMED,
@@ -205,6 +206,13 @@ def fault_schedule(config: NominalOperationsScenario, ids: list[str]) -> FaultSc
     )
 
 
+def _handover_policy(config: NominalOperationsScenario) -> ForecastWindowRule | None:
+    ho = config.agents.handover
+    if ho is None:
+        return None
+    return ForecastWindowRule(ho.window_threshold_ratio, seconds_to_ns(ho.lead_s))
+
+
 def _forecast_max_age_ns(config: NominalOperationsScenario) -> int | None:
     rp = config.environment.replay if config.environment is not None else None
     age = rp.forecast_max_age_s if rp is not None else None
@@ -328,6 +336,8 @@ def run_nominal_operations(
         recovery_peer_heard_ns=seconds_to_ns(config.supervisor.recovery_peer_heard_s),
         payload_check=payload_settings,
         forecast_max_age_ns=_forecast_max_age_ns(config),
+        handover=_handover_policy(config),
+        share_window=config.agents.handover is None or config.agents.handover.share_window,
     )
     agents = {a: SpacecraftAgent(a, tuple(p for p in ids if p != a), settings) for a in ids}
     for a in ids:
