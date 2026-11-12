@@ -10,10 +10,10 @@ Runs once, after the candidate's setting is frozen from ``handover_tuning.py``
 * ``S11-H+partition``: plus {sc00, sc01} | {sc02, sc03} from 10 May 12:00 to 11 May
   12:00 UT;
 * ``S11-H+fault``: plus a critical fault on sc00 for 2 h from the first onset;
-* ``S11-H-tight``: the region grid densified along its latitude bands to the smallest
-  of 8, 12, 16 longitudes per band at which the QUIET B4 run (seed 1) completes at most
-  80 % of its tasks (chosen from QUIET runs only; 16 if none qualifies);
 * ``S00``: no environment, both arms (identity check).
+
+The tight-schedule scenario of DL-094 is dropped (DL-096): densifying the regions did
+not tighten the schedule.
 
 Arms: ``baseline`` (no policy), ``candidate`` (frozen rule), ``candidate-noshare``
 (no window in status; S11-H, P-B only), ``quiet`` (the scenario without environment,
@@ -48,8 +48,9 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from storm_replay_comparison import SERIES, scenario_config  # noqa: E402
 
-#: Frozen candidate setting from the tuning run (DL-094); None until frozen.
-FROZEN: dict[str, float] | None = None
+#: Frozen candidate setting from the tuning run (DL-094, DL-096: handover_tuning_meta.json
+#: from clean commit a7b2046; every setting tied, so the tie rule chose it).
+FROZEN: dict[str, float] | None = {"window_threshold_ratio": 0.9, "lead_s": 1800.0}
 FIRST_ONSET_S = 234_600  # 2024-05-10 17:20 UT
 TOLERANCES = [100.0, 100.0, 50.0, 200.0]
 OUTAGE = {"fault_id": "forecast_outage_sc01", "type": "forecast_outage", "spacecraft": ["sc01"],
@@ -66,23 +67,11 @@ CRITICAL = {"fault_id": "critical_sc00", "type": "critical_fault", "spacecraft":
             "observability": "effects_only", "consequences": "sc00 in SAFE for 2 h"}  # fmt: skip
 FORECAST = {"P-A": "P-A", "P-B": "P-B/q50", "P-C": "P-C/q50"}
 PLANNERS = ("cbba_b3_timeout", "rule_b4")
-LADDER = (8, 12, 16)
 ALPHAS = tuple(round(0.01 * k, 2) for k in range(1, 100))
 
 
-def _regions(base: list[dict[str, Any]], n_lon: int) -> list[dict[str, Any]]:
-    pri = {r["latitude_deg"]: r["priority"] for r in base}
-    out = []
-    for lat in sorted(pri, reverse=True):
-        for i in range(n_lon):
-            out.append({"region_id": f"REGION_{len(out) + 1:02d}", "latitude_deg": lat,
-                        "longitude_deg": round(-180.0 + (i + 0.5) * 360.0 / n_lon, 6),
-                        "priority": pri[lat]})  # fmt: skip
-    return out
-
-
-def config(scenario: str, forecast: str, planner: str, arm: str, seed: int, sha: str,
-           tight_lon: int | None = None) -> dict[str, Any]:  # fmt: skip
+def config(scenario: str, forecast: str, planner: str, arm: str, seed: int,
+           sha: str) -> dict[str, Any]:  # fmt: skip
     raw = scenario_config("P-B", planner, seed, sha)
     raw["scenario_id"] = ("HO_" + scenario + "_" + arm).replace("+", "_").replace("-", "_")
     rp = raw["environment"]["replay"]
@@ -93,9 +82,6 @@ def config(scenario: str, forecast: str, planner: str, arm: str, seed: int, sha:
         faults.append(copy.deepcopy(PARTITION))
     elif scenario == "S11-H+fault":
         faults.append(copy.deepcopy(CRITICAL))
-    elif scenario == "S11-H-tight":
-        assert tight_lon is not None
-        raw["science"]["regions"] = _regions(raw["science"]["regions"], tight_lon)
     if scenario == "S00" or arm == "quiet":
         del raw["environment"]
         faults = [f for f in faults if not f["type"].startswith("forecast_")]
@@ -114,8 +100,8 @@ def run_one(job: tuple[Any, ...]) -> dict[str, Any]:
     from astramesh.core.rng import RandomStreams
     from astramesh.scenarios.nominal_operations import run_nominal_operations
 
-    scenario, forecast, planner, arm, seed, sha, tight = job
-    cfg = parse_scenario(config(scenario, forecast, planner, arm, seed, sha, tight))
+    scenario, forecast, planner, arm, seed, sha = job
+    cfg = parse_scenario(config(scenario, forecast, planner, arm, seed, sha))
     assert isinstance(cfg, NominalOperationsScenario)
     t0 = time.perf_counter()
     log = EventLog()
@@ -129,7 +115,7 @@ def run_one(job: tuple[Any, ...]) -> dict[str, Any]:
     unprot = {a: hz[a] - st["protected_in_hazard_s"][a] for a in hz}
     return {
         "scenario": scenario, "forecast": forecast, "planner": planner, "arm": arm,
-        "seed": seed, "tight_lon": tight or "", "utility": u, "utility_dup_charged": u - dup,
+        "seed": seed, "utility": u, "utility_dup_charged": u - dup,
         "n_tasks": s["operations"]["n_tasks"], "n_completed": s["operations"]["n_completed"],
         "n_duplicates": s["operations"]["n_duplicates"],
         "n_invalid": s["operations"]["n_invalid"],
@@ -146,7 +132,7 @@ def run_one(job: tuple[Any, ...]) -> dict[str, Any]:
     }  # fmt: skip
 
 
-def jobs(sha: str, tight: int) -> list[tuple[Any, ...]]:
+def jobs(sha: str) -> list[tuple[Any, ...]]:
     out: list[tuple[Any, ...]] = []
 
     def add(sc: str, fc: str, arms: tuple[str, ...], b3_seeds: int) -> None:
@@ -154,18 +140,17 @@ def jobs(sha: str, tight: int) -> list[tuple[Any, ...]]:
             n = b3_seeds if planner == "cbba_b3_timeout" else 10
             for arm in arms:
                 for seed in range(1, n + 1):
-                    out.append((sc, fc, planner, arm, seed, sha,
-                                tight if sc == "S11-H-tight" else None))  # fmt: skip
+                    out.append((sc, fc, planner, arm, seed, sha))
 
     add("S11-H", "P-B", ("baseline", "candidate", "quiet"), 10)
     for fc in ("P-A", "P-C"):
         add("S11-H", fc, ("baseline", "candidate"), 5)
-    for sc in ("S11-H+partition", "S11-H+fault", "S11-H-tight"):
+    for sc in ("S11-H+partition", "S11-H+fault"):
         add(sc, "P-B", ("baseline", "candidate", "quiet"), 5)
     add("S11-H", "P-B", ("candidate-noshare",), 5)
     for planner in PLANNERS:
         for arm in ("baseline", "candidate"):
-            out.append(("S00", "P-B", planner, arm, 1, sha, None))
+            out.append(("S00", "P-B", planner, arm, 1, sha))
     return list(dict.fromkeys(out))
 
 
@@ -240,15 +225,6 @@ def _write(path: Path, rows: list[dict[str, Any]]) -> None:
         w.writerows(rows)
 
 
-def choose_tight(sha: str, workers: int) -> tuple[int, dict[int, float]]:
-    probe = [("S11-H-tight", "P-B", "rule_b4", "quiet", 1, sha, n) for n in LADDER]
-    with ProcessPoolExecutor(min(workers, len(probe))) as ex:
-        res = list(ex.map(run_one, probe))
-    frac = {r["tight_lon"]: r["n_completed"] / r["n_tasks"] for r in res}
-    ok = [n for n in LADDER if frac[n] <= 0.8]
-    return (min(ok) if ok else LADDER[-1]), frac
-
-
 def main() -> None:
     from astramesh.evaluation.manifest import git_state
 
@@ -261,9 +237,7 @@ def main() -> None:
     args.out.mkdir(parents=True, exist_ok=True)
     sha = hashlib.sha256(SERIES.read_bytes()).hexdigest()
     t0 = time.perf_counter()
-    tight, frac = choose_tight(sha, args.workers)
-    print(f"tight grid: {tight} longitudes per band; QUIET completion {frac}", flush=True)
-    todo = jobs(sha, tight)
+    todo = jobs(sha)
     todo.sort(key=lambda j: j[2] != "cbba_b3_timeout")  # long B3 runs first
     with ProcessPoolExecutor(args.workers) as ex:
         rows = list(ex.map(run_one, todo))
@@ -276,8 +250,7 @@ def main() -> None:
         "experiment": "Forecast handover vs reactive baseline on May 2024 (DL-078, DL-094)",
         "git_commit": git["commit"], "git_dirty": git["dirty"],
         "lockfile_sha256": hashlib.sha256((ROOT / "uv.lock").read_bytes()).hexdigest(),
-        "series_sha256": sha, "frozen": FROZEN, "tight_lon": tight,
-        "tight_quiet_completion": frac, "n_runs": len(rows),
+        "series_sha256": sha, "frozen": FROZEN, "n_runs": len(rows),
         "config_hashes": {"/".join(str(r[k]) for k in ("scenario", "forecast", "planner",
                                                         "arm", "seed")): r["config_hash"]
                           for r in rows},

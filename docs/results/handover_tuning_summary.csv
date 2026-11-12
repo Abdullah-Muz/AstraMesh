@@ -1,0 +1,11 @@
+arm,mean_retention_gain,mean_retention_gain_dup_charged
+baseline,0.0,0.0
+candidate:0.5:1800,0.0,0.0
+candidate:0.5:3600,0.0,0.0
+candidate:0.5:7200,0.0,0.0
+candidate:0.7:1800,0.0,0.0
+candidate:0.7:3600,0.0,0.0
+candidate:0.7:7200,0.0,0.0
+candidate:0.9:1800,0.0,0.0
+candidate:0.9:3600,0.0,0.0
+candidate:0.9:7200,0.0,0.0
