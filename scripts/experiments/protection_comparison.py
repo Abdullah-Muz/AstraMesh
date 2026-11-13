@@ -40,7 +40,8 @@ from protection_tuning import (  # noqa: E402
     storm_metrics,
 )
 
-FROZEN: dict[str, Any] | None = None  # set from protection_tuning in the results commit
+# frozen from protection_tuning (DL-103)
+FROZEN: dict[str, Any] | None = {"horizon_s": 600.0, "release_dwell_s": 600.0, "margin": "none"}
 ARMS = ("baseline", "candidate", "quiet")
 
 
