@@ -1,0 +1,13 @@
+scope,planner,gain_utility,gain_utility_seed_spread,gain_utility_dup_charged,gain_utility_dup_charged_seed_spread,baseline_retention,hazard_identical,n,mean,ci_lo,ci_hi,wilcoxon_p
+jul18_2023,cbba_b3_timeout,0.0,0.0,0.0,0.0,0.941748,True,,,,,
+jul29_2023,cbba_b3_timeout,0.0,0.0,0.0,0.0,0.992105,True,,,,,
+jan29_2024,cbba_b3_timeout,0.0,0.0,0.0,0.0,1.0,True,,,,,
+mar23_2024,cbba_b3_timeout,0.0,0.0,0.0,0.0,0.852993,True,,,,,
+pooled over storms (utility),cbba_b3_timeout,,,,,,,4,0.0,0.0,0.0,1.0
+pooled over storms (utility_dup_charged),cbba_b3_timeout,,,,,,,4,0.0,0.0,0.0,1.0
+jul18_2023,rule_b4,0.0,0.0,0.0,0.0,0.935569,True,,,,,
+jul29_2023,rule_b4,0.0,0.0,0.0,0.0,0.992105,True,,,,,
+jan29_2024,rule_b4,0.0,0.0,0.0,0.0,1.0,True,,,,,
+mar23_2024,rule_b4,0.0,0.0,0.0,0.0,0.852993,True,,,,,
+pooled over storms (utility),rule_b4,,,,,,,4,0.0,0.0,0.0,1.0
+pooled over storms (utility_dup_charged),rule_b4,,,,,,,4,0.0,0.0,0.0,1.0
