@@ -1,6 +1,6 @@
 # Shorter protection: tuning on the February 2024 storm
 
-> **Status:** recorded 2026-11-12 from clean commit `29f1b3f` (`git_dirty: false`; 60 runs, 21 min on 12 workers alongside the test suite). Phase 5 increment 4, before 4b (DL-101, DL-102, DL-103). Identical, apart from wall time, to the dirty-tree preview reported in DL-102. Awaiting owner review.
+> **Status:** recorded 2026-11-12 from clean commit `29f1b3f` (`git_dirty: false`; 60 runs, 21 min on 12 workers alongside the test suite). Phase 5 increment 4, before 4b (DL-101, DL-102, DL-103). Identical, apart from wall time, to the dirty-tree preview reported in DL-102. Approved by the owner 2026-11-13.
 
 ## Setup
 

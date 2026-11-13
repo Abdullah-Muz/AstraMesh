@@ -1,6 +1,6 @@
 # Shorter protection on the four evaluation storms
 
-> **Status:** recorded 2026-11-12 from clean commit `0935e98` (`git_dirty: false`; 72 runs, 113 min on 12 workers). Phase 5 increment 4, before 4b (DL-101 – DL-104). Nothing was tuned: the setting is the one frozen in DL-103 (H = 600 s, D = 600 s, no margin). Awaiting owner review.
+> **Status:** recorded 2026-11-12 from clean commit `0935e98` (`git_dirty: false`; 72 runs, 113 min on 12 workers). Phase 5 increment 4, before 4b (DL-101 – DL-104). Nothing was tuned: the setting is the one frozen in DL-103 (H = 600 s, D = 600 s, no margin). Approved by the owner 2026-11-13.
 
 ## Setup
 
