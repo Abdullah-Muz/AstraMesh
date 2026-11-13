@@ -1,0 +1,49 @@
+scope,planner,ablation,baseline_retention,retention_change,retention_change_seed_spread,max_extra_unprotected_s,unprotected_change_s_all_sc,protected_change_h_all_sc,protective_entries_change_all_sc,n,mean,ci_lo,ci_hi,wilcoxon_p
+jul18_2023,cbba_b3_timeout,no_lookahead,0.941748,0.0,0.0,0.0,0.0,-8.77,81.0,,,,,
+jul29_2023,cbba_b3_timeout,no_lookahead,0.992105,0.005263,0.0,390.0,390.0,-13.45,46.0,,,,,
+jan29_2024,cbba_b3_timeout,no_lookahead,1.0,0.0,0.0,0.0,0.0,-4.68,11.0,,,,,
+mar23_2024,cbba_b3_timeout,no_lookahead,0.852993,0.003521,0.0,270.0,670.0,-5.86,155.0,,,,,
+may2024,cbba_b3_timeout,no_lookahead,0.996479,0.003521,0.0,40.0,40.0,-19.13,51.0,,,,,
+pooled over storms,cbba_b3_timeout,no_lookahead,,,,390.0,,,,5,0.002461,-0.000465,0.005387,0.25
+jul18_2023,cbba_b3_timeout,no_forecast,0.941748,0.0,0.0,0.0,0.0,-1.67,0.0,,,,,
+jul29_2023,cbba_b3_timeout,no_forecast,0.992105,0.007895,0.0,50.0,50.0,-13.25,-3.0,,,,,
+jan29_2024,cbba_b3_timeout,no_forecast,1.0,0.0,0.0,560.0,1510.0,-1.25,0.0,,,,,
+mar23_2024,cbba_b3_timeout,no_forecast,0.852993,0.006162,0.0,410.0,820.0,-1.83,0.0,,,,,
+may2024,cbba_b3_timeout,no_forecast,0.996479,0.003521,0.0,600.0,1340.0,-14.42,2.0,,,,,
+pooled over storms,cbba_b3_timeout,no_forecast,,,,600.0,,,,5,0.003516,-0.000914,0.007945,0.25
+jul18_2023,cbba_b3_timeout,no_hysteresis,0.941748,0.015887,0.0,0.0,0.0,-11.72,5.0,,,,,
+jul29_2023,cbba_b3_timeout,no_hysteresis,0.992105,0.005263,0.0,370.0,370.0,-18.7,11.0,,,,,
+jan29_2024,cbba_b3_timeout,no_hysteresis,1.0,0.0,0.0,0.0,0.0,-5.99,1.0,,,,,
+mar23_2024,cbba_b3_timeout,no_hysteresis,0.852993,0.002641,0.0,410.0,1020.0,-10.33,24.0,,,,,
+may2024,cbba_b3_timeout,no_hysteresis,0.996479,0.0,0.0,300.0,600.0,-31.4,25.0,,,,,
+pooled over storms,cbba_b3_timeout,no_hysteresis,,,,410.0,,,,5,0.004758,-0.003428,0.012944,0.25
+jul18_2023,cbba_b3_timeout,no_reconciliation,0.941748,-0.035305,0.0,0.0,0.0,0.0,0.0,,,,,
+jul29_2023,cbba_b3_timeout,no_reconciliation,0.992105,-0.061404,0.0,0.0,0.0,0.0,0.0,,,,,
+jan29_2024,cbba_b3_timeout,no_reconciliation,1.0,-0.023768,0.0,0.0,0.0,0.0,0.0,,,,,
+mar23_2024,cbba_b3_timeout,no_reconciliation,0.852993,-0.026408,0.0,0.0,0.0,0.0,0.0,,,,,
+may2024,cbba_b3_timeout,no_reconciliation,0.996479,-0.129401,0.0,0.0,0.0,0.0,0.0,,,,,
+pooled over storms,cbba_b3_timeout,no_reconciliation,,,,0.0,,,,5,-0.055257,-0.109936,-0.000578,0.0625
+jul18_2023,rule_b4,no_lookahead,0.935569,0.00353,0.0,0.0,0.0,-8.77,81.0,,,,,
+jul29_2023,rule_b4,no_lookahead,0.992105,0.007895,0.0,390.0,390.0,-13.45,46.0,,,,,
+jan29_2024,rule_b4,no_lookahead,1.0,0.0,0.0,0.0,0.0,-4.68,11.0,,,,,
+mar23_2024,rule_b4,no_lookahead,0.852993,0.003521,0.0,270.0,670.0,-5.86,155.0,,,,,
+may2024,rule_b4,no_lookahead,0.993838,0.0,0.0,40.0,40.0,-19.13,51.0,,,,,
+pooled over storms,rule_b4,no_lookahead,,,,390.0,,,,5,0.002989,-0.001059,0.007037,0.25
+jul18_2023,rule_b4,no_forecast,0.935569,0.0,0.0,0.0,0.0,-1.67,0.0,,,,,
+jul29_2023,rule_b4,no_forecast,0.992105,0.007895,0.0,50.0,50.0,-13.25,-3.0,,,,,
+jan29_2024,rule_b4,no_forecast,1.0,0.0,0.0,560.0,1510.0,-1.25,0.0,,,,,
+mar23_2024,rule_b4,no_forecast,0.852993,0.006162,0.0,410.0,820.0,-1.83,0.0,,,,,
+may2024,rule_b4,no_forecast,0.993838,0.0,0.0,600.0,1340.0,-14.42,2.0,,,,,
+pooled over storms,rule_b4,no_forecast,,,,600.0,,,,5,0.002811,-0.002029,0.007651,0.5
+jul18_2023,rule_b4,no_hysteresis,0.935569,0.015887,0.0,0.0,0.0,-11.72,5.0,,,,,
+jul29_2023,rule_b4,no_hysteresis,0.992105,0.007895,0.0,370.0,370.0,-18.7,11.0,,,,,
+jan29_2024,rule_b4,no_hysteresis,1.0,0.0,0.0,0.0,0.0,-5.99,1.0,,,,,
+mar23_2024,rule_b4,no_hysteresis,0.852993,0.002641,0.0,410.0,1020.0,-10.33,24.0,,,,,
+may2024,rule_b4,no_hysteresis,0.993838,0.0,0.0,300.0,600.0,-31.4,25.0,,,,,
+pooled over storms,rule_b4,no_hysteresis,,,,410.0,,,,5,0.005285,-0.003093,0.013662,0.25
+jul18_2023,rule_b4,no_reconciliation,0.935569,-0.029126,0.0,0.0,0.0,0.0,0.0,,,,,
+jul29_2023,rule_b4,no_reconciliation,0.992105,-0.061404,0.0,0.0,0.0,0.0,0.0,,,,,
+jan29_2024,rule_b4,no_reconciliation,1.0,-0.023768,0.0,0.0,0.0,0.0,0.0,,,,,
+mar23_2024,rule_b4,no_reconciliation,0.852993,-0.026408,0.0,0.0,0.0,0.0,0.0,,,,,
+may2024,rule_b4,no_reconciliation,0.993838,-0.126761,0.0,0.0,0.0,0.0,0.0,,,,,
+pooled over storms,rule_b4,no_reconciliation,,,,0.0,,,,5,-0.053493,-0.107764,0.000778,0.0625

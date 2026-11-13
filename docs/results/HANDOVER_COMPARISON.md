@@ -1,6 +1,6 @@
 # Forecast handover against the reactive baseline, May 2024
 
-> **Status:** recorded 2026-11-12 from clean commit `fd5abc3` (`git_dirty: false`; 229 runs, 4.7 h on 8 workers). Phase 5 increment 4 (DL-078, DL-094 – DL-097). The held-out storm, used once with the setting frozen in DL-096 (θ = 0.9, L = 30 min). Approved by the owner 2026-11-12. Wording of the findings and limits revised 2026-11-13 (DL-106 F2, F3); no result changed.
+> **Status:** recorded 2026-11-12 from clean commit `fd5abc3` (`git_dirty: false`; 229 runs, 4.7 h on 8 workers). Phase 5 increment 4 (DL-078, DL-094 – DL-097). The held-out storm, used once with the setting frozen in DL-096 (θ = 0.9, L = 30 min). Approved by the owner 2026-11-12. Wording of the findings and limits revised 2026-11-13 (DL-106 F2, F3); no result changed. Generality limit updated with the recorded spread run 2026-11-13 (DL-108).
 
 ## Setup
 
@@ -48,5 +48,5 @@ Utilities in points (tasks of 346 in brackets). The duplicate-charging utility g
 - One storm. The seeds vary only message loss and navigation noise, which changed no outcome; the intervals therefore say nothing about variation across storms.
 - The B3 setting was frozen from B4-only tuning (DL-094, owner choice); B3 was not tuned.
 - The schedule has slack; the tight-schedule scenario could not be built by density (DL-096).
-- **Generality (DL-106 F3):** at 20 km along-track spacing every task has windows on all four spacecraft, and the four cross each hazard region within seconds of each other. The conclusions hold for this close formation, not for constellations in general; a spread formation trades shared hazard for shared tasks (DL-105 preview; recorded run in DL-106).
+- **Generality (DL-106 F3):** at 20 km along-track spacing every task has windows on all four spacecraft, and the four cross each hazard region within seconds of each other. The conclusions hold for this close formation, not for constellations in general; a spread formation trades shared hazard for shared tasks (DL-105 preview). The recorded spread run ([`SPREAD_FORMATION.md`](SPREAD_FORMATION.md), DL-108) finds that spreading to 5 000 km does not reduce the 23 Mar 2024 loss under the baseline protection, which protects the same at every spacing.
 - A pipeline dry run executed three of these runs before the recorded run (DL-096); the recorded values agree with it (B4 seed 1: 1 129 / 1 129 / 1 136).

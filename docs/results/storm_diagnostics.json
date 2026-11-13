@@ -1,0 +1,217 @@
+{
+  "experiment": "Storm diagnostics behind DL-100 / DL-104 and the 18 Jul 2023 onset (DL-106)",
+  "git_commit": "16f038e18393c10b188d143b7494dbcd1a08eae6",
+  "git_dirty": false,
+  "lockfile_sha256": "cb23cc16440fa7f6e63a8d8b4c90ff80a418b91b421e6a9147e78fe10b1e84b4",
+  "planner": "rule_b4",
+  "seed": 1,
+  "shorter": {
+    "horizon_s": 600.0,
+    "release_dwell_s": 600.0,
+    "margin": "none"
+  },
+  "series_sha256": {
+    "jul18_2023": "f359a7da3e879df99bd9f87d5c2efeb91c1cc8601d2141b533e66503b6cd92bb",
+    "jul29_2023": "bc7080ec122cff9fe11e84dd1dc3ff74f36adbebb3afc0ebb1c169ee3d5774a5",
+    "jan29_2024": "f800a9865cbc7e917da6f329c84e8b0a5ddf0e534dbdbcf37e5e65eeb4a995ed",
+    "mar23_2024": "0f63027f661df7e0c3ee3efb814c131b4d6f972dd963631183fc5f7c41a00acc"
+  },
+  "config_hashes": {
+    "mar23_2024/quiet": "74825276d6e8da8ba953639125e0e3893f4d92c12e153ffbf055b3b53a687d69",
+    "mar23_2024/baseline": "30142d2bd83a489a5598112c85e79d0361b058f8ea04189fac4c5e753c6cc0b8",
+    "mar23_2024/candidate": "65871e8f51f6dbf20adfc0d29527a6e16f3b18a8e017e595a4ad273ffafa5b6b",
+    "jul18_2023/quiet": "d9a542f952f9476bf99a6eacf7b7b8ffb78b0ffe3c0b80348a6815449681ddb2",
+    "jul18_2023/baseline": "9178d2708fa2cdbc1a8253401800c2a5806237e5238dd5ceea9c4e3fd4558a90"
+  },
+  "lost_tasks": {
+    "mar23_2024/baseline": {
+      "n_lost": 50,
+      "classes": {
+        "a spacecraft fully available": 1,
+        "only partly available": 0,
+        "none in a tasking mode": 49
+      }
+    },
+    "mar23_2024/shorter": {
+      "n_lost": 50,
+      "classes": {
+        "a spacecraft fully available": 3,
+        "only partly available": 9,
+        "none in a tasking mode": 38
+      }
+    },
+    "mar23_2024/lost_in_both": 50,
+    "jul18_2023/baseline": {
+      "n_lost": 22,
+      "classes": {
+        "a spacecraft fully available": 3,
+        "only partly available": 0,
+        "none in a tasking mode": 19
+      }
+    }
+  },
+  "protection": {
+    "mar23_2024/baseline": {
+      "all_four_out_h": 27.58,
+      "sc00": {
+        "n_spans": 2,
+        "median_min": 967.5,
+        "max_min": 1845.0,
+        "entry_reasons": {
+          "radiation>=1.0": 2
+        }
+      },
+      "sc01": {
+        "n_spans": 2,
+        "median_min": 967.5,
+        "max_min": 1845.0,
+        "entry_reasons": {
+          "radiation>=1.0": 2
+        }
+      },
+      "sc02": {
+        "n_spans": 1,
+        "median_min": 2645.0,
+        "max_min": 2645.0,
+        "entry_reasons": {
+          "radiation>=1.0": 1
+        }
+      },
+      "sc03": {
+        "n_spans": 1,
+        "median_min": 1655.0,
+        "max_min": 1655.0,
+        "entry_reasons": {
+          "radiation>=1.0": 1
+        }
+      }
+    },
+    "mar23_2024/shorter": {
+      "all_four_out_h": 22.2,
+      "sc00": {
+        "n_spans": 40,
+        "median_min": 39.8,
+        "max_min": 42.7,
+        "entry_reasons": {
+          "radiation>=1.0": 40
+        }
+      },
+      "sc01": {
+        "n_spans": 40,
+        "median_min": 39.7,
+        "max_min": 42.7,
+        "entry_reasons": {
+          "radiation>=1.0": 40
+        }
+      },
+      "sc02": {
+        "n_spans": 53,
+        "median_min": 39.5,
+        "max_min": 42.7,
+        "entry_reasons": {
+          "radiation>=1.0": 53
+        }
+      },
+      "sc03": {
+        "n_spans": 34,
+        "median_min": 39.4,
+        "max_min": 40.7,
+        "entry_reasons": {
+          "radiation>=1.0": 34
+        }
+      }
+    }
+  },
+  "onset": {
+    "jul18_2023/baseline": {
+      "sc00": {
+        "intervals": [
+          {
+            "start_s": 178500.0,
+            "end_s": 179100.0,
+            "mode": "STORM_WATCH",
+            "radiation_input": 0.626,
+            "flux_pfu": 163.9,
+            "start_utc": "2023-07-18T01:45:00+00:00",
+            "duration_s": 600.0
+          }
+        ],
+        "transitions_near": [
+          {
+            "t_s": 176700.0,
+            "from": "NOMINAL",
+            "to": "STORM_WATCH",
+            "reason": "risk>=watch:radiation",
+            "utc": "2023-07-18T01:15:00+00:00"
+          },
+          {
+            "t_s": 179100.0,
+            "from": "STORM_WATCH",
+            "to": "PROTECTIVE",
+            "reason": "radiation>=1.0",
+            "utc": "2023-07-18T01:55:00+00:00"
+          }
+        ]
+      },
+      "sc01": {
+        "intervals": [
+          {
+            "start_s": 178500.0,
+            "end_s": 179100.0,
+            "mode": "STORM_WATCH",
+            "radiation_input": 0.626,
+            "flux_pfu": 163.9,
+            "start_utc": "2023-07-18T01:45:00+00:00",
+            "duration_s": 600.0
+          }
+        ],
+        "transitions_near": [
+          {
+            "t_s": 176700.0,
+            "from": "NOMINAL",
+            "to": "STORM_WATCH",
+            "reason": "risk>=watch:radiation",
+            "utc": "2023-07-18T01:15:00+00:00"
+          },
+          {
+            "t_s": 179100.0,
+            "from": "STORM_WATCH",
+            "to": "PROTECTIVE",
+            "reason": "radiation>=1.0",
+            "utc": "2023-07-18T01:55:00+00:00"
+          }
+        ]
+      },
+      "sc02": {
+        "intervals": [
+          {
+            "start_s": 175500.0,
+            "end_s": 176100.0,
+            "mode": "STORM_WATCH",
+            "radiation_input": 0.8604,
+            "flux_pfu": 51.59,
+            "start_utc": "2023-07-18T00:55:00+00:00",
+            "duration_s": 600.0
+          }
+        ],
+        "transitions_near": [
+          {
+            "t_s": 175500.0,
+            "from": "NOMINAL",
+            "to": "STORM_WATCH",
+            "reason": "risk>=watch:radiation",
+            "utc": "2023-07-18T00:55:00+00:00"
+          },
+          {
+            "t_s": 176100.0,
+            "from": "STORM_WATCH",
+            "to": "PROTECTIVE",
+            "reason": "radiation>=1.0",
+            "utc": "2023-07-18T01:05:00+00:00"
+          }
+        ]
+      }
+    }
+  },
+  "total_wall_s": 109.8
+}

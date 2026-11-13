@@ -1,6 +1,6 @@
 # Shorter protection on the four evaluation storms
 
-> **Status:** recorded 2026-11-12 from clean commit `0935e98` (`git_dirty: false`; 72 runs, 113 min on 12 workers). Phase 5 increment 4, before 4b (DL-101 – DL-104). Nothing was tuned: the setting is the one frozen in DL-103 (H = 600 s, D = 600 s, no margin). Approved by the owner 2026-11-13. Wording of the findings and limits revised 2026-11-13 (DL-106 F2, F3); no result changed.
+> **Status:** recorded 2026-11-12 from clean commit `0935e98` (`git_dirty: false`; 72 runs, 113 min on 12 workers). Phase 5 increment 4, before 4b (DL-101 – DL-104). Nothing was tuned: the setting is the one frozen in DL-103 (H = 600 s, D = 600 s, no margin). Approved by the owner 2026-11-13. Wording of the findings and limits revised 2026-11-13 (DL-106 F2, F3); no result changed. Diagnostic now cited from the recorded file 2026-11-13 (DL-106 F1, DL-108); two span figures corrected, no other number changed.
 
 ## Setup
 
@@ -42,12 +42,12 @@ Utility with tasks completed in brackets. No run has duplicates, exposure or pay
 | 29 Jan 2024 | 0.7 / 0.7 / 1.6 / 0 | 3.7 / 3.7 / 9.1 / 0 → 1.8 / 1.8 / 5.9 / 0 | 3.0 / 3.0 / 7.4 / 0 → 1.1 / 1.1 / 4.3 / 0 | 1 / 1 / 2 / 0 → 3 / 3 / 10 / 0 |
 | 23 Mar 2024 | 9.3 / 9.3 / 11.5 / 7.7 | 32.2 / 32.2 / 44.1 / 27.6 → 25.8 / 25.8 / 34.4 / 22.3 | 22.9 / 22.9 / 32.6 / 19.9 → 16.5 / 16.5 / 22.9 / 14.6 | 2 / 2 / 1 / 1 → 40 / 40 / 53 / 34 |
 
-## Diagnostic (not recorded): why 23 March recovers nothing under B4
+## Diagnostic: why 23 March recovers nothing under B4
 
-B4, seed 1, scratchpad scripts run from the clean tree after the recording.
+B4, seed 1. Recorded in [`storm_diagnostics.json`](storm_diagnostics.json) (`scripts/experiments/storm_diagnostics.py`, clean commit `16f038e`, DL-108). It was first run as unrecorded scratchpad scripts; the recording corrected two figures: the span count (34 – 53, not 40 – 53; sc03 has 34) and the lowest median (39.4 min, not 39.5).
 
 - The candidate loses the **same 50 tasks** against QUIET as the baseline.
-- Every candidate protection entry is on radiation ≥ 1.0. The 40 – 53 protected spans per spacecraft each last about 40 min (median 39.5 – 39.8 min, longest 43 min): roughly the 10 min look-ahead, the pass through the hazard region, the 10 min dwell and the 5 min minimum recovery.
+- Every candidate protection entry is on radiation ≥ 1.0. The 34 – 53 protected spans per spacecraft each last about 40 min (median 39.4 – 39.8 min, longest 43 min): roughly the 10 min look-ahead, the pass through the hazard region, the 10 min dwell and the 5 min minimum recovery.
 - With the 20 km formation the four spacecraft cross each region together, so **all four are out of the tasking modes at once for 22.2 h** (baseline 27.6 h).
 - Of the 50 lost tasks, 38 have no window on any spacecraft in a tasking mode, 9 only part of a window, and 3 a whole window on a free peer (baseline: 49, 0, 1).
 
@@ -63,6 +63,6 @@ Shorter protection removes about a fifth of the protected time on this storm, bu
 ## Limits
 
 - Four evaluation storms, so the pooled interval is wide (n = 4); seeds change no outcome.
-- **Generality (DL-106 F3):** at 20 km along-track spacing every task has windows on all four spacecraft, and the four cross each hazard region within seconds of each other. The conclusions hold for this close formation, not for constellations in general; a spread formation trades shared hazard for shared tasks (DL-105 preview; recorded run in DL-106).
+- **Generality (DL-106 F3):** at 20 km along-track spacing every task has windows on all four spacecraft, and the four cross each hazard region within seconds of each other. The conclusions hold for this close formation, not for constellations in general; a spread formation trades shared hazard for shared tasks (DL-105 preview). The recorded spread run ([`SPREAD_FORMATION.md`](SPREAD_FORMATION.md), DL-108) finds that spreading to 5 000 km does not reduce the 23 Mar 2024 loss under the baseline protection, which protects the same at every spacing.
 - One frozen setting from one tuning storm and one planner (B4); B3 + timeout was not tuned.
-- The diagnostic covers one storm, one planner and one seed and is not recorded.
+- The diagnostic covers one storm, one planner and one seed (recorded separately, DL-108).
