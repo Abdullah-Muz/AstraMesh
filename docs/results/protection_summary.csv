@@ -1,0 +1,13 @@
+scope,planner,gain_utility,gain_utility_seed_spread,gain_utility_dup_charged,gain_utility_dup_charged_seed_spread,max_extra_unprotected_s,baseline_retention,n,mean,ci_lo,ci_hi,wilcoxon_p,verdict
+jul18_2023,cbba_b3_timeout,0.009709,0.0,0.009709,0.0,0.0,0.941748,,,,,,
+jul29_2023,cbba_b3_timeout,0.007895,0.0,0.007895,0.0,0.0,0.992105,,,,,,
+jan29_2024,cbba_b3_timeout,-0.003521,0.0,-0.003521,0.0,0.0,1.0,,,,,,
+mar23_2024,cbba_b3_timeout,0.014085,0.0,0.014085,0.0,410.0,0.852993,,,,,,
+pooled over storms (utility),cbba_b3_timeout,,,,,410.0,,4,0.007042,-0.004902,0.018985,0.25,rejected
+pooled over storms (utility_dup_charged),cbba_b3_timeout,,,,,410.0,,4,0.007042,-0.004902,0.018985,0.25,rejected
+jul18_2023,rule_b4,0.013239,0.0,0.013239,0.0,0.0,0.935569,,,,,,
+jul29_2023,rule_b4,0.007895,0.0,0.007895,0.0,0.0,0.992105,,,,,,
+jan29_2024,rule_b4,0.0,0.0,0.0,0.0,0.0,1.0,,,,,,
+mar23_2024,rule_b4,0.0,0.0,0.0,0.0,410.0,0.852993,,,,,,
+pooled over storms (utility),rule_b4,,,,,410.0,,4,0.005283,-0.005026,0.015593,0.5,rejected
+pooled over storms (utility_dup_charged),rule_b4,,,,,410.0,,4,0.005283,-0.005026,0.015593,0.5,rejected
