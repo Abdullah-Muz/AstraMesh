@@ -1,6 +1,6 @@
 # Frozen forecast handover on four more storms
 
-> **Status:** recorded 2026-11-12 from clean commit `f25e224` (`git_dirty: false`; 72 runs, 88 min on 12 workers). Phase 5 increment 4, room for methods (DL-098 scope A, DL-099, DL-100). Nothing was tuned: the setting is the one frozen in DL-096 (θ = 0.9, L = 30 min). Awaiting owner review.
+> **Status:** recorded 2026-11-12 from clean commit `f25e224` (`git_dirty: false`; 72 runs, 88 min on 12 workers). Phase 5 increment 4, room for methods (DL-098 scope A, DL-099, DL-100). Nothing was tuned: the setting is the one frozen in DL-096 (θ = 0.9, L = 30 min). Approved by the owner 2026-11-12.
 
 ## Setup
 
