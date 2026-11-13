@@ -64,6 +64,7 @@ def test_pa05_every_numeric_field_carries_a_unit_suffix() -> None:
         ("reference_orbit.raan_deg", 360),
         ("formation.n_spacecraft", 0),
         ("formation.along_track_spacing_km", 0),
+        ("formation.along_track_spacing_km", 6000.1),  # cap (DL-106)
         ("output.trajectory_sample_interval_s", 15),  # not a multiple of the 10 s step
         ("output.trajectory_sample_interval_s", 70),  # 86400 s not a multiple of 70 s
     ],

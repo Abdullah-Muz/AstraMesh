@@ -208,7 +208,11 @@ class FormationConfig(_Model):
     """Along-track formation; spacecraft 0 leads, the others trail."""
 
     n_spacecraft: int = Field(ge=1, le=16)
-    along_track_spacing_km: float = Field(gt=0.0, le=500.0, allow_inf_nan=False)
+    along_track_spacing_km: float = Field(
+        gt=0.0, le=6000.0, allow_inf_nan=False,
+        description="Along-track spacing [km]; the formation must span under half an orbit "
+        "(checked at initialization). Cap 6000 km (DL-106; was 500 km)",
+    )  # fmt: skip
 
 
 class OutputConfig(_Model):

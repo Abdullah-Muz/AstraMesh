@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import itertools
 from pathlib import Path
 from typing import Any
 
@@ -51,6 +52,21 @@ def test_the_storm_protects_every_spacecraft_and_never_breaks_safety(runs: Any) 
                    for tr in s["protection"]["transitions"].values())  # fmt: skip
         assert sum(s["protection"]["payload_steps_in_protected_modes"].values()) == 0
         assert s["operations"]["utility"] < runs["quiet"]["operations"]["utility"]
+
+
+def test_unprotected_hazard_intervals_add_up(runs: Any) -> None:
+    """DL-106: the intervals cover exactly the unprotected hazard and record what the
+    spacecraft saw when each began."""
+    for k in ("P-A", "P-C/q50"):
+        st = runs[k]["storm"]
+        for a, items in st["unprotected_hazard_intervals"].items():
+            total = sum(x["end_s"] - x["start_s"] for x in items)
+            assert total == pytest.approx(st["hazard_s"][a] - st["protected_in_hazard_s"][a])
+            for x, y in itertools.pairwise(items):
+                assert x["end_s"] < y["start_s"]  # merged and ordered
+            for x in items:
+                assert x["mode"] not in ("PROTECTIVE", "RECOVERY")
+                assert x["flux_pfu"] >= 100.0
 
 
 def test_a_forecast_protects_earlier_than_reacting(runs: Any) -> None:

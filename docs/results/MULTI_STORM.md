@@ -1,6 +1,6 @@
 # Frozen forecast handover on four more storms
 
-> **Status:** recorded 2026-11-12 from clean commit `f25e224` (`git_dirty: false`; 72 runs, 88 min on 12 workers). Phase 5 increment 4, room for methods (DL-098 scope A, DL-099, DL-100). Nothing was tuned: the setting is the one frozen in DL-096 (θ = 0.9, L = 30 min). Approved by the owner 2026-11-12.
+> **Status:** recorded 2026-11-12 from clean commit `f25e224` (`git_dirty: false`; 72 runs, 88 min on 12 workers). Phase 5 increment 4, room for methods (DL-098 scope A, DL-099, DL-100). Nothing was tuned: the setting is the one frozen in DL-096 (θ = 0.9, L = 30 min). Approved by the owner 2026-11-12. Wording of the findings and limits revised 2026-11-13 (DL-106 F2, F3); no result changed.
 
 ## Setup
 
@@ -35,7 +35,7 @@ Utilities in points (tasks completed of 345 – 347 in brackets). The duplicate-
 
 ## Findings
 
-1. **The candidate changes no outcome on any of the four storms, under either planner.** The pooled gain is exactly 0 with a degenerate interval [0, 0]; by DL-094's rule the hypothesis is **rejected for both planners** on these storms. The candidate does act (1 – 6 early releases per run), but every released task is completed or lost exactly as in the baseline.
+1. **The candidate changes no outcome on any of the four storms, under either planner.** The pooled gain is exactly 0 with a degenerate interval [0, 0]; by DL-094's rule the hypothesis is **rejected for both planners** on these storms. With seeds changing no outcome, the sample is the four storms (n = 4): the result excludes any gain on these storms, not a small gain on storms of other shapes. The candidate does act (1 – 6 early releases per run), but every released task is completed or lost exactly as in the baseline.
 2. **The May 2024 B3 gain (+1 task, DL-097) does not recur.** On the five storms now measured (May plus these four), the candidate's total effect is one task on one storm under one planner.
 3. **These storms do cost science, unlike May.** Retention falls to 0.853 on 23 Mar 2024 and 0.94 on 18 Jul 2023 (against 0.994 – 0.996 on May), so DL-098's search for room worked. But the room sits where no peer can absorb it: 68 of the 72 lost tasks the diagnostic classified (94 %) had no spacecraft in a tasking mode for their whole window.
 4. **What remains recoverable is small.** The diagnostic finds 4 tasks across the two costly storms that a peer could in principle have taken; neither arm takes them. Why B4 misses them was not investigated.
@@ -48,3 +48,4 @@ Utilities in points (tasks completed of 345 – 347 in brackets). The duplicate-
 - The diagnostic is one seed, B4 only, from a script outside the repository; its counts are not part of the recorded run. The B3 losses were not classified.
 - The setting was frozen on B4-only tuning (DL-094); B3 was not tuned.
 - The formation geometry (four spacecraft, 20 km along-track spacing) makes simultaneous protection likely; a more spread-out constellation, where peers sit in different radiation environments, was not tested.
+- **Generality (DL-106 F3):** at 20 km along-track spacing every task has windows on all four spacecraft, and the four cross each hazard region within seconds of each other. The conclusions hold for this close formation, not for constellations in general; a spread formation trades shared hazard for shared tasks (DL-105 preview; recorded run in DL-106).

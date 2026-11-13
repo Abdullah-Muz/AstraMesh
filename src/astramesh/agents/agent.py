@@ -295,6 +295,10 @@ class SpacecraftAgent:
     def mode(self) -> str:
         return self._sup.mode if self._sup is not None else NOMINAL
 
+    def risk_inputs(self, now_ns: int) -> dict[str, float | None]:
+        """The environment inputs the supervisor sees at ``now_ns`` (read-only; for metrics)."""
+        return dict(self._risks(now_ns))
+
     def _risks(self, now_ns: int) -> dict[str, float | None]:
         """Own environment inputs; expired ones (issued more than ``forecast_max_age_ns``
         ago, DL-090) are invalid, never zero risk."""

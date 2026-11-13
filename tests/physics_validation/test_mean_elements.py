@@ -7,6 +7,7 @@ vector so results do not depend on ERFA's last bits.
 
 from __future__ import annotations
 
+import itertools
 import math
 from datetime import UTC, datetime
 
@@ -114,6 +115,19 @@ def test_mean_matched_formation_holds_together_under_j2(u0_deg: float) -> None:
         assert abs(trend) <= FORMATION_TREND_M_PER_ORBIT
     assert float(np.ptp(sep[:k], axis=0).max()) <= FORMATION_SWING_M
     assert float(np.max(np.abs(avg[0] - 20_000.0))) <= FORMATION_MEAN_SEP_DEV_M
+
+
+def test_spread_formation_initialises() -> None:
+    """5000 km spacing (DL-106 spread run): four members, equal mean a, 41.5 deg apart."""
+    members = mean_matched_formation(
+        mean_a_m=MEAN_A, mean_i_rad=MEAN_I, raan_rad=0.0, u0_rad=0.0, n_spacecraft=4,
+        spacing_m=5_000e3, forces=FM, epoch_utc=EPOCH,
+    )  # fmt: skip
+    assert max(abs(m.mean.a_m - members[0].mean.a_m) for m in members) <= FORMATION_MEAN_A_DIFF_M
+    for lead, trail in itertools.pairwise(members):
+        ang = math.acos(float(np.dot(lead.r_m, trail.r_m))
+                        / (np.linalg.norm(lead.r_m) * np.linalg.norm(trail.r_m)))  # fmt: skip
+        assert ang == pytest.approx(5_000e3 / MEAN_A, rel=0.01)
 
 
 def test_invalid_requests_raise() -> None:

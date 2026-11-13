@@ -1,6 +1,6 @@
 # Forecast handover against the reactive baseline, May 2024
 
-> **Status:** recorded 2026-11-12 from clean commit `fd5abc3` (`git_dirty: false`; 229 runs, 4.7 h on 8 workers). Phase 5 increment 4 (DL-078, DL-094 – DL-097). The held-out storm, used once with the setting frozen in DL-096 (θ = 0.9, L = 30 min). Approved by the owner 2026-11-12.
+> **Status:** recorded 2026-11-12 from clean commit `fd5abc3` (`git_dirty: false`; 229 runs, 4.7 h on 8 workers). Phase 5 increment 4 (DL-078, DL-094 – DL-097). The held-out storm, used once with the setting frozen in DL-096 (θ = 0.9, L = 30 min). Approved by the owner 2026-11-12. Wording of the findings and limits revised 2026-11-13 (DL-106 F2, F3); no result changed.
 
 ## Setup
 
@@ -37,7 +37,7 @@ Utilities in points (tasks of 346 in brackets). The duplicate-charging utility g
 ## Findings
 
 1. **B3 + timeout: the hypothesis is not rejected by the pre-registered rule, but the effect is one task.** The candidate recovers the only task the B3 baseline loses (priority 4; 1 136 against 1 132, equal to QUIET) on every seed, in every scenario with P-B or P-C. Because the seeds do not change the outcome, the t-interval collapses to the point +0.0035 and excludes 0; the ten seeds are effectively one sample, so this is a deterministic result for one storm, not a measured spread.
-2. **B4: the hypothesis is rejected.** The candidate changes no outcome under any forecast or scenario (gain 0, interval [0, 0]), as on the tuning storm: B4 already hands tasks on when protection starts, and the 7 points it loses against QUIET are tasks no unprotected peer can take.
+2. **B4: the hypothesis is rejected** (on one storm, n = 1: the degenerate interval [0, 0] says the candidate changes nothing here, not that it cannot help elsewhere). The candidate changes no outcome under any forecast or scenario (gain 0, interval [0, 0]), as on the tuning storm: B4 already hands tasks on when protection starts, and the 7 points it loses against QUIET are tasks no unprotected peer can take.
 3. **Sharing the window adds nothing measurable.** Without sharing the B3 gain is the same, so it comes from the protecting spacecraft releasing its own claim early; under B4 the shared window changes nothing.
 4. **Protection is identical by construction and verified.** Unprotected hazard and exposure match in all 24 comparisons (the payload-in-protected-mode count is not recorded by this script; HO-04 tests it).
 5. **The storm costs little science here.** Baseline retention is 0.996 (B3) and 0.994 (B4): with per-spacecraft risk (DL-093) most protected time lies outside the hazard, but the schedule has enough slack (four spacecraft share every window) that peers absorb almost all of it. This, more than the method, bounds what any handover rule can gain on this storm.
@@ -48,4 +48,5 @@ Utilities in points (tasks of 346 in brackets). The duplicate-charging utility g
 - One storm. The seeds vary only message loss and navigation noise, which changed no outcome; the intervals therefore say nothing about variation across storms.
 - The B3 setting was frozen from B4-only tuning (DL-094, owner choice); B3 was not tuned.
 - The schedule has slack; the tight-schedule scenario could not be built by density (DL-096).
+- **Generality (DL-106 F3):** at 20 km along-track spacing every task has windows on all four spacecraft, and the four cross each hazard region within seconds of each other. The conclusions hold for this close formation, not for constellations in general; a spread formation trades shared hazard for shared tasks (DL-105 preview; recorded run in DL-106).
 - A pipeline dry run executed three of these runs before the recorded run (DL-096); the recorded values agree with it (B4 seed 1: 1 129 / 1 129 / 1 136).

@@ -393,6 +393,8 @@ def run_nominal_operations(
         in_access = lam >= truth_cut[:, None]
         storm["in_access_s"] = {a: float(in_access[:, j].sum()) * step_s
                                 for j, a in enumerate(ids)}  # fmt: skip
+    # unprotected hazard as intervals, with what the spacecraft saw when each began (DL-106)
+    unprotected: dict[str, list[dict[str, Any]]] = {a: [] for a in ids}
     active: dict[str, Segment] = {}
     segments: list[Segment] = []
     transitions = faults.transitions(spec.duration_ns)
@@ -466,6 +468,8 @@ def run_nominal_operations(
                         storm["hazard_s"][a] += step_s
                         storm["exposed_s"][a] += step_s if cmd is not None else 0.0
                         storm["protected_in_hazard_s"][a] += step_s if protected else 0.0
+                        if not protected:
+                            _extend_unprotected(unprotected[a], agents[a], t, step_s, flux)
                     elif protected:
                         storm["protected_outside_hazard_s"][a] += step_s
             if a in active and active[a].task_id != cmd:
@@ -576,12 +580,32 @@ def run_nominal_operations(
         "protection": _protection_summary(agents, ids, spec.duration_ns, protection_violations),
         **({"storm": {"forecast": rp.forecast,
                       "radiation_tolerance_pfu": rp.radiation_tolerance_pfu, **storm,
+                      "unprotected_hazard_intervals": unprotected,
                       **({"access": acc.model_dump(mode="json")} if acc is not None else {})}}
            if rp is not None else {}),
         "network": kernel.network_summary(),
         **kernel.agents_summary(),
     })  # fmt: skip
     return OperationsRun(formation, plan, catalog, segments, kernel.trace, summary, agents)
+
+
+def _extend_unprotected(
+    intervals: list[dict[str, Any]],
+    agent: SpacecraftAgent,
+    t_ns: int,
+    step_s: float,
+    flux_pfu: float,
+) -> None:
+    """Grow the last interval if this step continues it, else open a new one recording the
+    mode, the radiation input the supervisor saw and the true flux at its start."""
+    t_s = t_ns / 1e9
+    if intervals and intervals[-1]["end_s"] == t_s:
+        intervals[-1]["end_s"] = t_s + step_s
+        return
+    intervals.append({
+        "start_s": t_s, "end_s": t_s + step_s, "mode": agent.mode,
+        "radiation_input": agent.risk_inputs(t_ns).get("radiation"), "flux_pfu": flux_pfu,
+    })  # fmt: skip
 
 
 def _health_metrics(
