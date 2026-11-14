@@ -1,6 +1,6 @@
 # Ablations of the baseline protection system
 
-> **Status:** recorded 2026-11-13 from clean commit `16f038e` (`git_dirty: false`; 180 runs, 3.7 h on 12 workers). Phase 5 increment 5 (DL-106 design, DL-107 code, DL-108 results). Descriptive: no hypothesis is accepted or rejected, nothing was tuned, and the expectations below were written into DL-106 before any run. Awaiting owner review.
+> **Status:** recorded 2026-11-13 from clean commit `16f038e` (`git_dirty: false`; 180 runs, 3.7 h on 12 workers). Phase 5 increment 5 (DL-106 design, DL-107 code, DL-108 results). Descriptive: no hypothesis is accepted or rejected, nothing was tuned, and the expectations below were written into DL-106 before any run. Approved by the owner 2026-11-13.
 
 ## Setup
 

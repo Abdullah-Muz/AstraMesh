@@ -1,6 +1,6 @@
 # Spread formation on 23 – 24 March 2024
 
-> **Status:** recorded 2026-11-13 from clean commit `16f038e` (`git_dirty: false`; 36 runs, 7 min on 12 workers). Phase 5 increment 5 (DL-105 preview, DL-106 design, DL-108 results). Descriptive; nothing was tuned. Awaiting owner review.
+> **Status:** recorded 2026-11-13 from clean commit `16f038e` (`git_dirty: false`; 36 runs, 7 min on 12 workers). Phase 5 increment 5 (DL-105 preview, DL-106 design, DL-108 results). Descriptive; nothing was tuned. Approved by the owner 2026-11-13.
 
 ## Setup
 

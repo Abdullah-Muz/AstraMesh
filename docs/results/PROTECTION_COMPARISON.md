@@ -1,6 +1,6 @@
 # Shorter protection on the four evaluation storms
 
-> **Status:** recorded 2026-11-12 from clean commit `0935e98` (`git_dirty: false`; 72 runs, 113 min on 12 workers). Phase 5 increment 4, before 4b (DL-101 – DL-104). Nothing was tuned: the setting is the one frozen in DL-103 (H = 600 s, D = 600 s, no margin). Approved by the owner 2026-11-13. Wording of the findings and limits revised 2026-11-13 (DL-106 F2, F3); no result changed. Diagnostic now cited from the recorded file 2026-11-13 (DL-106 F1, DL-108); two span figures corrected, no other number changed.
+> **Status:** recorded 2026-11-12 from clean commit `0935e98` (`git_dirty: false`; 72 runs, 113 min on 12 workers). Phase 5 increment 4, before 4b (DL-101 – DL-104). Nothing was tuned: the setting is the one frozen in DL-103 (H = 600 s, D = 600 s, no margin). Approved by the owner 2026-11-13. Wording of the findings and limits revised 2026-11-13 (DL-106 F2, F3); no result changed. Diagnostic now cited from the recorded file 2026-11-13 (DL-106 F1, DL-108); two span figures corrected, no other number changed. "Safety limit" reworded to name the modelled limit 2026-11-13 (DL-109).
 
 ## Setup
 
@@ -31,7 +31,7 @@ Utility with tasks completed in brackets. No run has duplicates, exposure or pay
 | B3 + timeout | +0.0070 | [−0.0049, +0.0190] | 0.25 | 410 s | **rejected** (interval includes 0) |
 | B4 | +0.0053 | [−0.0050, +0.0156] | 0.50 | 410 s | **rejected** (interval includes 0) |
 
-**What "rejected" means here (DL-106 F2):** seeds change no outcome, so the sample is the four storms (n = 4) and the intervals are wide. The data do not exclude a gain up to the interval's upper bound, +0.019 (B3 + timeout) or +0.016 (B4) of QUIET utility, about 20 points; they do exclude a gain like the tuning storm's +0.031 under B4. Charging duplicates changes nothing (there are none). The safety limit held everywhere: the only extra unprotected hazard is on 23 Mar 2024, 410 s on sc00 and sc01 (the 100 pfu spacecraft) and 10 s on sc02. The 600 s of unprotected hazard on sc00 – sc02 on 18 Jul 2023 (DL-100) is unchanged; it is the same in both arms.
+**What "rejected" means here (DL-106 F2):** seeds change no outcome, so the sample is the four storms (n = 4) and the intervals are wide. The data do not exclude a gain up to the interval's upper bound, +0.019 (B3 + timeout) or +0.016 (B4) of QUIET utility, about 20 points; they do exclude a gain like the tuning storm's +0.031 under B4. Charging duplicates changes nothing (there are none). The 600 s limit on extra unprotected hazard (DL-101, a modelled budget, not a dose limit) held everywhere: the only extra unprotected hazard is on 23 Mar 2024, 410 s on sc00 and sc01 (the 100 pfu spacecraft) and 10 s on sc02. The 600 s of unprotected hazard on sc00 – sc02 on 18 Jul 2023 (DL-100) is unchanged; it is the same in both arms.
 
 **Protection time** (hours per spacecraft sc00 / sc01 / sc02 / sc03, the same under both planners; baseline → candidate):
 
