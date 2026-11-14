@@ -4,7 +4,7 @@
 
 AstraMesh is an independent, public-methods computational research project. It is a Python-first, CPU-feasible simulation platform for a **simulated four-spacecraft, decentralized low-Earth-orbit mission** that cooperatively schedules ionospheric observations, coordinates over constrained inter-satellite links, assesses its own health and environmental risk, and tries to preserve scientific value when spacecraft become unavailable or space-weather conditions worsen.
 
-> **Project status: Phases 1–5 complete (Gate P5 signed off 2026-11-13), released as v1.0.0 ([`CHANGELOG.md`](CHANGELOG.md)); Phase 6 (research conclusion and public demonstration) not started.**
+> **Project status: Phases 1–5 complete (Gate P5 signed off 2026-11-13), released as v1.0.0 ([`CHANGELOG.md`](CHANGELOG.md)); Phase 6 (research conclusion and public demonstration) in progress.**
 > The repository contains reproducibility infrastructure, validated truth dynamics (two-body and J2) for a four-spacecraft formation, mission geometry (illumination, geometry-only science opportunities), and resource accounting, each with its physics acceptance tests. Phase 2 added isolated spacecraft agents over a modelled crosslink network and four allocation baselines: a static scheduler, a centralized reference, a one-shot auction and CBBA. They are compared on a fault-free day under message loss. Phase 3 added deterministic fault injection, per-agent health beliefs, two fault-aware baselines (B3 + timeout and B4 rule-based redistribution), and a five-mode local protection supervisor; all six methods are compared across nine synthetic fault and hazard scenarios ([`docs/results/FAULT_COMPARISON.md`](docs/results/FAULT_COMPARISON.md)). Phase 4 added bounded, pinned real data (OPS-SAT-AD telemetry; OMNI and GOES-18 proton data, January 2023 – May 2024), an anomaly-detection benchmark independent of the simulation, probabilistic and detector-aided health models, proton-flux forecasts, and a replay of the May 2024 storm ([`docs/results/GATE_P4.md`](docs/results/GATE_P4.md)). Phase 5 added atmospheric drag and formation keeping, per-spacecraft radiation risk from a geomagnetic cutoff model, and storm scenarios combining risk with a network partition or a critical fault. Two candidate methods for coordinating protection across the formation were tested against the baseline on five storms, with ablations; neither improved on it, and no novelty is claimed ([`docs/results/GATE_P5.md`](docs/results/GATE_P5.md)). It contains **no** science-retrieval model. All results are simulation results with synthetic spacecraft and a modelled radiation hazard; nothing here should be read as a validated or published finding.
 
 The authoritative design document is **[`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md)** (v1.0). Where this README and the specification differ, the specification governs.
@@ -109,7 +109,7 @@ A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a prove
 | 3 | Deterministic faults and protection supervisor | Complete (Gate P3 signed off 2026-11-04) |
 | 4 | External data and probabilistic/ML experiments | Complete (Gate P4 signed off 2026-11-10) |
 | 5 | Storm-aware distributed recovery | Complete (Gate P5 signed off 2026-11-13) |
-| 6 | Research conclusion and public demonstration | Not started |
+| 6 | Research conclusion and public demonstration | In progress |
 
 Each phase has explicit exit gates defined in specification §13.
 

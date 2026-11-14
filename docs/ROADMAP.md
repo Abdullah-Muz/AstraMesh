@@ -12,7 +12,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 3 | Deterministic faults and protection supervisor | **Complete**: Gate P3 signed off 2026-11-04 (DL-061); open follow-ups listed there |
 | 4 | External data and probabilistic/ML experiments | **Complete**: Gate P4 signed off 2026-11-10 (DL-076); open follow-ups listed there |
 | 5 | Storm-aware distributed recovery | **Complete**: Gate P5 signed off 2026-11-13 (DL-110); open follow-ups listed there |
-| 6 | Research conclusion and public demonstration | **Plan proposed** (DL-111), awaiting owner approval |
+| 6 | Research conclusion and public demonstration | **In progress** (DL-111) |
 
 ## Phase 0 deliverables (spec §17)
 
@@ -60,11 +60,11 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 4 | Full five-mode machine: STORM_WATCH, RECOVERY, three risk dimensions, hysteresis, dwell, invalid-input policy | **Done**: commit `e3c675f`, CI passing |
 | 5 | Fault-scenario comparison (S01–S10; S06 deferred) | **Done**: script `bb2ea8e`, B4 fix `311477a` (DL-059), 600-run results in [`docs/results/FAULT_COMPARISON.md`](results/FAULT_COMPARISON.md) (DL-060); reviewed and approved 2026-11-04 |
 
-## Phase 6 increments (DL-111, proposed)
+## Phase 6 increments (DL-111)
 
 | # | Increment | Status |
 |---|---|---|
-| 1 | Held-out storm design and data: storms after May 2024 chosen by a rule fixed in advance, new pinned GOES-18 and OMNI data, frozen forecasts and methods; expectations stated before any run | Not started |
+| 1 | Held-out storm design and data: storms after May 2024 chosen by a rule fixed in advance, new pinned GOES-18 and OMNI data, frozen forecasts and methods; expectations stated before any run | **In progress**: DL-111 approved 2026-11-13; design DL-113 proposed (reserve one third, seeds 1 – 3, v3-0-3 storms reported separately) |
 | 2 | Basilisk comparison (spec §4.1 D3): selected propagation cases (two-body, J2, drag) with tolerances fixed before running | Not started |
 | 3 | Negative-result analysis: the open questions carried in `GATE_P5.md`, answered by recorded diagnostics | Not started |
 | 4 | Plots from committed results and an MP4 demonstration from a recorded storm run | Not started |
