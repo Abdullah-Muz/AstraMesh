@@ -1,6 +1,6 @@
 # Phase 5 write-up (Gate P5)
 
-> **Status:** written 2026-11-13 from the recorded Phase 5 results; no new runs. Awaiting owner review (DL-109). Phase 5 increment 5 (DL-077, DL-106). **Simulation results, not flight or radiation results:** the radiation hazard is a model built from a GEO proxy flux, a dipole cutoff model and synthetic payload tolerances, and every spacecraft, task and link is synthetic.
+> **Status:** written 2026-11-13 from the recorded Phase 5 results; no new runs. Approved 2026-11-13 (DL-109); Gate P5 signed off 2026-11-13 (DL-110). Phase 5 increment 5 (DL-077, DL-106). **Simulation results, not flight or radiation results:** the radiation hazard is a model built from a GEO proxy flux, a dipole cutoff model and synthetic payload tolerances, and every spacecraft, task and link is synthetic.
 
 This page checks the three Gate P5 criteria (spec §13) against the evidence and summarises what Phase 5 found. Every number is quoted from the results pages linked in each section; where a number is derived here, the derivation is stated.
 

@@ -1,6 +1,6 @@
 # Roadmap and Gate Tracking
 
-> **Owner:** Abdullah Muzher · **Status:** ACTIVE · **Spec:** §13, §14, §17 · **Last updated:** 2026-11-10
+> **Owner:** Abdullah Muzher · **Status:** ACTIVE · **Spec:** §13, §14, §17 · **Last updated:** 2026-11-13
 
 Phase definitions and exit gates are defined in spec §13; this file tracks status only.
 
@@ -11,7 +11,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 2 | Decentralized nominal science operations | **Complete**: Gate P2 signed off 2026-11-03 (DL-049); open follow-ups listed there |
 | 3 | Deterministic faults and protection supervisor | **Complete**: Gate P3 signed off 2026-11-04 (DL-061); open follow-ups listed there |
 | 4 | External data and probabilistic/ML experiments | **Complete**: Gate P4 signed off 2026-11-10 (DL-076); open follow-ups listed there |
-| 5 | Storm-aware distributed recovery | **In progress** (DL-077) |
+| 5 | Storm-aware distributed recovery | **Complete**: Gate P5 signed off 2026-11-13 (DL-110); open follow-ups listed there |
 | 6 | Research conclusion and public demonstration | Not started |
 
 ## Phase 0 deliverables (spec §17)
@@ -70,15 +70,15 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 3 | Per-spacecraft risk (DL-082): heterogeneous knowledge (late, stale or missing inputs; partitions) and payload tolerances; position-based risk built and its (small) differences reported | **Done**: design DL-090 (`be2a800`), values DL-091 and code `45430aa` (DL-092), results `0388e4e` in [`docs/results/PER_SPACECRAFT_RISK.md`](results/PER_SPACECRAFT_RISK.md) (DL-093); approved 2026-11-11 |
 | 4 | Candidate method (as a policy slot, DL-079) and baselines; combined scenarios (S11 with per-spacecraft risk, storm + partition, storm + critical fault, tighter schedule) | **In progress**: design DL-094 approved 2026-11-11 (February tuning storm, B4 correction, B3 secondaries on 5 seeds); code `a7b2046` (DL-095); tuning `fd5abc3` (DL-096); **Done**: [`docs/results/HANDOVER_COMPARISON.md`](results/HANDOVER_COMPARISON.md) (DL-097); approved 2026-11-12. Room for methods (DL-098 scope A): evaluation storms `f25e224` (DL-099); [`docs/results/MULTI_STORM.md`](results/MULTI_STORM.md) (DL-100); approved 2026-11-12. Spread constellation checked first (owner choice): protection does not separate (DL-101); next: shorter, pass-following protection (DL-101, approved 2026-11-12; scripts `29f1b3f`, DL-102; tuning [`docs/results/PROTECTION_TUNING.md`](results/PROTECTION_TUNING.md), DL-103) before 4b; evaluation storms [`docs/results/PROTECTION_COMPARISON.md`](results/PROTECTION_COMPARISON.md): rejected for both planners (DL-104). Spread formation previewed: no room (DL-105). **Closed** (DL-105, approved 2026-11-13): neither candidate beats the baseline; the storm loss is set by geometry |
 | 4b | RL policies (DL-079): task handover first, then early protection timing; algorithm, library and training budget fixed in an RL design entry; the supervisor keeps the final say | **Dropped** (DL-105, approved 2026-11-13; amends DL-079): no room for either role |
-| 5 | Frozen comparison with ablations; Gate P5 write-up | Design DL-106 approved 2026-11-13: four ablations (no look-ahead, no forecast, no hysteresis, no reconciliation) on five storms, both planners; recorded spread run; recorded diagnostics and wording fixes (F1 – F3); then Gate P5 write-up. Code DL-107; results DL-108 ([`ABLATIONS.md`](results/ABLATIONS.md), [`SPREAD_FORMATION.md`](results/SPREAD_FORMATION.md)); approved 2026-11-13; Gate P5 write-up [`GATE_P5.md`](results/GATE_P5.md) (DL-109), awaiting review |
+| 5 | Frozen comparison with ablations; Gate P5 write-up | Design DL-106 approved 2026-11-13: four ablations (no look-ahead, no forecast, no hysteresis, no reconciliation) on five storms, both planners; recorded spread run; recorded diagnostics and wording fixes (F1 – F3); then Gate P5 write-up. Code DL-107; results DL-108 ([`ABLATIONS.md`](results/ABLATIONS.md), [`SPREAD_FORMATION.md`](results/SPREAD_FORMATION.md)); approved 2026-11-13; **Done**: Gate P5 write-up [`GATE_P5.md`](results/GATE_P5.md) `eab2682` (DL-109); approved 2026-11-13 |
 
 Maneuvers return as rule-based formation keeping (increment 2b, DL-086 meets the DL-082 condition); low-thrust maneuver *optimization* stays deferred (DL-077); attitude-based drag control is out of scope (spec §16).
 
 ## Gate P5 checklist (spec §13)
 
-- [ ] Combined failure/science/protection scenarios reproducible
-- [ ] No claims of radiation or flight safety beyond simulation assumptions
-- [ ] Baseline and candidate methods compared fairly
+- [x] Combined failure/science/protection scenarios reproducible (storm + forecast outage, + 2 + 2 partition, + critical fault in DL-097; 729 runs recorded from clean commits; every rerun of an earlier configuration matched it; [`GATE_P5.md`](results/GATE_P5.md))
+- [x] No claims of radiation or flight safety beyond simulation assumptions (hazard modelled from a GEO proxy flux, a dipole cutoff model and synthetic tolerances; one phrase reworded, DL-109)
+- [x] Baseline and candidate methods compared fairly (candidates fixed before tuning, tuned on a training-period storm, tested on held-out and out-of-sample storms; asymmetries stated in `GATE_P5.md`)
 
 ## Phase 4 increments
 
