@@ -64,7 +64,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 
 | # | Increment | Status |
 |---|---|---|
-| 1 | Held-out storm design and data: storms after May 2024 chosen by a rule fixed in advance, new pinned GOES-18 and OMNI data, frozen forecasts and methods; expectations stated before any run | **In progress**: DL-111 approved 2026-11-13; design DL-113 proposed (reserve one third, seeds 1 – 3, v3-0-3 storms reported separately) |
+| 1 | Held-out storm design and data: storms after May 2024 chosen by a rule fixed in advance, new pinned GOES-18 and OMNI data, frozen forecasts and methods; expectations stated before any run | **In progress**: DL-111 approved 2026-11-13; design DL-113 approved 2026-11-13 (reserve one third, seeds 1 – 3, v3-0-3 storms reported separately); data DS-11 / DS-12, 6 test storms and 2 reserved, code DL-114; next: recorded run |
 | 2 | Basilisk comparison (spec §4.1 D3): selected propagation cases (two-body, J2, drag) with tolerances fixed before running | Not started |
 | 3 | Negative-result analysis: the open questions carried in `GATE_P5.md`, answered by recorded diagnostics | Not started |
 | 4 | Plots from committed results and an MP4 demonstration from a recorded storm run | Not started |

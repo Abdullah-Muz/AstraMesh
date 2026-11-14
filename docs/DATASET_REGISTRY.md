@@ -24,6 +24,8 @@
 | DS-08 | NOAA NCEI GOES-18 SEISS/SGPS L2 (forecast training) | As DS-07 (same metadata statement in every file) | **Yes** (1 Jan 2023 – 30 Apr 2024, 5-min, 486 files, 293 MB, pinned 2026-11-05) | 4–5 |
 | DS-09 | NASA OMNI / SPDF (forecast training) | As DS-06 | **Yes** (Jan 2023 – Apr 2024 1-min, 16 files, 210 MB, pinned 2026-11-05) | 4–5 |
 | DS-10 | NASA OMNI2 hourly (F10.7, ap) | As DS-06 | **Yes** (2023 and 2024, 2 files, 5.8 MB, pinned 2026-11-10) | 5 |
+| DS-11 | NOAA NCEI GOES-18 SEISS/SGPS L2 (held-out storms) | As DS-07 (same metadata statement in the files) | **Yes** (1 Jun 2024 – 31 Oct 2026, 5-min, 883 files, 419 MB, pinned 2026-11-13) | 6 |
+| DS-12 | NASA OMNI / SPDF (held-out storms) | As DS-06 | **Yes** (Jun 2024 – Oct 2026 1-min, 29 files, 381 MB, pinned 2026-11-13) | 6 |
 
 ## Record template
 
@@ -258,6 +260,64 @@ intended_experiment: "Phase 5 increment 2: storm-time density D2 (NRLMSIS 2.0 in
 partitions: "Not a learning dataset; inputs only. For the forecast-tuning storm (2024 Q1) and the May 2024 test week the same file supplies the drivers."
 leakage_risks: "The 81-day centred F10.7 average uses 40 days after the epoch. The simulator uses this density as truth only (agents never see it), so this is not forecast leakage; it must not be used as an agent input."
 domain_transfer_caveats: "Global indices; MSIS is an empirical climatological model with its own uncertainty (DL-084)"
+```
+
+### DS-11 — GOES-18 SEISS/SGPS L2 5-min averages (Jun 2024 – Oct 2026; Phase 6 held-out storms)
+
+```yaml
+id: DS-11
+name: "L2 SEISS/SGPS 5-minute Flux Averages, GOES-18, 2024-06-01 to 2026-10-31"
+owner_provider: "NOAA NCEI"
+url: https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes18/l2/data/sgps-l2-avg5m/
+doi: null
+version_or_date: "v3-0-2 to 2026-01-09, v3-0-3 from 2026-01-10 (algorithm version 3.3, dated 2025-09-04). Same variables and channel band edges in both (checked on 2026-01-09 and 2026-01-10). No NOAA release notes for v3-0-3 were found (searched 2026-11-13); the SGPS Full Maturity README says a temperature correction of the L2 averages was to follow, which may be what v3-0-3 contains (not confirmed)"
+retrieved_utc: "2026-11-13"
+retrieved_files: "883 daily netCDF-4 files, one per day with no gaps and no duplicate versions (sha256 pinned in configs/data/sources.yaml)"
+license_terms: "As DS-07: 'These data may be redistributed and used without restriction.' (license attribute of the files, checked on one file of each version)"
+license_verified_utc: "2026-11-13"
+citation_required: "As DS-07"
+sampling_interval: "5 min; 254 304 records"
+units: "as DS-07"
+time_conventions: "as DS-07"
+geospatial_conventions: "as DS-07"
+event_labels: "as DS-07"
+expected_storage_gb: 0.42
+expected_ram_gb: "< 0.5 (files are read one at a time)"
+missingness_quality_flags: "as DS-07; 0.57 % of records have no valid >= 10 MeV flux under the DL-068 rule, mostly in August 2026 (12.9 %); every other month 0.04 - 0.5 %. Around the version change (90 days each side): 0.073 % and 0.085 % invalid; median quiet-day flux 0.426 and 0.419 pfu (configs/data/heldout_selection.json)"
+intended_experiment: "Phase 6 increment 1: held-out evaluation of the frozen Phase 5 methods (DL-113). The frozen forecasts are applied, never fitted"
+partitions: "Test only. Storm windows are chosen by the DL-113 rule; one third are reserved (never run) for a later fair test"
+derived_quantity: ">= 10 MeV integral flux as DS-08 (DL-068). 8 episodes >= 100 pfu (48 h merge), 8 qualifying windows: 6 test storms (facts in heldout_selection.json) and 2 reserved, described by start date only"
+caveats: "The 19 Jan 2026 test storm peaks at 39 231 pfu, far above the training maximum of 1 048 pfu; P-C cannot forecast above its training range (DL-071)"
+leakage_risks: "None for training: the forecasts are frozen from DS-08 / DS-09. Reserved windows must not be inspected beyond their start dates"
+domain_transfer_caveats: "As DS-07; v3-0-3 data are a processing version the forecasts never saw"
+```
+
+### DS-12 — NASA OMNI 1-min (Jun 2024 – Oct 2026; Phase 6 held-out storms)
+
+```yaml
+id: DS-12
+name: "OMNI high-resolution (HRO) 1-min data, June 2024 - October 2026"
+owner_provider: "NASA/GSFC Space Physics Data Facility (OMNIWeb)"
+url: https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/
+doi: "10.48322/45bb-8792"
+version_or_date: "files as served on 2026-11-13"
+retrieved_utc: "2026-11-13"
+retrieved_files: "29 monthly files omni_min202406.asc ... omni_min202610.asc (sha256 pinned in configs/data/sources.yaml)"
+license_terms: "As DS-06"
+license_verified_utc: "2026-11-13"
+citation_required: "As DS-06"
+sampling_interval: "1 min; 1 271 520 rows, contiguous"
+units: "as DS-09"
+time_conventions: "as DS-06"
+geospatial_conventions: "as DS-06"
+missingness_quality_flags: "SYM/H complete; AE complete except October 2026 (19.4 % missing); Bz GSM 3 - 28 % and flow speed 19 - 49 % missing per month (training: 10 % and 29 %). No test storm falls in October 2026"
+event_labels: "none"
+expected_storage_gb: 0.38
+expected_ram_gb: "< 0.5"
+intended_experiment: "Phase 6 increment 1: forecast features and the cutoff shift for the held-out storms (DL-113)"
+partitions: "Test only, as DS-11"
+leakage_risks: "As DS-11"
+domain_transfer_caveats: "As DS-06"
 ```
 
 ### DS-03, DS-04, DS-05
