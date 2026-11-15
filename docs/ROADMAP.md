@@ -64,8 +64,8 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 
 | # | Increment | Status |
 |---|---|---|
-| 1 | Held-out storm design and data: storms after May 2024 chosen by a rule fixed in advance, new pinned GOES-18 and OMNI data, frozen forecasts and methods; expectations stated before any run | **In progress**: DL-111 approved 2026-11-13; design DL-113 approved 2026-11-13 (reserve one third, seeds 1 – 3, v3-0-3 storms reported separately); data DS-11 / DS-12, 6 test storms and 2 reserved, code DL-114; 288-run results from `32e005a` in [`HELDOUT.md`](results/HELDOUT.md) (DL-115, awaiting owner review) |
-| 2 | Basilisk comparison (spec §4.1 D3): selected propagation cases (two-body, J2, drag) with tolerances fixed before running | Not started |
+| 1 | Held-out storm design and data: storms after May 2024 chosen by a rule fixed in advance, new pinned GOES-18 and OMNI data, frozen forecasts and methods; expectations stated before any run | **Done**: design DL-113 (reserve one third, seeds 1 – 3, v3-0-3 storms reported separately); data DS-11 / DS-12, 6 test storms and 2 reserved, code DL-114; 288-run results from `32e005a` in [`HELDOUT.md`](results/HELDOUT.md) (DL-115, results commit `e0d0d95`); approved 2026-11-14 |
+| 2 | Basilisk comparison (spec §4.1 D3): selected propagation cases (two-body, J2, drag) with tolerances fixed before running | **Design proposed**: DL-116 (separate `tools/basilisk/` project instead of a dependency group, because `bsk` 2.12.2 pins numpy, matplotlib and pillow below the project lock) |
 | 3 | Negative-result analysis: the open questions carried in `GATE_P5.md`, answered by recorded diagnostics | Not started |
 | 4 | Plots from committed results and an MP4 demonstration from a recorded storm run | Not started |
 | 5 | Technical report (`docs/REPORT.md`), README and Gate P6 write-up | Not started |

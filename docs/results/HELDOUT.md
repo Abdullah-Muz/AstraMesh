@@ -1,6 +1,6 @@
 # Held-out storms after May 2024
 
-> **Status:** recorded 2026-11-14 from clean commit `32e005a` (`git_dirty: false`; 288 runs, 8.2 h of process time on 12 workers). Phase 6 increment 1 (DL-113 design, DL-114 data and code, DL-115 results). Every method, setting and forecast was frozen before the run, and the expectations below were written into DL-113 before any held-out run. The results are reported as they came out. Proposed for owner review.
+> **Status:** recorded 2026-11-14 from clean commit `32e005a` (`git_dirty: false`; 288 runs, 8.2 h of process time on 12 workers). Phase 6 increment 1 (DL-113 design, DL-114 data and code, DL-115 results). Every method, setting and forecast was frozen before the run, and the expectations below were written into DL-113 before any held-out run. The results are reported as they came out. Approved by the owner 2026-11-14.
 
 ## Setup
 
