@@ -1,0 +1,25 @@
+case,quantity,value,test,tolerance,passed
+K1,max |dr| AstraMesh - Basilisk [m],0.00013466241430184085,T1,1.0,True
+K1,max |dv| AstraMesh - Basilisk [m/s],1.4766975087293923e-07,T1,0.001,True
+K2,max |dr| AstraMesh - Basilisk [m],0.0002162839503326055,T1,1.0,True
+K2,max |dv| AstraMesh - Basilisk [m/s],2.3803417756061244e-07,T1,0.001,True
+K1,max |dr| AstraMesh - Kepler [m],15.040700806462151,,,
+K1,max |dv| AstraMesh - Kepler [m/s],0.016527176882744396,,,
+K1,max |dr| Basilisk - Kepler [m],15.040835468768133,,,
+K1,max |dv| Basilisk - Kepler [m/s],0.016527324552404722,,,
+K3,drag effect max |r_K3 - r_K2| (AstraMesh) [m],63256.18785353772,,,
+K3,max |dr| AstraMesh - Basilisk [m],0.08007807684777887,,,
+K3,max |dr| / drag effect,1.265932702634409e-06,T2,0.005,True
+K3,max |dv| AstraMesh - Basilisk [m/s],8.785367764386886e-05,,,
+K4,spacing change max |s(t) - s(0)| (AstraMesh) [m],12353.123712805305,,,
+K4,max |d spacing| AstraMesh - Basilisk [m],0.01614162320493051,,,
+K4,max |d spacing| / spacing change,1.306683522338405e-06,T3,0.005,True
+K4,"max |dr| AstraMesh - Basilisk, both spacecraft [m]",0.09632271363650444,,,
+M1,K3: max |dr| production AstraMesh - Basilisk [m],9148.93533736711,,,
+M1,K3: max |dr| production - matched AstraMesh [m],9149.011853456303,,,
+M1,K4: max |d spacing| production AstraMesh - Basilisk [m],1541.2904062922726,,,
+M1,"K4: spacing change, production AstraMesh [m]",10811.817164889828,,,
+M1,K2: max |dr| Basilisk RK4 - RKF78 [m],15.08864188352409,,,
+M1,K2: max |dr| AstraMesh RK4 - Basilisk RKF78 [m],15.088858167371038,,,
+M1,K3: max |dr| Basilisk RK4 - RKF78 [m],15.098752680882624,,,
+M1,K3: max |dr| AstraMesh RK4 - Basilisk RKF78 [m],15.17831307605583,,,

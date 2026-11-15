@@ -541,3 +541,21 @@ Model: `astramesh.agents.handover` (policy slot; `ForecastWindowRule` = the DL-0
 **Previews (dirty tree; tuning storm 8 – 16 Feb 2024, P-B, seed 1; not recorded results).** QUIET 1 136 (341 tasks) under both planners. B4: baseline 1 062 (319), candidate (θ, L) = (0.7, 60 min), (0.5, 30 min), (0.9, 120 min) all 1 062, with 0 duplicates in every arm (the B4 correction). B3 + timeout: baseline 1 062 (319), candidate (0.7, 60 min) 1 041 (313), (0.5, 120 min) 952 (286). Modes, hazard and exposure are identical between arms in every case (no unprotected hazard). Under B4 the candidate's early hand-on changes no outcome because the option A input already forecasts the next hour, so baseline B4 hands tasks on before they start; under B3 released claims are partly lost, more so for a longer window.
 
 Status: implemented (DL-095); tuning in [`docs/results/HANDOVER_TUNING.md`](results/HANDOVER_TUNING.md) (DL-096); May 2024 comparison in [`docs/results/HANDOVER_COMPARISON.md`](results/HANDOVER_COMPARISON.md) (DL-097); approved by the owner 2026-11-12. Four further storms in [`docs/results/MULTI_STORM.md`](results/MULTI_STORM.md) (DL-100); approved by the owner 2026-11-12.
+
+## B.14 Basilisk cross-check (2026-11-14; Phase 6 increment 2; DL-116, DL-117, DL-118)
+
+Basilisk `bsk` 2.12.2 runs in its own environment, `tools/basilisk/`, against `scripts/experiments/basilisk_comparison.py`. Both sides use the same constants, initial states (sc00 and sc01 of the 20 km formation), density table and integration scheme: RK4 at 10 s for 8 days. The J2 pole is GCRS z and the altitude is spherical, so the models are matched.
+
+| Check | Result | Tolerance |
+|---|---|---|
+| BK-01 two-body (K1), AstraMesh against Basilisk | 0.13 mm, 1.5e-7 m/s | 1 m, 1e-3 m/s |
+| BK-02 J2 (K2), AstraMesh against Basilisk | 0.22 mm, 2.4e-7 m/s | 1 m, 1e-3 m/s |
+| BK-03 J2 + USSA 1976 drag with co-rotation (K3), relative to drag's own 63.3 km effect | 8.0 cm (1.3e-6) | 0.5 % |
+| BK-04 spacing under differential drag, sc01 at 1.2 B (K4), relative to the 12.35 km spacing change | 1.6 cm (1.3e-6) | 0.5 % |
+
+**Reported only:**
+
+- RK4 at 10 s is 15.0 – 15.2 m from the analytic Kepler solution and from Basilisk RKF78 after 8 days, in both codes.
+- The production model (WGS 84 ellipsoidal altitude, pole at the epoch) is up to 9.15 km from the matched model on sc00. Its spacing change is 10.81 km against 12.35 km, and it reproduces DL-083's 9.2059 km final spacing exactly.
+
+Status: recorded from clean commit `21c5db9`; results in [`docs/results/BASILISK_COMPARISON.md`](results/BASILISK_COMPARISON.md) (DL-118); approved by the owner 2026-11-14.

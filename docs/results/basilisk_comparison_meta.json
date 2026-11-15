@@ -1,0 +1,50 @@
+{
+  "experiment": "Basilisk cross-check of the truth dynamics (DL-116)",
+  "git_commit": "21c5db9b12b4a1a09935d204def0985cdfb07ed5",
+  "git_dirty": false,
+  "lockfile_sha256": "8102775c8fde0482162c9371ce572c80e61f6f07548678648290c4b932b73bfb",
+  "tools_lockfile_sha256": "e9c6a8b50d68994f44a192f0e8c4d9b51c3cc0c8b6da751553ec10ddbb6be985",
+  "basilisk": {
+    "bsk_version": "2.12.2",
+    "numpy_version": "2.4.6",
+    "python": "3.12.3",
+    "tools_lockfile_sha256": "e9c6a8b50d68994f44a192f0e8c4d9b51c3cc0c8b6da751553ec10ddbb6be985",
+    "cases_sha256": "881903421f331e958b5c9bf3f732467fd5ff6b7fe1f48949824460d4c4cad128",
+    "mass_kg": 100.0,
+    "drag_coeff": 2.2,
+    "wall_s": {
+      "K1": 5.21,
+      "K2": 3.38,
+      "K3": 3.12,
+      "K4": 6.19,
+      "K2_rkf78": 16.83,
+      "K3_rkf78": 15.01
+    }
+  },
+  "astramesh": {
+    "production_config_hash": "30b0f49e60e0cb387d3db1e9843db7a2f5588ae75afa46689de775f84a67292d",
+    "epoch_utc": "2025-06-01 00:00:00+00:00",
+    "production_pole_gcrs": [
+      0.0024745553517419266,
+      3.444480095519666e-05,
+      0.9999969376899946
+    ],
+    "cases_sha256": "881903421f331e958b5c9bf3f732467fd5ff6b7fe1f48949824460d4c4cad128",
+    "wall_s": 574.2
+  },
+  "tolerances": {
+    "T1_dr_m": 1.0,
+    "T1_dv_mps": 0.001,
+    "T2_fraction": 0.005,
+    "T3_fraction": 0.005
+  },
+  "passed": {
+    "T1 K1 max |dr| AstraMesh - Basilisk [m]": true,
+    "T1 K1 max |dv| AstraMesh - Basilisk [m/s]": true,
+    "T1 K2 max |dr| AstraMesh - Basilisk [m]": true,
+    "T1 K2 max |dv| AstraMesh - Basilisk [m/s]": true,
+    "T2 K3 max |dr| / drag effect": true,
+    "T3 K4 max |d spacing| / spacing change": true
+  },
+  "all_passed": true
+}
