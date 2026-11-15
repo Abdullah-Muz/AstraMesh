@@ -259,6 +259,34 @@ def classify(task_windows: list[tuple[str, int, int]],
 
 
 # -- worker ------------------------------------------------------------------------------
+def eligible(agent: Any, peer: str, now_ns: int, before_ns: int | None,
+             beliefs: dict[str, str]) -> dict[str, list[str]]:  # fmt: skip
+    """B4's take-over candidates for each task ``peer`` owns in ``agent``'s view, computed
+    as ``SpacecraftAgent._respond_to_loss`` does (read-only, before the call)."""
+    if agent._plan_algorithm != "B4-rule-redistribution":
+        return {}
+    out = {}
+    for tid, t in sorted(agent._public.items()):
+        if t.owner != peer:
+            continue
+        slots = {s.spacecraft: s for s in t.slots if s.start_ns > now_ns}
+        if before_ns is not None and (peer not in slots or slots[peer].start_ns >= before_ns):
+            continue
+        out[tid] = [sc for sc in sorted(slots)
+                    if agent._can_take(sc, beliefs, slots[sc].start_ns)]  # fmt: skip
+    return out
+
+
+def mode_at(transitions: list[dict[str, Any]], t_s: float) -> str:
+    """Mode at ``t_s`` (after any transition at that time); NOMINAL before the first."""
+    mode = "NOMINAL"
+    for x in transitions:
+        if x["t_s"] > t_s:
+            break
+        mode = x["to"]
+    return mode
+
+
 def _hazard(cfg: Any, run: Any, geo: Any) -> npt.NDArray[np.bool_]:
     """Per-step hazard (n_ticks, n_sc), as the run computes it (DL-090 access, DL-091)."""
     from astramesh.dynamics.geomagnetic import decimal_year, dipole_axis, invariant_latitude_deg
@@ -301,18 +329,20 @@ def run_one(job: Job, folder: str) -> dict[str, Any]:
 
     def traced(self: Any, peer: str, now_ns: int, before_ns: int | None = None) -> None:
         before = {tid: t.owner for tid, t in self._public.items()}
+        beliefs = self._health.beliefs() if self._health is not None else {}
+        considered = eligible(self, peer, now_ns, before_ns, beliefs)  # before the call
         n_log = len(self._log)
         orig(self, peer, now_ns, before_ns)
         changed = {tid: [before.get(tid), t.owner] for tid, t in self._public.items()
                    if before.get(tid) != t.owner}  # fmt: skip
         skipped = [e["task"] for e in self._log[n_log:] if e.get("kind") == "takeover_skipped"]
-        if changed or skipped:
-            beliefs = self._health.beliefs() if self._health is not None else {}
+        if changed or skipped or considered:
             trace.append({"t_s": now_ns / 1e9, "agent": self.agent_id, "peer": peer,
                           "window": before_ns is not None, "own_mode": self.mode,
                           "peers": {p: [r.reported_mode, beliefs.get(p)]
                                     for p, r in sorted(self._peer_table.items())},
-                          "changed": changed, "skipped": skipped})  # fmt: skip
+                          "changed": changed, "skipped": skipped,
+                          "considered": considered})  # fmt: skip
 
     def geo_capture(*a: Any, **k: Any) -> Any:
         captured["geo"] = orig_geo(*a, **k)
@@ -348,8 +378,12 @@ def run_one(job: Job, folder: str) -> dict[str, Any]:
     watch = set(split) | {tid for tid, c in not_done.items() if c == AVAILABLE[0]}
     out.update(split_views=split, not_completed_class=not_done,
                watch_trace=[{**e, "changed": {k: v for k, v in e["changed"].items() if k in watch},
-                             "skipped": [k for k in e["skipped"] if k in watch]}
-                            for e in trace if watch & (set(e["changed"]) | set(e["skipped"]))],
+                             "skipped": [k for k in e["skipped"] if k in watch],
+                             "considered": {k: v for k, v in e["considered"].items()
+                                            if k in watch}}
+                            for e in trace if watch & (set(e["changed"]) | set(e["skipped"])
+                                                       | set(e["considered"]))],
+               watch_final_views={tid: views[tid] for tid in watch},
                windows={tid: windows[tid] for tid in watch},
                window_sc_fully_tasking={tid: {a: bool(tasking[a][w0 : w1 + 1].all())
                                          for a, w0, w1 in windows[tid]} for tid in watch},
@@ -384,15 +418,14 @@ def _key(r: dict[str, Any]) -> tuple[str, str, str]:
     return g, s, a
 
 
-def owner_details(r: dict[str, Any], tid: str) -> dict[str, Any]:
+def owner_details(r: dict[str, Any], tid: str, around_s: float | None = 600.0) -> dict[str, Any]:
+    """Owner-view history of one task. ``around_s``: loss responses within that many
+    seconds of the last divergence (None: all of them)."""
     ch = [{"t_s": e["t_s"], "agent": e["agent"], "old": e["changed"][tid][0],
            "new": e["changed"][tid][1], "peer": e["peer"], "window": e["window"],
            "own_mode": e["own_mode"], "peers": e["peers"]}
           for e in r["watch_trace"] if tid in e["changed"]]  # fmt: skip
-    final = dict(zip(r["agents"], r["split_views"].get(tid, [None] * len(r["agents"])),
-                     strict=True))  # fmt: skip
-    if tid not in r["split_views"]:
-        final = {a: (ch[-1]["new"] if ch else None) for a in r["agents"]}
+    final = dict(zip(r["agents"], r["watch_final_views"][tid], strict=True))
     tl = views_timeline(ch, r["agents"], final)
     t_div = last_divergence(tl)
     tasking = tuple(r["tasking_modes"])
@@ -401,10 +434,19 @@ def owner_details(r: dict[str, Any], tid: str) -> dict[str, Any]:
             for c in ch if t_div is not None and t_div - 600 <= c["t_s"] <= t_div]  # fmt: skip
     skipped = [{"t_s": e["t_s"], "agent": e["agent"]} for e in r["watch_trace"]
                if tid in e["skipped"]]  # fmt: skip
+    centre = t_div if t_div is not None and t_div != float("-inf") else None
+    responses = [{"t_s": e["t_s"], "agent": e["agent"], "peer": e["peer"],
+                  "own_mode": e["own_mode"], "eligible": e["considered"][tid],
+                  "new_owner": e["changed"].get(tid, [None, None])[1]}
+                 for e in r["watch_trace"] if tid in e["considered"]
+                 and (around_s is None or (centre is not None
+                                           and abs(e["t_s"] - centre) <= around_s))]  # fmt: skip
+    modes = ({a: mode_at(r["transitions"][a], centre) for a in r["agents"]}
+             if centre is not None else None)  # fmt: skip
     return {"task": tid, "final_views": list(tl[-1][1]),
             "n_changes": len(ch),
             "last_divergence_s": "never agreed" if t_div == float("-inf") else t_div,
-            "changes_near": near,
+            "modes_at_divergence": modes, "changes_near": near, "loss_responses": responses,
             "takeover_skipped": skipped, "windows": r["windows"].get(tid),
             "window_sc_fully_tasking": r["window_sc_fully_tasking"].get(tid)}  # fmt: skip
 
@@ -442,7 +484,7 @@ def analyse(results: list[dict[str, Any]]) -> dict[str, Any]:
         q = quiet[("phase5", storm)]
         tasks = sorted(t for t, c in r["not_completed_class"].items()
                        if c == AVAILABLE[0] and t in q)  # fmt: skip
-        n2[f"{storm}/{arm}"] = [{**owner_details(r, t), "split": t in r["split_views"]}
+        n2[f"{storm}/{arm}"] = [{**owner_details(r, t, None), "split": t in r["split_views"]}
                                 for t in tasks]  # fmt: skip
 
     def placement(group: str, storm: str, arm: str,

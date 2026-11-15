@@ -182,3 +182,31 @@ def test_variant_series_rejects_an_unexpected_latency(
     monkeypatch.setattr(m, "RECORDED_LATENCY_S", 300)
     with pytest.raises(ValueError, match="expected one"):
         m.variant_series(storm, 0, tmp_path)
+
+
+def test_b4_eligibility_is_computed_as_the_agent_does() -> None:
+    from types import SimpleNamespace as NS
+
+    m = _mod()
+    slots = (NS(spacecraft="sc00", start_ns=50), NS(spacecraft="sc01", start_ns=200),
+             NS(spacecraft="sc02", start_ns=300))  # fmt: skip
+    agent = NS(
+        _plan_algorithm="B4-rule-redistribution",
+        _public={"T1": NS(owner="sc01", slots=slots), "T2": NS(owner="sc02", slots=slots),
+                 "T3": NS(owner="sc01", slots=slots[:1])},
+        _can_take=lambda sc, beliefs, start: sc != "sc01" and beliefs.get(sc) == "HEALTHY",
+    )  # fmt: skip
+    beliefs = {"sc00": "HEALTHY", "sc01": "HEALTHY", "sc02": "HEALTHY"}
+    # slots must start after now (100 ns): sc00's has passed; T3 has none left
+    assert m.eligible(agent, "sc01", 100, None, beliefs) == {"T1": ["sc02"], "T3": []}
+    # window hand-on: only tasks the owner would start before before_ns
+    assert m.eligible(agent, "sc01", 100, 150, beliefs) == {}
+    assert m.eligible(agent, "sc01", 100, 250, beliefs) == {"T1": ["sc02"]}
+    assert m.eligible(NS(_plan_algorithm="B3"), "sc01", 0, None, beliefs) == {}
+
+
+def test_mode_at() -> None:
+    m = _mod()
+    tr = [{"t_s": 10.0, "to": "PROTECTIVE"}, {"t_s": 20.0, "to": "RECOVERY"}]
+    assert [m.mode_at(tr, t) for t in (5.0, 10.0, 15.0, 30.0)] == [
+        "NOMINAL", "PROTECTIVE", "PROTECTIVE", "RECOVERY"]  # fmt: skip
