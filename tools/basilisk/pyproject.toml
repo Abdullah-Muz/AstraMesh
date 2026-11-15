@@ -1,0 +1,14 @@
+# Basilisk cross-check environment (DL-116, DL-117). A separate uv project with its own lock:
+# bsk 2.12.2 pins numpy <= 2.4.6, matplotlib <= 3.10.9 and pillow <= 12.2.0, below the main
+# project's lock, so it cannot share the main environment. It never imports astramesh; it
+# reads a case file written by scripts/experiments/basilisk_comparison.py and writes
+# trajectories back. Basilisk is ISC-licensed (see DL-116).
+[project]
+name = "astramesh-basilisk-check"
+version = "0.0.0"
+description = "Propagates the DL-116 cases with Basilisk for comparison with AstraMesh"
+requires-python = ">=3.12,<3.13"
+dependencies = ["bsk==2.12.2"]
+
+[tool.uv]
+package = false
