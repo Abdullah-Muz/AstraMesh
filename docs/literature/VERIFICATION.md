@@ -1,6 +1,6 @@
 # Literature verification pack
 
-> **Status:** prepared 2026-11-16 for owner verification (DL-132, PROPOSED). Every literature row in [`LITERATURE_REVIEW.md`](../LITERATURE_REVIEW.md) is an assistant draft that the owner has not verified, carried since DL-049. This pack lists the claims that AstraMesh actually relies on, each with the place in the source to check, so they can be verified without re-reading every paper. It adds no new readings.
+> **Status:** prepared 2026-11-16 for owner verification (DL-132, approved 2026-11-16). Every literature row in [`LITERATURE_REVIEW.md`](../LITERATURE_REVIEW.md) is an assistant draft that the owner has not verified, carried since DL-049. This pack lists the claims that AstraMesh actually relies on, each with the place in the source to check, so they can be verified without re-reading every paper. It adds no new readings.
 
 ## How to use it
 
