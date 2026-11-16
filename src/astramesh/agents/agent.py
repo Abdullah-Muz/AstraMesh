@@ -84,6 +84,18 @@ DEFAULT_HEALTH = HealthSettings(suspect_ns=90 * 10**9, lost_ns=300 * 10**9, reco
 
 
 @dataclass(frozen=True, slots=True)
+class OwnershipSync:
+    """B4 ownership re-sync settings (DL-122)."""
+
+    horizon_ns: int  # claim only own slots starting within this, or in progress
+    grace_status_intervals: int  # orphan grace after this view last changed the owner
+
+    def __post_init__(self) -> None:
+        if self.horizon_ns <= 0 or self.grace_status_intervals < 1:
+            raise ValueError("ownership_sync needs a positive horizon and grace >= 1")
+
+
+@dataclass(frozen=True, slots=True)
 class AgentSettings:
     status_interval_ns: int
     status_lifetime_ns: int
@@ -99,6 +111,7 @@ class AgentSettings:
     forecast_max_age_ns: int | None = None  # environment inputs expire (DL-090)
     handover: HandoverPolicy | None = None  # None = reactive baseline (DL-094)
     share_window: bool = True  # announce the window in status (False: ablation)
+    ownership_sync: OwnershipSync | None = None  # None = B4 as recorded (DL-122)
 
     def __post_init__(self) -> None:
         if self.status_interval_ns <= 0 or self.status_lifetime_ns <= 0:
@@ -121,6 +134,8 @@ class PeerRecord:
     reported_mode: str | None = None
     reported_payload: str | None = None  # "ok" / "degraded" (H-C status field)
     window_end_ns: int | None = None  # announced handover window end (DL-094)
+    claims: frozenset[str] | None = None  # peer's latest B4 claims (DL-122)
+    claims_created_ns: int | None = None  # creation time of the status that carried them
 
 
 @dataclass(slots=True)
@@ -153,6 +168,8 @@ class SpacecraftAgent:
     _declined: dict[str, str] = field(default_factory=dict)
     _payload: PayloadBelief | None = None
     _window_end_ns: int | None = None  # own announced window end (DL-094)
+    _owner_set_ns: dict[str, int] = field(default_factory=dict)  # re-sync (DL-122)
+    _view_since_ns: int = 0  # re-sync: when the plan was accepted
 
     def __post_init__(self) -> None:
         if self.agent_id in self.peers:
@@ -211,6 +228,7 @@ class SpacecraftAgent:
             self._plan_algorithm = packet.algorithm
             self.plan_version = packet.version
             self._public = {t.task_id: t for t in packet.public_tasks}
+            self._view_since_ns = packet.t_ns
             self._log.append(
                 {
                     "kind": "plan_accepted",
@@ -457,6 +475,12 @@ class SpacecraftAgent:
                 if (mode not in TASKING_MODES and was in (None, *TASKING_MODES)
                         and self._plan_algorithm == "B4-rule-redistribution"):  # fmt: skip
                     self._respond_to_loss(m.sender, d.delivered_ns)
+            cl = m.payload.get("claims")
+            if (self.settings.ownership_sync is not None and isinstance(cl, tuple)
+                    and self._plan_algorithm == "B4-rule-redistribution"):  # fmt: skip
+                rec.claims = frozenset(x for x in cl if isinstance(x, str))
+                rec.claims_created_ns = m.created_ns
+                self._reconcile(m.sender, d.delivered_ns, m.created_ns)
 
     # -- outputs ----------------------------------------------------------------
     def step(self, now_ns: int) -> list[Message]:
@@ -560,6 +584,8 @@ class SpacecraftAgent:
         for t, peer, old, belief in new:
             self._log.append({"kind": "belief_changed", "peer": peer, "from": old, "to": belief,
                               "t_ns": t})  # fmt: skip
+            if belief in UNAVAILABLE_BELIEFS and self.settings.ownership_sync is not None:
+                self._peer_table[peer].claims = None  # forget a lost peer's claims (DL-122)
             if belief in UNAVAILABLE_BELIEFS and self._plan_algorithm in REDISTRIBUTING:
                 self._respond_to_loss(peer, now_ns)
 
@@ -584,6 +610,8 @@ class SpacecraftAgent:
                 continue
             winner = ok[0]
             self._public[tid] = PublicTask(t.task_id, t.priority, winner, t.slots, t.data_mb)
+            if self.settings.ownership_sync is not None and winner != t.owner:
+                self._owner_set_ns[tid] = now_ns
             if winner != self.agent_id or tid in mine:
                 continue
             s = slots[winner]
@@ -596,6 +624,117 @@ class SpacecraftAgent:
             self._log.append({"kind": "task_taken_over", "task": tid, "from": peer})
         if taken:
             self._plan = tuple(sorted(list(self._plan) + taken, key=lambda o: o.start_ns))
+            self.plan_version += 1
+            self._last_plan_change_ns = now_ns
+            self._log.append({"kind": "plan_changed", "version": self.plan_version,
+                              "n_observations": len(self._plan)})  # fmt: skip
+
+    # -- B4 ownership re-sync ("claims", DL-122), opt-in, off by default --------------------
+    def _own_claims(self, now_ns: int) -> list[str]:
+        """Tasks this agent owns in its own view and will still do: in its plan, not
+        finished or declined, own slot starting after now and within the horizon, or in
+        progress. Nothing while outside the tasking modes or with a degraded payload."""
+        sync = self.settings.ownership_sync
+        assert sync is not None
+        if self.mode not in TASKING_MODES or self.payload_degraded:
+            return []
+        end = now_ns + sync.horizon_ns
+        obs = self._observing.task_id if self._observing is not None else None
+        out = set()
+        for o in self._plan:
+            t = self._public.get(o.task_id)
+            if (t is None or t.owner != self.agent_id or o.task_id in self._finished
+                    or o.task_id in self._declined):  # fmt: skip
+                continue
+            if now_ns < o.start_ns <= end or o.task_id == obs:
+                out.add(o.task_id)
+        cur = self._public.get(obs) if obs is not None else None
+        if obs is not None and cur is not None and cur.owner == self.agent_id:
+            out.add(obs)
+        return sorted(out)
+
+    def _set_owner(self, tid: str, owner: str, now_ns: int, why: str) -> None:
+        t = self._public[tid]
+        self._public[tid] = PublicTask(t.task_id, t.priority, owner, t.slots, t.data_mb)
+        self._owner_set_ns[tid] = now_ns
+        self._log.append({"kind": "owner_resynced", "task": tid, "from": t.owner, "to": owner,
+                          "why": why, "t_ns": now_ns})  # fmt: skip
+
+    def _reconcile(self, sender: str, now_ns: int, created_ns: int) -> None:
+        """Reconcile own owner view with ``sender``'s claims (deterministic rules).
+
+        Conflict: ``sender`` claims a task this view gives to another: the owner becomes
+        the winner among the current claimants (own claim included; a claimant whose slot
+        has already started, i.e. in progress, first, then the lowest ID).
+        Orphan: this view gives the task to ``sender`` but it does not claim it, its slot
+        for ``sender`` has not started, and the view has not changed that owner within
+        the grace period: hand it on by B4's rule, ``sender`` excluded. Only slots
+        ``sender`` would have claimed (start <= created + horizon). Stored claims older than
+        the status lifetime are ignored."""
+        sync = self.settings.ownership_sync
+        assert sync is not None
+        assert self._health is not None
+        beliefs = self._health.beliefs()
+        claims = self._peer_table[sender].claims or frozenset()
+        grace = sync.grace_status_intervals * self.settings.status_interval_ns
+        fresh = now_ns - self.settings.status_lifetime_ns
+        mine = set(self._own_claims(now_ns))
+        observing = self._observing.task_id if self._observing is not None else None
+        planned = {o.task_id for o in self._plan}
+        drop: set[str] = set()
+        taken: list[PlannedObservation] = []
+        horizon = sync.horizon_ns
+        relevant = set(claims) | {tid for tid, t in self._public.items() if t.owner == sender}
+        for tid in sorted(relevant):
+            t = self._public.get(tid)
+            if t is None:
+                continue
+            slots = {s.spacecraft: s for s in t.slots}
+            if tid in claims:
+                if t.owner == sender:
+                    continue
+                claimants = {sender} | {p for p, r in self._peer_table.items()
+                                        if r.claims is not None and tid in r.claims
+                                        and r.claims_created_ns is not None
+                                        and r.claims_created_ns >= fresh
+                                        and beliefs.get(p) in AVAILABLE_BELIEFS}  # fmt: skip
+                if tid in mine:
+                    claimants.add(self.agent_id)
+                winner = min(claimants, key=lambda p: (
+                    0 if p in slots and slots[p].start_ns <= now_ns else 1, p))  # fmt: skip
+                if winner != t.owner:
+                    self._set_owner(tid, winner, now_ns, "conflict")
+                if winner != self.agent_id and tid in planned and tid != observing:
+                    drop.add(tid)
+            elif t.owner == sender:
+                s = slots.get(sender)
+                if s is None or s.start_ns <= now_ns:
+                    continue
+                if s.start_ns > created_ns + horizon:
+                    continue
+                if now_ns - max(self._owner_set_ns.get(tid, 0), self._view_since_ns) < grace:
+                    continue
+                future = {sc: x for sc, x in slots.items() if x.start_ns > now_ns and sc != sender}
+                ok = [sc for sc in sorted(future)
+                      if self._can_take(sc, beliefs, future[sc].start_ns)]  # fmt: skip
+                if not ok:
+                    continue
+                winner = ok[0]
+                self._set_owner(tid, winner, now_ns, "orphan")
+                if winner != self.agent_id or tid in planned:
+                    continue
+                x = future[winner]
+                obs = PlannedObservation(tid, x.start_ns, x.stop_ns)
+                if any(o.start_ns < obs.stop_ns and obs.start_ns < o.stop_ns
+                       for o in list(self._plan) + taken if o.task_id not in drop):  # fmt: skip
+                    self._log.append({"kind": "takeover_skipped", "task": tid,
+                                      "reason": "overlap"})  # fmt: skip
+                    continue
+                taken.append(obs)
+                self._log.append({"kind": "task_taken_over", "task": tid, "from": sender})
+        if drop or taken:
+            kept = [o for o in self._plan if o.task_id not in drop]
+            self._plan = tuple(sorted(kept + taken, key=lambda o: o.start_ns))
             self.plan_version += 1
             self._last_plan_change_ns = now_ns
             self._log.append({"kind": "plan_changed", "version": self.plan_version,
@@ -675,6 +814,9 @@ class SpacecraftAgent:
         if self.settings.handover is not None and self.settings.share_window:  # DL-094
             w = self._window_end_ns
             payload["window_end_ns"] = w if w is not None and w > now_ns else None
+        if (self.settings.ownership_sync is not None
+                and self._plan_algorithm == "B4-rule-redistribution"):  # fmt: skip
+            payload["claims"] = self._own_claims(now_ns)  # DL-122
         msg = Message(
             sender=self.agent_id,
             seq=self._seq,

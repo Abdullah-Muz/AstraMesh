@@ -6,7 +6,7 @@
 >
 > **Corrected after an independent audit (2026-11-15):** every table number matched the data. Two descriptions were wrong and several were overstated, and the hypothesis verdicts did not follow DL-119's rule (confirmed, refuted or undecided). All are fixed below, and DL-121 lists them.
 >
-> Proposed for owner review.
+> Approved by the owner 2026-11-15.
 
 ## Setup
 

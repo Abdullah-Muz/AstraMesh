@@ -102,6 +102,8 @@ class _ScenarioBase(_Model):
             ag.pop("health", None)
         if isinstance(ag, dict) and ag.get("handover", 0) is None:
             ag.pop("handover")  # DL-094
+        if isinstance(ag, dict) and ag.get("ownership_sync", 0) is None:
+            ag.pop("ownership_sync")  # DL-122: absent = recorded B4
         env = d.get("environment")
         if isinstance(env, dict) and env.get("replay") is None:
             env.pop("replay", None)  # DL-069
@@ -453,6 +455,17 @@ class HandoverConfig(_Model):
     )
 
 
+class OwnershipSyncConfig(_Model):
+    """B4 ownership re-sync (DL-122): status reports carry the sender's claims (own tasks
+    starting within ``horizon_s`` or in progress), and receivers resolve conflicts and
+    re-assign orphans by B4's rule. Absent = B4 as recorded."""
+
+    horizon_s: PositiveSeconds = Field(description="Claim only slots starting within this [s]")
+    grace_status_intervals: int = Field(
+        ge=1, le=100, description="Orphan grace after this view last changed the owner"
+    )
+
+
 class AgentsConfig(_Model):
     """Agent message timing and sensor noise (values PROVISIONAL)."""
 
@@ -475,6 +488,9 @@ class AgentsConfig(_Model):
     )
     handover: HandoverConfig | None = Field(
         default=None, description="Forecast-handover candidate (DL-094); absent = baseline"
+    )
+    ownership_sync: OwnershipSyncConfig | None = Field(
+        default=None, description="B4 ownership re-sync (DL-122); absent = B4 as recorded"
     )
 
     @model_validator(mode="after")
@@ -779,6 +795,8 @@ class NominalOperationsScenario(MissionScenarioBase):
         self._require_on_grid(self.agents.nav_fix_interval_s, "agents.nav_fix_interval_s")
         self._require_on_grid(self.agents.status_interval_s, "agents.status_interval_s")
         self._require_on_grid(self.operations.min_observation_s, "operations.min_observation_s")
+        if self.agents.ownership_sync is not None and self.operations.algorithm != "rule_b4":
+            raise ValueError("agents.ownership_sync applies to rule_b4 only (DL-122)")
         h = self.agents.health
         if h is not None and h.payload_check is not None:
             self._require_on_grid(h.payload_check.interval_s, "payload_check.interval_s")

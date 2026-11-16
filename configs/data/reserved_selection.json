@@ -1,0 +1,54 @@
+{
+ "decision": "DL-122",
+ "generated_by": "scripts/data/make_heldout_series.py --reserved",
+ "period_utc": [
+  "2024-06-01",
+  "2026-11-01"
+ ],
+ "rule": {
+  "threshold_pfu": 100.0,
+  "merge_h": 48.0,
+  "lead_days": 2,
+  "window_days": 8,
+  "reserve": "default_rng(113).permutation, first floor(N/3)"
+ },
+ "heldout_selection_sha256": "dea50ab485a4ad2291bbbf09041c3f404adee63e5e50be7c0e4553cda50b91a9",
+ "reserved_window_starts_utc": [
+  "2024-11-19",
+  "2025-05-30"
+ ],
+ "test_storms": [
+  {
+   "name": "20241119",
+   "window_start_utc": "2024-11-19",
+   "epoch_utc": "2024-11-19T00:10:00Z",
+   "series_file": "configs/data/reserved_20241119_series.json",
+   "series_sha256": "9e9ac3c05107d59f2304bf955c8423a2288f5280a867779d4ca8c85ea8bba5c2",
+   "first_ge100_utc": [
+    "2024-11-21T23:45:00Z"
+   ],
+   "peak_pfu": 149.5,
+   "hours_ge100": 6.92,
+   "sym_h_min_nt": -45.0,
+   "processing": "v3-0-2",
+   "truth_invalid_fraction": 0.0004,
+   "ae_missing_fraction": 0.0
+  },
+  {
+   "name": "20250530",
+   "window_start_utc": "2025-05-30",
+   "epoch_utc": "2025-05-30T00:10:00Z",
+   "series_file": "configs/data/reserved_20250530_series.json",
+   "series_sha256": "f9afd8f932200d2296655379bf7611b2813422b55c050f520846f3ea29cf35b6",
+   "first_ge100_utc": [
+    "2025-06-01T05:40:00Z"
+   ],
+   "peak_pfu": 706.2,
+   "hours_ge100": 7.08,
+   "sym_h_min_nt": -151.4,
+   "processing": "v3-0-2",
+   "truth_invalid_fraction": 0.0004,
+   "ae_missing_fraction": 0.0
+  }
+ ]
+}

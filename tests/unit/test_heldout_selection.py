@@ -1,12 +1,17 @@
-"""Held-out storm selection rule (DL-113) on synthetic flux: episodes, windows, reserve."""
+"""Held-out storm selection rule (DL-113) on synthetic flux: episodes, windows, reserve;
+and the reserve windows' series built for DL-122."""
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
+import json
 from pathlib import Path
 from types import ModuleType
 
 import numpy as np
+
+from astramesh.forecast.replay import StormSeries
 
 ROOT = Path(__file__).resolve().parents[2]
 STEP = 300 * 10**9
@@ -89,3 +94,36 @@ def test_version_check_reports_invalid_and_quiet_flux() -> None:
     assert out["after"]["quiet_days"] == 90
     assert out["before"]["invalid_fraction"] == 0.0
     assert out["after"]["invalid_fraction"] > 0.0
+
+
+def _ns(day: str) -> int:
+    return int(np.datetime64(day, "ns").astype(np.int64))
+
+
+def test_reserved_series_are_pinned_and_are_the_dl113_reserve() -> None:
+    data = ROOT / "configs/data"
+    held_bytes = (data / "heldout_selection.json").read_bytes()
+    held = json.loads(held_bytes)
+    res = json.loads((data / "reserved_selection.json").read_text())
+    assert res["decision"] == "DL-122"
+    assert res["heldout_selection_sha256"] == hashlib.sha256(held_bytes).hexdigest()
+    assert res["rule"] == held["rule"]
+    assert res["period_utc"] == held["period_utc"]
+    starts = held["reserved_window_starts_utc"]
+    assert res["reserved_window_starts_utc"] == starts
+    assert [s["window_start_utc"] for s in res["test_storms"]] == starts
+    assert len(starts) == held["n_qualifying"] // 3 >= 1
+    test_starts = [_ns(s["window_start_utc"]) for s in held["test_storms"]]
+    for s in res["test_storms"]:
+        assert s["series_file"] == f"configs/data/reserved_{s['name']}_series.json"
+        path = ROOT / s["series_file"]
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == s["series_sha256"]
+        series = StormSeries.load(s["series_file"], s["series_sha256"])
+        start = _ns(s["window_start_utc"])
+        assert series.start_ns == start
+        assert len(series.truth_pfu) == 8 * 288
+        assert max(v for v in series.truth_pfu if v == v) >= 100.0
+        assert s["peak_pfu"] >= 100.0
+        # [start, start + 8 d) is disjoint from every test-storm window
+        assert all(start + 8 * DAY <= t or t + 8 * DAY <= start for t in test_starts)
+        assert set(s) == set(held["test_storms"][0])

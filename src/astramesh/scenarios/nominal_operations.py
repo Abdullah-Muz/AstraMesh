@@ -29,7 +29,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from astramesh.agents.agent import AgentSettings, SpacecraftAgent
+from astramesh.agents.agent import AgentSettings, OwnershipSync, SpacecraftAgent
 from astramesh.agents.handover import ForecastWindowRule
 from astramesh.agents.health import (
     AVAILABLE_BELIEFS,
@@ -213,6 +213,13 @@ def _handover_policy(config: NominalOperationsScenario) -> ForecastWindowRule | 
     return ForecastWindowRule(ho.window_threshold_ratio, seconds_to_ns(ho.lead_s))
 
 
+def _ownership_sync(config: NominalOperationsScenario) -> OwnershipSync | None:
+    o = config.agents.ownership_sync
+    if o is None:
+        return None
+    return OwnershipSync(seconds_to_ns(o.horizon_s), o.grace_status_intervals)
+
+
 def _forecast_max_age_ns(config: NominalOperationsScenario) -> int | None:
     rp = config.environment.replay if config.environment is not None else None
     age = rp.forecast_max_age_s if rp is not None else None
@@ -338,6 +345,7 @@ def run_nominal_operations(
         forecast_max_age_ns=_forecast_max_age_ns(config),
         handover=_handover_policy(config),
         share_window=config.agents.handover is None or config.agents.handover.share_window,
+        ownership_sync=_ownership_sync(config),
     )
     agents = {a: SpacecraftAgent(a, tuple(p for p in ids if p != a), settings) for a in ids}
     for a in ids:

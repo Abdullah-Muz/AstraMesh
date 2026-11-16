@@ -22,7 +22,8 @@ UNIT_SUFFIXES = ("_s", "_ns", "_m", "_km", "_mps", "_kg", "_w", "_wh", "_j", "_n
 # Non-physical (dimensionless, identifiers, or explicitly unit-less) fields.
 UNITLESS_OK = {"schema_version", "seed", "n_spacecraft", "n_nodes", "priority",
                "health_recover_messages",
-               "loss_prior_a", "loss_prior_b"}  # Beta pseudo-counts (DL-066)  # fmt: skip
+               "loss_prior_a", "loss_prior_b",  # Beta pseudo-counts (DL-066)
+               "grace_status_intervals"}  # a count of status periods (DL-122)  # fmt: skip
 
 
 def _with(base: dict[str, Any], path: str, value: Any) -> dict[str, Any]:

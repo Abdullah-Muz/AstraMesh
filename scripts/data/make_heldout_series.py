@@ -22,10 +22,17 @@ DS-08 / DS-09, ``make_storm_series.py``) and never refitted. Writes one series p
 storm, ``configs/data/heldout_<yyyymmdd>_series.json`` (window start date), and
 ``configs/data/heldout_selection.json`` (rule, windows, reserve, test-storm facts and the
 v3-0-3 consistency check). Prints each sha256. Deterministic.
+
+With ``--reserved`` (DL-122, which uses the reserve as test storms): recomputes the
+windows and the reserve by the same rule, checks the reserve against
+``heldout_selection.json``, and writes ``configs/data/reserved_<yyyymmdd>_series.json``
+per reserved window (same format and frozen forecasts) and
+``configs/data/reserved_selection.json``. Writes no heldout_* file.
 """
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import math
@@ -55,6 +62,9 @@ WINDOW_DAYS = 8
 RESERVE_SEED = 113
 VERSION_SPAN_DAYS = 90
 QUIET_PFU = 10.0
+RULE = {"threshold_pfu": THRESHOLD_PFU, "merge_h": MERGE_NS / 3.6e12,
+        "lead_days": LEAD_DAYS, "window_days": WINDOW_DAYS,
+        "reserve": f"default_rng({RESERVE_SEED}).permutation, first floor(N/3)"}  # fmt: skip
 
 
 def ns(day: str) -> int:
@@ -135,7 +145,88 @@ def version_check(t_ns: npt.NDArray[np.int64], flux: npt.NDArray[np.float64],
     return out
 
 
-def main() -> int:
+def write_series(g: Any, flux: npt.NDArray[np.float64], logs: dict[str, Any],
+                 w: dict[str, Any], change: int, kind: str) -> dict[str, Any]:  # fmt: skip
+    """Write the series of window ``w`` (``kind`` "heldout": a test storm of DL-113;
+    "reserved": a DL-113 reserve window used as a test storm by DL-122) and return its
+    facts as listed in the selection file."""
+    day = utc(w["start_ns"], "D")
+    idx = np.flatnonzero((g.t_ns >= w["start_ns"]) & (g.t_ns < w["end_ns"]))
+    if len(idx) != WINDOW_DAYS * 288 or np.any(np.diff(g.t_ns[idx]) != STEP_NS):
+        raise ValueError(f"{day}: window is not a contiguous 8-day 5-min grid")
+    name = day.replace("-", "")[:8]
+    f = flux[idx]
+    label = {"heldout": f"Held-out storm {name} (DL-113)",
+             "reserved": f"Reserved storm {name} (DL-113 reserve, used as a test storm by "
+                         "DL-122)"}[kind]  # fmt: skip
+    doc = {
+        "description": f"{label}: GOES-18 >= 10 MeV flux (DL-068 "
+        f"method), 1 h forecasts of its maximum, OMNI SYM-H and AE, 8 days from {day[:10]}; "
+        "forecasts fitted on Jan 2023 - Apr 2024 only (as S11).",
+        "generated_by": "scripts/data/make_heldout_series.py",
+        "sources": ["DS-08", "DS-09", "DS-11", "DS-12"],
+        "record_start_utc": utc(int(g.t_ns[idx[0]])),
+        "step_s": STEP_NS // 10**9,
+        "latency_s": LATENCY_NS // 10**9,
+        "horizon_s": HORIZON_S,
+        "pc_settings": PC_SETTINGS,
+        "truth_flux_pfu": _round(f),
+        "forecast_flux_pfu": {k2: _round(10.0 ** logs[k2][idx]) for k2 in FORECASTS},
+        "sym_h_nt": _round(g.omni["sym_h_nt"][idx]),
+        "ae_nt": _round(g.omni["ae_nt"][idx]),
+    }
+    text = json.dumps(doc, indent=0, separators=(",", ":")) + "\n"
+    path = DATA / f"{kind}_{name}_series.json"
+    path.write_text(text, encoding="ascii")
+    sha = hashlib.sha256(text.encode("ascii")).hexdigest()
+    ge = np.nan_to_num(f, nan=-np.inf) >= THRESHOLD_PFU
+    print(path.relative_to(ROOT), len(text), "bytes, sha256", sha)
+    return {
+        "name": name, "window_start_utc": day, "epoch_utc": utc(w["start_ns"] + 600 * 10**9),
+        "series_file": str(path.relative_to(ROOT)), "series_sha256": sha,
+        "first_ge100_utc": [utc(t) for t in w["episodes"]],
+        "peak_pfu": round(float(np.nanmax(f)), 1),
+        "hours_ge100": round(float(ge.sum()) * STEP_NS / 3.6e12, 2),
+        "sym_h_min_nt": round(float(np.nanmin(g.omni["sym_h_nt"][idx])), 1),
+        "processing": "v3-0-3" if w["start_ns"] >= change else (
+            "v3-0-2" if w["end_ns"] <= change else "both"),
+        "truth_invalid_fraction": round(float(np.isnan(f).mean()), 4),
+        "ae_missing_fraction": round(float(np.isnan(g.omni["ae_nt"][idx]).mean()), 4),
+    }  # fmt: skip
+
+
+def write_reserved(g: Any, flux: npt.NDArray[np.float64], logs: dict[str, Any],
+                   ok: list[dict[str, Any]], held: set[int], change: int) -> int:  # fmt: skip
+    """--reserved (DL-122): series for the DL-113 reserve windows and
+    ``reserved_selection.json``; never writes a heldout_* file."""
+    sel_path = DATA / "heldout_selection.json"
+    sel_bytes = sel_path.read_bytes()
+    pinned = json.loads(sel_bytes)["reserved_window_starts_utc"]
+    days = sorted(utc(w["start_ns"], "D") for k, w in enumerate(ok) if k in held)
+    if days != pinned:
+        raise ValueError(f"reserve {days} != heldout_selection.json {pinned}")
+    storms = [write_series(g, flux, logs, w, change, "reserved")
+              for k, w in enumerate(ok) if k in held]  # fmt: skip
+    selection = {
+        "decision": "DL-122",
+        "generated_by": "scripts/data/make_heldout_series.py --reserved",
+        "period_utc": [PERIOD[0], PERIOD[1]],
+        "rule": RULE,
+        "heldout_selection_sha256": hashlib.sha256(sel_bytes).hexdigest(),
+        "reserved_window_starts_utc": days,
+        "test_storms": storms,
+    }
+    out = DATA / "reserved_selection.json"
+    out.write_text(json.dumps(selection, indent=1) + "\n", encoding="ascii")
+    print(out.relative_to(ROOT), "sha256", hashlib.sha256(out.read_bytes()).hexdigest())
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--reserved", action="store_true",
+                    help="build the DL-113 reserve windows' series (DL-122) instead")  # fmt: skip
+    reserved_mode = ap.parse_args(argv).reserved
     lo, hi = ns(PERIOD[0]), ns(PERIOD[1])
     g = build_grid(goes.load("DS-11"), omni.load("DS-12"))
     if g.t_ns[0] != lo or g.t_ns[-1] + STEP_NS != hi:
@@ -158,58 +249,19 @@ def main() -> int:
         logs[f"P-C/{tag}"] = PC(q).fit(Xtr, ytr).predict(X)
     assert set(logs) == set(FORECASTS)
 
-    test, reserved = [], []
+    reserved = [utc(w["start_ns"], "D") for k, w in enumerate(ok) if k in held]
+    if reserved_mode:
+        return write_reserved(g, flux, logs, ok, held, change)
+    test = []
     for k, w in enumerate(ok):
-        day = utc(w["start_ns"], "D")
         if k in held:
-            reserved.append(day)
             continue
-        idx = np.flatnonzero((g.t_ns >= w["start_ns"]) & (g.t_ns < w["end_ns"]))
-        if len(idx) != WINDOW_DAYS * 288 or np.any(np.diff(g.t_ns[idx]) != STEP_NS):
-            raise ValueError(f"{day}: window is not a contiguous 8-day 5-min grid")
-        name = day.replace("-", "")[:8]
-        f = flux[idx]
-        doc = {
-            "description": f"Held-out storm {name} (DL-113): GOES-18 >= 10 MeV flux (DL-068 "
-            f"method), 1 h forecasts of its maximum, OMNI SYM-H and AE, 8 days from {day[:10]}; "
-            "forecasts fitted on Jan 2023 - Apr 2024 only (as S11).",
-            "generated_by": "scripts/data/make_heldout_series.py",
-            "sources": ["DS-08", "DS-09", "DS-11", "DS-12"],
-            "record_start_utc": utc(int(g.t_ns[idx[0]])),
-            "step_s": STEP_NS // 10**9,
-            "latency_s": LATENCY_NS // 10**9,
-            "horizon_s": HORIZON_S,
-            "pc_settings": PC_SETTINGS,
-            "truth_flux_pfu": _round(f),
-            "forecast_flux_pfu": {k2: _round(10.0 ** logs[k2][idx]) for k2 in FORECASTS},
-            "sym_h_nt": _round(g.omni["sym_h_nt"][idx]),
-            "ae_nt": _round(g.omni["ae_nt"][idx]),
-        }
-        text = json.dumps(doc, indent=0, separators=(",", ":")) + "\n"
-        path = DATA / f"heldout_{name}_series.json"
-        path.write_text(text, encoding="ascii")
-        sha = hashlib.sha256(text.encode("ascii")).hexdigest()
-        ge = np.nan_to_num(f, nan=-np.inf) >= THRESHOLD_PFU
-        test.append({
-            "name": name, "window_start_utc": day, "epoch_utc": utc(w["start_ns"] + 600 * 10**9),
-            "series_file": str(path.relative_to(ROOT)), "series_sha256": sha,
-            "first_ge100_utc": [utc(t) for t in w["episodes"]],
-            "peak_pfu": round(float(np.nanmax(f)), 1),
-            "hours_ge100": round(float(ge.sum()) * STEP_NS / 3.6e12, 2),
-            "sym_h_min_nt": round(float(np.nanmin(g.omni["sym_h_nt"][idx])), 1),
-            "processing": "v3-0-3" if w["start_ns"] >= change else (
-                "v3-0-2" if w["end_ns"] <= change else "both"),
-            "truth_invalid_fraction": round(float(np.isnan(f).mean()), 4),
-            "ae_missing_fraction": round(float(np.isnan(g.omni["ae_nt"][idx]).mean()), 4),
-        })  # fmt: skip
-        print(path.relative_to(ROOT), len(text), "bytes, sha256", sha)
+        test.append(write_series(g, flux, logs, w, change, "heldout"))
     selection = {
         "decision": "DL-113",
         "generated_by": "scripts/data/make_heldout_series.py",
         "period_utc": [PERIOD[0], PERIOD[1]],
-        "rule": {"threshold_pfu": THRESHOLD_PFU, "merge_h": MERGE_NS / 3.6e12,
-                 "lead_days": LEAD_DAYS, "window_days": WINDOW_DAYS,
-                 "reserve": f"default_rng({RESERVE_SEED}).permutation, first floor(N/3)"},
+        "rule": RULE,
         "n_episodes": len(eps), "n_windows": len(ws), "n_qualifying": len(ok),
         "not_qualifying": [{"window_start_utc": utc(w["start_ns"], "D"), "reason": w["reason"]}
                            for w in ws if not w["qualifies"]],
