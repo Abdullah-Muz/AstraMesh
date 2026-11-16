@@ -65,6 +65,13 @@ ml = [
     "torch>=2.14.1,<2.15",
     "xgboost-cpu>=3.4.1",
 ]
+# Phase 6 demonstration video (DL-125): imageio-ffmpeg (BSD-2-Clause) supplies an ffmpeg
+# executable for matplotlib's MP4 writer. Its bundled ffmpeg is a GPL v3+ build, used only
+# as an external encoder and not redistributed. Not a default group (170 MB binary):
+# `uv run --group viz python scripts/figures/make_demo.py`.
+viz = [
+    "imageio-ffmpeg>=0.8.1,<0.9",
+]
 
 [tool.uv]
 default-groups = ["atmosphere", "data", "dev", "ml"]
