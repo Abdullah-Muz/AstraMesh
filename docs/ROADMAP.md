@@ -69,9 +69,11 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 3 | Negative-result analysis: the open questions carried in `GATE_P5.md`, answered by recorded diagnostics | **Done**: design DL-119 approved 2026-11-14 (N1 – N6, including the B4 ownership split from DL-115 and latency varied 0 – 1 200 s); code DL-120 (`f2a1b3a`; first recorded run `796563b` superseded); results in [`NEGATIVE_RESULTS.md`](results/NEGATIVE_RESULTS.md) (DL-121); approved 2026-11-15 |
 | 3b | B4 ownership re-sync (added by the owner, 2026-11-15): fix the DL-121 split, tested on the two reserved windows | **Done**: design DL-122; code and reserved series DL-123 (`a94b654`); results in [`RESYNC_COMPARISON.md`](results/RESYNC_COMPARISON.md) (DL-124, `0465610`): all six expectations held on the test storms, with no change from B4; duplicates and bytes failed in the spread formations; approved 2026-11-15 |
 | 4 | Plots from committed results and an MP4 demonstration from a recorded storm run | **Done**: design DL-125; code DL-126 (`74273a0`); figures F1 – F9 in [`docs/figures/`](figures/README.md), trace and MP4 in [`docs/media/`](media/README.md) (DL-127, `66ea3be`); approved 2026-11-16 |
-| 5 | Technical report (`docs/REPORT.md`), README and Gate P6 write-up | **Design proposed**: DL-128 (report sections, Gate P6 traceability table, README update, link and metadata test, independent number check); then DL-129 (report), Gate P6 sign-off, release v2.0.0 |
+| 5 | Technical report (`docs/REPORT.md`), README and Gate P6 write-up | **Written**: design DL-128 approved 2026-11-16; [`REPORT.md`](REPORT.md), [`GATE_P6.md`](results/GATE_P6.md), README and the link and metadata test (DL-129), with 32 corrections from an independent number check; awaiting owner review, then Gate P6 sign-off and release v2.0.0 |
 
 ## Gate P6 checklist (spec §13)
+
+Assessed in [`GATE_P6.md`](results/GATE_P6.md) (DL-129); ticked when the owner signs off.
 
 - [ ] Every reported result traces to a commit/config/data version
 - [ ] Limitations disclosed

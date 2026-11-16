@@ -4,8 +4,19 @@
 
 AstraMesh is an independent, public-methods computational research project. It is a Python-first, CPU-feasible simulation platform for a **simulated four-spacecraft, decentralized low-Earth-orbit mission** that cooperatively schedules ionospheric observations, coordinates over constrained inter-satellite links, assesses its own health and environmental risk, and tries to preserve scientific value when spacecraft become unavailable or space-weather conditions worsen.
 
-> **Project status: Phases 1–5 complete (Gate P5 signed off 2026-11-13), released as v1.0.0 ([`CHANGELOG.md`](CHANGELOG.md)); Phase 6 (research conclusion and public demonstration) in progress.**
-> The repository contains reproducibility infrastructure, validated truth dynamics (two-body and J2) for a four-spacecraft formation, mission geometry (illumination, geometry-only science opportunities), and resource accounting, each with its physics acceptance tests. Phase 2 added isolated spacecraft agents over a modelled crosslink network and four allocation baselines: a static scheduler, a centralized reference, a one-shot auction and CBBA. They are compared on a fault-free day under message loss. Phase 3 added deterministic fault injection, per-agent health beliefs, two fault-aware baselines (B3 + timeout and B4 rule-based redistribution), and a five-mode local protection supervisor; all six methods are compared across nine synthetic fault and hazard scenarios ([`docs/results/FAULT_COMPARISON.md`](docs/results/FAULT_COMPARISON.md)). Phase 4 added bounded, pinned real data (OPS-SAT-AD telemetry; OMNI and GOES-18 proton data, January 2023 – May 2024), an anomaly-detection benchmark independent of the simulation, probabilistic and detector-aided health models, proton-flux forecasts, and a replay of the May 2024 storm ([`docs/results/GATE_P4.md`](docs/results/GATE_P4.md)). Phase 5 added atmospheric drag and formation keeping, per-spacecraft radiation risk from a geomagnetic cutoff model, and storm scenarios combining risk with a network partition or a critical fault. Two candidate methods for coordinating protection across the formation were tested against the baseline on five storms, with ablations; neither improved on it, and no novelty is claimed ([`docs/results/GATE_P5.md`](docs/results/GATE_P5.md)). It contains **no** science-retrieval model. All results are simulation results with synthetic spacecraft and a modelled radiation hazard; nothing here should be read as a validated or published finding.
+> **Project status: Phases 1–5 complete; Phase 6 results recorded and its report written, with the Gate P6 write-up awaiting owner sign-off ([`docs/results/GATE_P6.md`](docs/results/GATE_P6.md)). v1.0.0 (Phases 1–5) is released ([`CHANGELOG.md`](CHANGELOG.md)).**
+> **Read first: the technical report, [`docs/REPORT.md`](docs/REPORT.md).** It sets out the question, the simulated system, the data, the methods and every result with its interval, the negative results, related work and limitations.
+
+The repository contains:
+
+- **Dynamics.** Validated truth dynamics for a four-spacecraft formation: two-body, J2 and atmospheric drag, with physics acceptance tests and a Basilisk cross-check.
+- **Mission model.** Mission geometry and resource accounting.
+- **Agents.** Isolated spacecraft agents over a modelled crosslink network, with six allocation baselines.
+- **Faults and protection.** Deterministic fault injection, per-agent health beliefs and a five-mode local protection supervisor.
+- **Pinned real data.** OPS-SAT-AD telemetry, and OMNI and GOES-18 proton data for January 2023 – October 2026 (GOES only 8–15 May within May 2024).
+- **Storm scenarios.** Proton-flux forecasts and per-spacecraft radiation risk, run over measured storms.
+
+Every result about the formation is a **simulation** result with synthetic spacecraft and a modelled radiation hazard driven by **measured** storm data; the OPS-SAT anomaly benchmark and the forecast-skill scores are measured-data results outside the simulation. Nothing here should be read as a flight result or a validated finding, and no novelty is claimed. There is **no** science-retrieval model.
 
 The authoritative design document is **[`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md)** (v1.0). Where this README and the specification differ, the specification governs.
 
@@ -20,6 +31,27 @@ The core challenge is **decision-making under incomplete information**. A satell
 > Can a decentralized spacecraft constellation preserve useful scientific operations during uncertain spacecraft-health events, communication disruption, and hazardous space-weather conditions while keeping local protection and maneuver constraints satisfied?
 
 The specification defines five testable hypotheses (H1–H5) covering fault-aware task planning, explicit health uncertainty, space-weather-aware protection, a local safety supervisor, and forecast-informed protection. **These are hypotheses, not promised outcomes**; the final contribution may be narrowed to one of them after literature review and baseline experiments.
+
+## Results
+
+Inside the simulation (details, intervals and sources in [`docs/REPORT.md`](docs/REPORT.md)):
+
+- **Reconciliation preserves science.** When one or two spacecraft are lost, CBBA with a health timeout and the rule-based redistribution keep all observable science, where a static schedule keeps 0.81 (one lost) or 0.68 (two lost). On six held-out storms, removing task reconciliation costs about 6 % of quiet-period utility, and both intervals exclude zero.
+- **Protection buys hazard reduction cheaply.** The supervisor's forecast, look-ahead and hysteresis each prevent unprotected hazard on some storms, at a science cost whose interval includes zero.
+- **The candidates did not beat the baseline.** The two methods proposed for coordinating protection across the formation (forecast handover and shorter protection) were frozen after tuning and did not improve on the baseline, either on their Phase 5 test storms or on six storms from June 2024 – January 2026 that no method had seen.
+- **The remaining losses are explained.**
+  - A close formation crosses each hazard region together, so a free peer is rare.
+  - The remaining hazard sits at sharp onsets and falls with data latency.
+  - One baseline (B4) can split task ownership. A re-sync fix recovered the lost tasks on the storms used to develop it and was neutral on two test storms, but adds duplicates where spacecraft that share tasks cannot hear each other.
+- **The dynamics agree with Basilisk**, given the same models and constants, to 0.22 mm (J2) and 8 cm (J2 and drag) over 8 days. This checks the implementation, not the physics.
+
+![Held-out storms: retention change by arm](docs/figures/f2_heldout_retention.png)
+
+*F2: simulated retention change against the baseline on the six held-out storms, with 95 % intervals (n = 6).*
+
+![Simulated formation through the measured 23 March 2024 storm](docs/media/astramesh_demo_mar2024.png)
+
+*A frame from the [demonstration video](docs/media/astramesh_demo_mar2024.mp4) (52 s, [about it](docs/media/README.md)): a simulated four-spacecraft formation through the measured 23 March 2024 solar proton event. All report figures are in [`docs/figures/`](docs/figures/README.md).*
 
 ## Research tracks
 
@@ -42,26 +74,39 @@ Reinforcement learning is **optional**, not a requirement. ML is used for predic
 
 All physical and numerical parameters are starting points that must be validated; see §3 of the specification.
 
-## Planned technology stack
+## Technology stack (as used)
 
-| Area | Core / near-term |
+| Area | Used |
 |---|---|
-| Language & environment | Python on Ubuntu 24.04 (WSL2), Git |
+| Language & environment | Python 3.12 on Ubuntu 24.04 (WSL2), Git |
 | Dependency management | `uv`, `pyproject.toml`, `uv.lock` |
 | Configuration | YAML validated with pydantic (unknown keys rejected) |
-| Numerics & physics | NumPy, SciPy; Astropy for time, frames, and units |
+| Numerics & physics | NumPy, SciPy (including `milp` for B1), Astropy and ERFA for time, frames and units |
 | Networking & discrete events | NetworkX, SimPy |
-| Data | h5py for the GOES netCDF-4 files (`data` dependency group, DL-068); pandas, PyArrow and Xarray not needed so far |
-| Machine learning | scikit-learn; PyOD, xgboost-cpu and CPU-only PyTorch for the Phase 4 anomaly benchmark (`ml` dependency group, DL-064) |
-| Visualization | Matplotlib, Plotly |
-| Testing | pytest, Hypothesis |
-| Later / optional | Basilisk (validation), CVXPY + OSQP, atmospheric models |
+| Atmosphere | USSA 1976 (built in); NRLMSIS 2.0 through `pymsis` (`atmosphere` group, DL-084) |
+| Data | h5py for the GOES netCDF-4 files (`data` group, DL-068) |
+| Machine learning | scikit-learn; PyOD, xgboost-cpu and CPU-only PyTorch for the anomaly benchmark (`ml` group, DL-064) |
+| Visualization | Matplotlib; ffmpeg through `imageio-ffmpeg` for the video only (`viz` group, not installed by default, DL-125) |
+| Validation | Basilisk 2.12.2 in its own environment, [`tools/basilisk/`](tools/basilisk/) (DL-116) |
+| Testing | pytest, Hypothesis, ruff, mypy (strict) |
 
-Dependencies will be added incrementally, phase by phase, only when a tested requirement needs them (specification §11).
+Planned but not needed: Plotly, CVXPY + OSQP (no manoeuvre optimisation was built, DL-077), pandas, PyArrow and Xarray. Dependencies were added phase by phase, only when a tested requirement needed them (specification §11).
 
-## Planned external data sources
+## External data
 
-ESA Anomaly Dataset (ESA-ADB), ESA OPS-SAT-AD, NOAA GloTEC, CelesTrak GP/OMM, UCAR COSMIC-2, NASA OMNI/SPDF, and NOAA SWPC/NCEI. **No datasets are included in this repository**; large raw data is kept out of Git, and every source will be recorded with version, hash, license, and caveats in a dataset registry (specification §8).
+Used, each pinned by SHA-256 with its licence or terms checked ([`docs/DATASET_REGISTRY.md`](docs/DATASET_REGISTRY.md)):
+
+- **ESA OPS-SAT-AD** telemetry (anomaly benchmark and health-model scores).
+- **NASA OMNI / SPDF** 1-min and OMNI2 hourly data, for SYM-H, AE, F10.7 and ap.
+- **NOAA NCEI GOES-18 SEISS / SGPS** ≥ 10 MeV proton flux, January 2023 – October 2026.
+
+Planned but not used:
+- **ESA-ADB:** sized only, too large for the available memory.
+- **NOAA GloTEC:** starts in 2025.
+- **UCAR COSMIC-2:** licence unverified.
+- **CelesTrak GP / OMM.**
+
+**No raw datasets are in this repository.** `scripts/data/fetch_data.py` downloads and hash-checks them. The derived storm series the simulation reads are committed under `configs/data/`.
 
 ## Getting started
 
@@ -95,6 +140,14 @@ uv run astramesh run configs/experiments/nominal_ops_b0_24h.yaml --out results/o
 uv run astramesh run configs/experiments/nominal_ops_b1_24h.yaml --out results/ops_b1   # B1 reference (privileged)
 uv run astramesh run configs/experiments/nominal_ops_b2_24h.yaml --out results/ops_b2   # B2 auction
 uv run astramesh run configs/experiments/nominal_ops_b3_24h.yaml --out results/ops_b3   # B3 CBBA
+
+# Recorded experiments: each results page in docs/results/ names its script and run time
+uv run python scripts/data/fetch_data.py                              # pinned external data
+uv run python scripts/experiments/heldout_comparison.py --out <dir>   # e.g. the held-out storms
+
+# Report figures and the demonstration video, from committed results only
+uv run python scripts/figures/make_figures.py
+uv run --group viz python scripts/figures/make_demo.py   # optional ffmpeg group (GPL build, external encoder)
 ```
 
 A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a provenance `manifest.json` (git commit, config hash, seeds, lockfile hash, artifact hashes). The formation scenarios also write `trajectory.csv` (sampled truth states), and the mission-geometry scenario writes `opportunities.json` (geometry-only science task records with energy and data costs) and a resource summary (battery, storage, Δv) in `summary.json`. See [`docs/EXPERIMENT_PROTOCOL.md`](docs/EXPERIMENT_PROTOCOL.md).
@@ -109,22 +162,27 @@ A run writes `events.jsonl`, `summary.json`, `config.resolved.json`, and a prove
 | 3 | Deterministic faults and protection supervisor | Complete (Gate P3 signed off 2026-11-04) |
 | 4 | External data and probabilistic/ML experiments | Complete (Gate P4 signed off 2026-11-10) |
 | 5 | Storm-aware distributed recovery | Complete (Gate P5 signed off 2026-11-13) |
-| 6 | Research conclusion and public demonstration | In progress |
+| 6 | Research conclusion and public demonstration | Results and report written; Gate P6 awaiting owner sign-off |
 
 Each phase has explicit exit gates defined in specification §13.
 
 ## Scope and integrity
 
-AstraMesh is a **simulation and research project**. It is **not** a real satellite constellation, flight software, a flight-validated system, or a NASA/ESA collaboration, and it makes no claim of a novel algorithm before a full related-work comparison. Results will be reported as **simulated**, **model-based**, or **data-informed** as appropriate, and negative results will be reported as valid outcomes.
+AstraMesh is a **simulation and research project**. It is **not** a real satellite constellation, flight software, a flight-validated system, or a NASA/ESA collaboration. It claims no novel algorithm: the one candidate contribution showed no improvement, and the related-work comparison is unverified. Results are reported as **simulated**, **model-based**, **measured** or **data-informed** as appropriate, and the negative results are reported as outcomes.
 
 ## Repository contents
 
 | Path | Purpose |
 |---|---|
 | [`ASTRAMESH_MASTER_SPEC.md`](ASTRAMESH_MASTER_SPEC.md) | Authoritative research and engineering specification (v1.0) |
+| [`docs/REPORT.md`](docs/REPORT.md) | Technical report (Phase 6) |
 | [`docs/`](docs/) | Supporting documents: conventions, physics test plan, literature matrix, dataset registry, decision log, roadmap |
+| [`docs/results/`](docs/results/) | Results pages with their per-run files and meta files (commit, config and data hashes); gate write-ups |
+| [`docs/figures/`](docs/figures/README.md), [`docs/media/`](docs/media/README.md) | Report figures F1 – F9 and the demonstration video, drawn from committed results |
 | [`src/astramesh/`](src/astramesh/) | Python package (`core/` clock, RNG, events, config; `dynamics/` validated truth dynamics, frames, time scales; `evaluation/` runner and manifests; `science/` region access and science opportunities; `resources/` energy, storage and Δv ledgers; `agents/` isolated spacecraft agents; `faults/` simulator-side fault injection (truth only); `datasets/` pinned external-data fetch, verification and the OPS-SAT-AD loader; `anomaly/` simulator-independent anomaly-detection benchmark on real telemetry; agent-side health beliefs and the protection supervisor in `agents/`; `planning/` external allocation (B0 static, B1 centralized reference); agent-side B2 auction and B3 CBBA in `agents/`; `communications/` messages and crosslink network; `scenarios/` runnable scenarios; `visualization/` diagnostic plots) |
 | [`scripts/studies/`](scripts/studies/) | Reference-error studies behind every physics test tolerance |
+| [`scripts/experiments/`](scripts/experiments/), [`scripts/data/`](scripts/data/), [`scripts/figures/`](scripts/figures/) | Recorded experiments, pinned-data fetch and series builders, figure and video rendering |
+| [`tools/basilisk/`](tools/basilisk/) | Separate environment for the Basilisk cross-check |
 | [`configs/`](configs/) | Scenario configuration files (YAML) |
 | [`tests/`](tests/) | Unit, integration, and regression tests |
 | `data/` | Local, Git-ignored dataset area (no data committed) |
