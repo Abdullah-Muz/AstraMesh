@@ -1,6 +1,6 @@
 # Phase 6 write-up (Gate P6)
 
-> **Status:** written 2026-11-16 from the recorded results; no new runs. Phase 6 increment 5 (DL-128 design, DL-129). Awaiting owner review; Gate P6 is signed off only by the owner. **Simulation results, not flight or radiation results:** every spacecraft, task, link and tolerance is synthetic, and the radiation hazard is a model. The storms are measured.
+> **Status:** written 2026-11-16 from the recorded results; no new runs. Phase 6 increment 5 (DL-128 design, DL-129). Approved 2026-11-16 (DL-129); Gate P6 signed off 2026-11-16 (DL-130). **Simulation results, not flight or radiation results:** every spacecraft, task, link and tolerance is synthetic, and the radiation hazard is a model. The storms are measured.
 
 This page checks the three Gate P6 criteria (spec §13) against the evidence. The full account of the results is the technical report, [`REPORT.md`](../REPORT.md).
 

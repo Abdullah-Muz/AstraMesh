@@ -1,6 +1,6 @@
 # Roadmap and Gate Tracking
 
-> **Owner:** Abdullah Muzher · **Status:** ACTIVE · **Spec:** §13, §14, §17 · **Last updated:** 2026-11-13
+> **Owner:** Abdullah Muzher · **Status:** ACTIVE · **Spec:** §13, §14, §17 · **Last updated:** 2026-11-16
 
 Phase definitions and exit gates are defined in spec §13; this file tracks status only.
 
@@ -12,7 +12,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 3 | Deterministic faults and protection supervisor | **Complete**: Gate P3 signed off 2026-11-04 (DL-061); open follow-ups listed there |
 | 4 | External data and probabilistic/ML experiments | **Complete**: Gate P4 signed off 2026-11-10 (DL-076); open follow-ups listed there |
 | 5 | Storm-aware distributed recovery | **Complete**: Gate P5 signed off 2026-11-13 (DL-110); open follow-ups listed there |
-| 6 | Research conclusion and public demonstration | **In progress** (DL-111) |
+| 6 | Research conclusion and public demonstration | **Complete**: Gate P6 signed off 2026-11-16 (DL-130); open follow-ups listed there |
 
 ## Phase 0 deliverables (spec §17)
 
@@ -69,15 +69,15 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 3 | Negative-result analysis: the open questions carried in `GATE_P5.md`, answered by recorded diagnostics | **Done**: design DL-119 approved 2026-11-14 (N1 – N6, including the B4 ownership split from DL-115 and latency varied 0 – 1 200 s); code DL-120 (`f2a1b3a`; first recorded run `796563b` superseded); results in [`NEGATIVE_RESULTS.md`](results/NEGATIVE_RESULTS.md) (DL-121); approved 2026-11-15 |
 | 3b | B4 ownership re-sync (added by the owner, 2026-11-15): fix the DL-121 split, tested on the two reserved windows | **Done**: design DL-122; code and reserved series DL-123 (`a94b654`); results in [`RESYNC_COMPARISON.md`](results/RESYNC_COMPARISON.md) (DL-124, `0465610`): all six expectations held on the test storms, with no change from B4; duplicates and bytes failed in the spread formations; approved 2026-11-15 |
 | 4 | Plots from committed results and an MP4 demonstration from a recorded storm run | **Done**: design DL-125; code DL-126 (`74273a0`); figures F1 – F9 in [`docs/figures/`](figures/README.md), trace and MP4 in [`docs/media/`](media/README.md) (DL-127, `66ea3be`); approved 2026-11-16 |
-| 5 | Technical report (`docs/REPORT.md`), README and Gate P6 write-up | **Written**: design DL-128 approved 2026-11-16; [`REPORT.md`](REPORT.md), [`GATE_P6.md`](results/GATE_P6.md), README and the link and metadata test (DL-129), with 32 corrections from an independent number check; awaiting owner review, then Gate P6 sign-off and release v2.0.0 |
+| 5 | Technical report (`docs/REPORT.md`), README and Gate P6 write-up | **Written**: design DL-128 approved 2026-11-16; [`REPORT.md`](REPORT.md), [`GATE_P6.md`](results/GATE_P6.md), README and the link and metadata test (DL-129), with 32 corrections from an independent number check (`83c5ebe`); approved 2026-11-16 |
 
 ## Gate P6 checklist (spec §13)
 
-Assessed in [`GATE_P6.md`](results/GATE_P6.md) (DL-129); ticked when the owner signs off.
+Assessed in [`GATE_P6.md`](results/GATE_P6.md) (DL-129); signed off 2026-11-16 (DL-130).
 
-- [ ] Every reported result traces to a commit/config/data version
-- [ ] Limitations disclosed
-- [ ] Novelty only claimed if supported by full-text prior-work comparison and experimental evidence
+- [x] Every reported result traces to a commit/config/data version (every results page with its clean commit, results commit, runs and data in [`GATE_P6.md`](results/GATE_P6.md); checked by `tests/unit/test_report_links.py` and an independent number check; exceptions disclosed)
+- [x] Limitations disclosed ([`REPORT.md`](REPORT.md) §8 and each results page's Limits section)
+- [x] Novelty only claimed if supported by full-text prior-work comparison and experimental evidence (none claimed: G3 showed no supported improvement, and the literature drafts are unverified)
 
 ## Phase 5 increments (DL-077)
 
