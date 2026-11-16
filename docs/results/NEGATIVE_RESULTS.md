@@ -2,7 +2,9 @@
 
 > **Status:** recorded 2026-11-15 from clean commit `f2a1b3a` (`git_dirty: false`; 96 runs, 31 min on 12 workers). Phase 6 increment 3 (DL-119 design, DL-120 code, DL-121 results). The hypotheses were written into DL-119 before any run; nothing was tuned and no method changed.
 >
-> **Earlier run superseded (disclosed):** a first recorded run from `796563b` could not explain two cases, so the trace was extended (DL-120 revision). Every output that does not depend on the trace is byte-identical between the two runs: the per-run table, N3 – N6, the config hashes and the latency series.
+> **Earlier run superseded (disclosed):** a first recorded run from `796563b` could not explain two cases, so the trace was extended (DL-120 revision). Every output that does not depend on the trace is byte-identical between the two runs: the per-run table, N3 – N6, the config hashes and the latency series. The `796563b` outputs were compared locally and are not committed.
+>
+> **Corrected after an independent audit (2026-11-15):** every table number matched the data. Two descriptions were wrong and several were overstated, and the hypothesis verdicts did not follow DL-119's rule (confirmed, refuted or undecided). All are fixed below, and DL-121 lists them.
 >
 > Proposed for owner review.
 
@@ -14,7 +16,7 @@
   - the six held-out storms (all seven arms);
   - the spread formation at 2 000 and 5 000 km.
 - **Latency variants (N6):** 16 runs, latency 0, 300, 900 and 1 200 s on four storms. The variant series differ from the pinned ones only in `latency_s`.
-- **Owner views:** in each worker, the one method where a B4 agent changes its view of a task's owner (`_respond_to_loss`) is wrapped read-only. Every call is recorded with its candidates, and outcomes are unchanged.
+- **Owner views:** in each worker, the one method where a B4 agent changes its view of a task's owner (`_respond_to_loss`) is wrapped read-only. Every call that changes a view, skips a take-over or has candidate tasks is recorded, with its candidates; the results keep the calls for the traced tasks. Outcomes are unchanged.
 - **Hazard:** rebuilt per step from each run's own inputs. The run stops unless the rebuilt series equals the run's hazard total and unprotected intervals exactly.
 - **Reproduce:** `uv run python scripts/experiments/negative_results.py --out <dir>`.
   - Files: [`negative_results.json`](negative_results.json) (every measure and trace detail), [`negative_runs.csv`](negative_runs.csv) (one row per run) and [`negative_results_meta.json`](negative_results_meta.json) (commit, config hashes, latency-series hashes).
@@ -41,17 +43,31 @@
 | No look-ahead (A1) | 7 of 11 | 361 | 204 |
 | Shorter protection | 8 of 10 | 267 | 22 |
 
-Splits are rare in the baseline and common in the two arms that cycle protection, shorter protection and A1. Most split tasks would have been lost anyway, because no spacecraft was free during their windows. Large losses happen only in the two DL-115 runs: 172 tasks lost while available on 7 Oct 2024 and 23 on 17 Jan 2026. All 236 and 63 split tasks there were completed in QUIET. The spread run at 2 000 km also has 180 split tasks.
+Split tasks are few in the 20 km baselines: 6 tasks over 4 of 11 storms. They are many in the two arms that cycle protection, shorter protection and A1. The 2 000 km spread baseline also has 180 (9 lost while available). Large losses happen only in the two DL-115 runs. All 236 and 63 split tasks there were completed in QUIET, and 172 and 22 of them had a spacecraft in a tasking mode for a whole window. In every other run, at most 9 tasks were lost while available, from any cause, the split included. That count also includes tasks lost for the N2 slot reason, so it is not specific to splits.
 
-**How a split forms.** Every split task traced (299 in the two DL-115 runs, 2 in N2) follows one pattern. At the moment of the split (7 Oct 2024, 206 800 s; 17 Jan 2026, 195 500 s), all four spacecraft are in PROTECTIVE:
+**How a split forms in the two DL-115 runs** (all 299 split tasks follow this pattern). At the moment of the split (7 Oct 2024, 206 800 s; 17 Jan 2026, 195 500 s), all four spacecraft are in PROTECTIVE:
 
 1. The owner (sc03) leaves the tasking modes and hands its tasks on by B4's rule. It chooses from its own view of its peers, which comes from their status reports (sent every 30 s). That view still shows the chosen peer in a tasking mode, although the peer is already protected. So the task moves to sc01 (7 Oct) or along sc00 → sc01 → sc02 (17 Jan) in sc03's view.
 2. The chosen peer is itself protected by then. When it hears sc03 leave, it and every other peer run the same rule from their own views. They find no eligible spacecraft, because all are protected, so they keep sc03 as the owner.
-3. B4 changes an owner only when the owner leaves the tasking modes or is believed lost. It has no handback and no step that compares owner views (DL-102). When the storm ends, sc03 believes sc02 (or sc01) owns the task, and the others believe sc03 does. Nobody observes it.
+3. B4 changes an owner only when the owner leaves the tasking modes or is believed lost. It has no handback and no step that compares owner views (DL-102). From then on the views never agree again.
+   - Later hand-ons move some tasks: each has 1 – 30 view changes after the split.
+   - On 17 Jan all 63 end as sc03, sc03, sc03, sc02.
+   - On 7 Oct 194 end that way, 2 end with sc01 in sc03's view, and 40 end as sc02, sc02, sc03, sc02.
+   - No spacecraft believes a task is its own, and nobody observes it.
 
-On 7 Oct 2024 sc03 had been back in a tasking mode for only 20 s, inside one of the short gaps of A1's cycling (N4). The peers did see it leave again: each ran its loss response for sc03 and found no candidate. **The smoke-run reading in DL-120, that the peers never saw sc03 return, was wrong.** The 7 Oct split has the same cause as 17 Jan.
+On 7 Oct 2024 sc03 had been back in a tasking mode for only 20 s, inside one of the short gaps of A1's cycling (N4). The peers did see it leave again: each ran its loss response for sc03 and found no candidate. **The smoke-run reading in DL-120, that the peers never saw sc03 return, was wrong.** The 7 Oct split has the same cause as 17 Jan. On 17 Jan, sc03 had been in a tasking mode since the start of the run.
 
-**H1** (the split forms when spacecraft leave the tasking modes within one status interval, and each hands on by its own out-of-date view): **confirmed** for every split task traced.
+**The two 18 Jul 2023 split tasks (N2)** form slightly differently.
+- At 179 100 s sc00 and sc01 leave the tasking modes at the same time. sc03 is still in STORM_WATCH, a tasking mode.
+- sc00, sc02 and sc03 all give sc00's task to sc01, which their views still show in STORM_WATCH.
+- sc01, already protected, finds no candidate and keeps sc00.
+
+What every traced split shares: spacecraft leave the tasking modes within one status interval, and the hand-on is decided from a view that still shows the successor in a tasking mode. The successor, already protected, never takes the task, and nothing brings the views back together.
+
+**H1** (the split forms when two spacecraft leave the tasking modes within one status interval and each hands on by its own out-of-date view): **refuted as stated.**
+- The timing condition holds for every traced split.
+- The mechanism is narrower than H1 says. The agents that hand on act on an out-of-date view of the successor, while the successor and the other protected peers act on correct views, find no candidate, and keep the old owner.
+- In the DL-115 runs only the owner hands on.
 
 ## N2: B4's four recoverable losses (DL-100)
 
@@ -62,7 +78,7 @@ On 7 Oct 2024 sc03 had been back in a tasking mode for only 20 s, inside one of 
 | 18 Jul 2023 | TEC_0092 | **Protection during the observation.** The owner (sc01) protects at 179 100 s; the task's slots began at 178 930 s. B4 moves only tasks whose slots start after now, so no spacecraft is a candidate, including sc03, which stays in a tasking mode. |
 | 23 Mar 2024 | TEC_0108 | **Protection during the observation.** The owner (sc00) protects at 213 300 s; the slots began at 213 260 s. |
 
-**H2** (the same cause as H1): **confirmed for 2 of 4.** The other two could not be moved by any hand-on rule that needs a full slot.
+**H2** (N2's tasks have the same cause as H1): **refuted.** Two of the four are splits with the mechanism above. The other two were protected after their slots had begun, and no hand-on rule that needs a full slot could move them.
 
 ## N3: where the no-forecast ablation's extra hazard falls
 
@@ -80,7 +96,7 @@ Extra unprotected hazard under A2 (no forecast) against the baseline, summed ove
 | 9 Nov 2025 | 10 s | 0 |
 | 17 Jan 2026 | 1 100 s | 0 |
 
-18 Jul 2023 and 7 Oct 2024 have none. **H3** (A2's extra hazard falls at onsets): **confirmed.** All of it is onset time. With P-A, the latest measurement, protection begins at about the time a record above tolerance arrives, later than with the P-B forecast of the next hour's maximum.
+18 Jul 2023 and 7 Oct 2024 have none. **H3** (A2's extra hazard falls at onsets): **confirmed.** All of it is onset time. That fits P-A being the latest measurement rather than a forecast of the next hour's maximum, but protection entry times were not compared with record arrival times.
 
 ## N4: why removing look-ahead cycles but adds little hazard
 
@@ -91,7 +107,7 @@ Protected spans, by where they start and end relative to hazard (all 11 storms, 
 | Baseline | 66 | 57 | 9 | 0 | 0 |
 | No look-ahead (A1) | 336 | 298 | 32 | 5 | 1 |
 
-On the storms where A1 cycles most (18 Jul 2023, 29 Jul 2023, 6 Jun 2024, 7 Oct 2024 and 25 Oct 2024), each spacecraft's median protected span is 47 min, with a median gap of 50 – 110 s.
+On five storms A1 cycles with short gaps: 18 Jul 2023, 29 Jul 2023, 6 Jun 2024, 7 Oct 2024 and 25 Oct 2024. There, each spacecraft's median protected span is 46.7 – 47.5 min, and the median gaps are 25 – 110 s; sc03 has a single span on 29 Jul. On the other storms the cycling is irregular: on 17 Jan 2026 (32 spans), sc00 and sc01 have median gaps of about 2 960 s.
 
 Without look-ahead, the radiation input follows the spacecraft's current position. During these storms that position is above the cutoff except briefly near each equator crossing. Protection therefore releases for about a minute twice an orbit (a 47 min span plus a 1 min gap is half the 95 min orbit), and hazard rarely falls in those gaps.
 
@@ -106,7 +122,7 @@ A1's extra unprotected hazard (against the baseline) appears on six storms:
 | 9 Nov 2025 | 520 s | 0 |
 | 17 Jan 2026 | 900 s | 0 |
 
-**H4** (most entries start and end inside a hazard episode): **refuted.** 89 % of A1's spans start and end outside hazard. The cycling follows the orbit, not the hazard, which is why it adds little hazard. Its short gaps are also where the N1 splits form.
+**H4** (most entries start and end inside a hazard episode): **refuted.** 89 % of A1's spans start and end outside hazard. The cycling follows the orbit, not the hazard, which is why it adds little hazard. On 7 Oct 2024 the split formed at the end of one such short tasking spell (20 s). On 17 Jan 2026 it did not: sc03 had been tasking since the start.
 
 ## N5: the unprotected hazard that spreading adds
 
@@ -133,26 +149,26 @@ Baseline unprotected hazard by series latency (s, summed over the four spacecraf
 
 At 900 and 1 200 s the first records arrive after t = 0, and no run entered protection in its first hour, so there is no start-up artefact.
 
-**H5** (the onset hazard falls as latency falls, and is 0 at 300 s where the onset is latency-bound): **partly confirmed.**
+**H5** (the onset hazard falls as latency falls, and is 0 at 300 s where the onset is latency-bound): **refuted as stated.** Its first part holds on all four storms; its second fails on two.
 - It falls with latency on all four storms and is 0 at 0 s on all of them.
 - At 300 s, the earliest physical value, it is 0 on 6 Jun 2024 and 30 Mar 2025 only.
-- **18 Jul 2023:** each spacecraft's unprotected time equals the latency (300 s at 300 s, 600 s at 600 s). The hazard begins in the same 5-min record that first shows it, so any physical latency is lost in full.
+- **18 Jul 2023:** at 300 and 600 s, sc00 – sc02 each have unprotected time equal to the latency (sc03, with a 200 pfu tolerance, has none). At 900 and 1 200 s they have 610 – 780 s, so beyond 600 s more latency adds little. Up to 600 s the onset is entirely latency-bound: the hazard begins in the same 5-min record that first shows it.
 - **17 Jan 2026:** sc03 keeps 200 s at 300 s latency.
 
 ## Hypotheses
 
 | | Hypothesis (DL-119) | Outcome |
 |---|---|---|
-| H1 | The split forms when spacecraft leave the tasking modes within one status interval and hand on by out-of-date views | **Confirmed** for every split task traced |
-| H2 | B4's recoverable losses have the H1 cause | **Confirmed for 2 of 4;** the other 2 were protected after their observation had begun |
+| H1 | The split forms when two spacecraft leave the tasking modes within one status interval and each hands on by its own out-of-date view | **Refuted as stated.** The timing condition holds, but only the agents that hand on act on an out-of-date view; the successor, already protected, keeps the old owner |
+| H2 | B4's recoverable losses have the H1 cause | **Refuted.** 2 of 4 are splits; the other 2 were protected after their slots had begun |
 | H3 | A2's extra hazard falls at onsets | **Confirmed;** all of it |
 | H4 | Without look-ahead, entries start and end inside hazard | **Refuted;** 89 % of spans start and end outside hazard |
-| H5 | Onset hazard falls with latency and is 0 at 300 s where latency-bound | **Partly confirmed;** 0 at 300 s on 2 of 4 storms |
+| H5 | Onset hazard falls with latency and is 0 at 300 s where latency-bound | **Refuted as stated.** It falls on all 4 storms, but is 0 at 300 s on only 2 |
 
 ## What this explains
 
-1. **Why B4 sometimes loses tasks a peer could do.** In a close formation every spacecraft protects at once, and B4's hand-on runs on views up to one status interval old. The owner and its successor can then disagree about ownership for good. Cycling protection (A1, shorter protection) makes this frequent. B3 + timeout re-auctions and is not affected. This is a defect of the B4 baseline, not of protection.
-2. **Why the remaining baseline hazard is at onsets.** Every unprotected interval in every baseline, spread and latency run starts with its hazard episode. It is bounded by the data latency: zero on every storm at 0 s, and on two storms at 300 s.
+1. **Why B4 sometimes loses tasks a peer could do.** In a close formation the spacecraft protect almost together, and B4's hand-on uses views of the peers' modes that are only refreshed every 30 s. A task can be handed to a successor that is already protected and never takes it, and the views never agree again. Cycling protection (A1, shorter protection) makes this frequent. B3 + timeout re-auctions and is not affected. This is a defect of the B4 baseline, not of protection.
+2. **Why the remaining baseline hazard is at onsets.** Every unprotected interval in every baseline, spread and latency run starts with its hazard episode. It shrinks with the data latency: it is zero on every storm at 0 s, and on two storms at 300 s.
 3. **Why look-ahead matters little for hazard but much for cycling.** Without it, protection follows the orbit, not the hazard.
 
 **Possible fixes (future work, not built; DL-119):** an ownership re-sync or handback in B4; status reports sent on mode changes rather than only every 30 s; hand-ons that the successor acknowledges; lower-latency data. Any of them would be a new method and would need its own design, tuning and held-out test.
