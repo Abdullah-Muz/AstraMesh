@@ -63,7 +63,7 @@ Short entries; the full reports in [`literature/`](literature/) give section ref
 - **P01**: no full text exists on NTRS. Its substitute **P01S** (Adams et al., SmallSat 2024, DOI 10.26077/kdtp-6540) was **read in full on 2026-11-10** from an owner download: [`literature/P01S.md`](literature/P01S.md). It confirms Finding 1 (3-spacecraft distributed GPS-TEC channel allocation by a shared MILP; no faults, health beliefs or protection).
 - **P21**: paywalled; skipped (owner policy, DL-038).
 - **R03** was read on 2026-11-10 from an owner download. The 2026 DSA extended-mission paper was read as D11.
-- **Owner verification** of every drafted row.
+- **Owner verification** of every drafted row. The claims AstraMesh relies on are listed, with where to check each, in [`literature/VERIFICATION.md`](literature/VERIFICATION.md) (DL-132).
 
 ## Phase 5 — closest work for G3 (search 2026-11-10, DL-077)
 
