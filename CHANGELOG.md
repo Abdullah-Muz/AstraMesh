@@ -2,6 +2,14 @@
 
 Release versions of the AstraMesh software and results. The specification has its own version history (`ASTRAMESH_MASTER_SPEC.md`, currently v1.0); a software release number is not a specification version.
 
+## v2.0.1 — 2026-11-16
+
+Documentation patch: the literature that AstraMesh relies on is now owner-verified. No code paths, results or runs changed; the version change alters only the project's own entry in `uv.lock`.
+
+- **Literature verified** (DL-132, DL-133). The owner checked every claim AstraMesh relies on against the sources: the radiation-cutoff values built into the code (R08, R06, R09), the CBBA rules behind baseline B3 (P06) and every claim in the report's related-work section. The owner also checked the bibliographic metadata of all 20 items read. The checks are listed in [`VERIFICATION.md`](docs/literature/VERIFICATION.md). The review's other analysis cells remain assistant drafts, and Priorities B – D were not reviewed.
+- **Report corrected** ([`REPORT.md`](docs/REPORT.md) §7, with a dated note): the "unverified" labels are removed. Starling 1.0 flew four CubeSats, but its distributed onboard planning of GPS ionospheric observations ran on three of them (D10, P01S); the report previously said four. This changes no result and not the conclusion: no novelty is claimed.
+- **`references.bib`** added, holding the 20 verified entries (spec §15).
+
 ## v2.0.0 — 2026-11-16
 
 Second release: Phase 6 complete, with Gate P6 signed off on 2026-11-16 (DL-130). Phases 1 – 6 are now complete. This release adds the technical report, a held-out test on storms no method had seen, a Basilisk cross-check, diagnostics for the open Phase 5 results, figures and a demonstration video.

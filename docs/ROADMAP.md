@@ -6,7 +6,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 
 | Phase | Focus | Status |
 |---|---|---|
-| 0 | Research and reproducibility foundation | **Complete except** Priority A full-text review (8 of 10 items drafted from full text, owner verification pending; P01 unavailable, P21 paywalled; see `LITERATURE_REVIEW.md`) |
+| 0 | Research and reproducibility foundation | **Complete except** Priority A full-text review (8 of 10 items read in full, key claims and metadata owner-verified 2026-11-16, DL-133; P01 unavailable (P01S read instead), P21 paywalled; see `LITERATURE_REVIEW.md`) |
 | 1 | Validated four-spacecraft dynamics and mission geometry | **Complete**: Gate P1 signed off 2026-11-03 (DL-037); open follow-ups listed there |
 | 2 | Decentralized nominal science operations | **Complete**: Gate P2 signed off 2026-11-03 (DL-049); open follow-ups listed there |
 | 3 | Deterministic faults and protection supervisor | **Complete**: Gate P3 signed off 2026-11-04 (DL-061); open follow-ups listed there |
@@ -77,7 +77,7 @@ Assessed in [`GATE_P6.md`](results/GATE_P6.md) (DL-129); signed off 2026-11-16 (
 
 - [x] Every reported result traces to a commit/config/data version (every results page with its clean commit, results commit, runs and data in [`GATE_P6.md`](results/GATE_P6.md); checked by `tests/unit/test_report_links.py` and an independent number check; exceptions disclosed)
 - [x] Limitations disclosed ([`REPORT.md`](REPORT.md) §8 and each results page's Limits section)
-- [x] Novelty only claimed if supported by full-text prior-work comparison and experimental evidence (none claimed: G3 showed no supported improvement, and the literature drafts are unverified)
+- [x] Novelty only claimed if supported by full-text prior-work comparison and experimental evidence (none claimed: G3 showed no supported improvement, and the literature drafts were unverified at sign-off; their key claims were verified on 2026-11-16, DL-133)
 
 ## Phase 5 increments (DL-077)
 

@@ -100,7 +100,7 @@ Every results page carries its own Limits section. The Phase 5 pages were review
 
 ## Carried forward (not blocking)
 
-- **Owner verification** of the literature drafts, and Priorities B – D.
+- **Owner verification** of the literature drafts, and Priorities B – D. *(Update 2026-11-16, after the sign-off, DL-133: the claims AstraMesh relies on and all 20 items' metadata are now owner-verified ([`VERIFICATION.md`](../literature/VERIFICATION.md)); the other analysis cells and Priorities B – D remain.)*
 - **Possible B4 fixes:** status on mode change, acknowledged hand-ons, or a re-sync that relays claims (DL-119, DL-124). Each would be a new method needing its own design and held-out test, and no untouched storm remains in the pinned period.
 - **Earlier carry-overs:**
   - CBBA has no stop rule; an 8-day B3 + timeout run takes 20 – 96 min.

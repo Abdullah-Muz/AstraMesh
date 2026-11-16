@@ -181,12 +181,12 @@ A 52 s video, [`astramesh_demo_mar2024.mp4`](media/astramesh_demo_mar2024.mp4), 
 
 ## 7. Related work
 
-From [`LITERATURE_REVIEW.md`](LITERATURE_REVIEW.md). **Every reviewed row there is an assistant draft from a full-text reading that the owner has not yet verified**, so this section is provisional. P01 is blocked (no full text; P01S was read instead), P21 was paywalled, R07 was not started, and Priorities B – D (spec §15.1) were not reviewed.
+From [`LITERATURE_REVIEW.md`](LITERATURE_REVIEW.md). Each row was drafted by the assistant from a full-text reading. The owner verified every claim below and the bibliographic metadata against the sources on 2026-11-16 ([`VERIFICATION.md`](literature/VERIFICATION.md), DL-133); the review's other analysis cells remain drafts. *(Corrected 2026-11-16, v2.0.1: this section previously marked every source unverified and said Starling coordinated observations on four CubeSats.)* P01 is blocked (no full text; P01S was read instead), P21 was paywalled, R07 was not started, and Priorities B – D (spec §15.1) were not reviewed.
 
-- **Flight precedent.** NASA's Starling 1.0 flew four CubeSats coordinating dual-band GPS ionospheric observations over crosslinks with distributed onboard planning (D01, D10, D11, P01S; unverified). AstraMesh cannot claim to be first at that. The Starling papers we read describe no space-weather response, protection modes or health beliefs.
-- **Task allocation.** CBBA (P06; unverified) is B3; its guarantees assume synchronous rounds and a static connected network with no loss model, which AstraMesh violates by design. Satellite variants (P03) and decomposition-based scheduling (P19; with P02 as a related version) assume idealised networks (unverified). Rule-based redistribution after a loss (P09; unverified) is weak precedent for B4.
-- **Faults.** Leader / follower fault separation in a swarm (P22; unverified) assumes instant communication.
-- **Space weather.** Storm impact on a LEO network varies between planes and satellites (R01, preprint; unverified). Forecast value is framed as a cost-loss or false go / no-go decision (R02, R03; unverified). Operators trade service against hazard and ask for localised warnings (R05, preprint; unverified). The cutoff model rests on R08 and R09 (unverified).
+- **Flight precedent.** NASA's Starling 1.0 flew four CubeSats; its distributed onboard planning of dual-band GPS ionospheric observations over crosslinks ran on three of them (D01, D10, D11, P01S). AstraMesh cannot claim to be first at that. The Starling papers we read describe no space-weather response, protection modes or health beliefs.
+- **Task allocation.** CBBA (P06) is B3; its guarantees assume synchronous rounds and a static connected network with no loss model, which AstraMesh violates by design. Satellite variants (P03) and decomposition-based scheduling (P19; with P02 as a related version) assume idealised networks. Rule-based redistribution after a loss (P09) is weak precedent for B4.
+- **Faults.** Leader / follower fault separation in a swarm (P22) assumes instant communication.
+- **Space weather.** Storm impact on a LEO network varies between planes and satellites (R01, preprint). Forecast value is framed as a cost-loss or false go / no-go decision (R02, R03). Operators trade service against hazard and ask for localised warnings (R05, preprint). The cutoff model rests on R08 and R09.
 - **Gap.** Searches on 2026-11-10 found no paper that coordinates protection modes across a decentralised constellation under per-spacecraft space-weather risk. That is a statement about those searches, not proof that none exists, and G3 showed no improvement, so it is not claimed as a contribution.
 
 ## 8. Limitations
@@ -198,7 +198,7 @@ From [`LITERATURE_REVIEW.md`](LITERATURE_REVIEW.md). **Every reviewed row there 
 - **Not measured:** CPU time and peak memory per algorithm (spec §10.2); a physical cost of protection cycling; false-degraded idle time in the utility.
 - **Model limits of the data:** forecasts from data 600 s old and 5-min averages; P-C cannot forecast above its training range; the 17 Jan 2026 peak is 37 times that range.
 - **B4 baseline defect:** the ownership split (§6) affects B4 under heavy cycling; it was reported, not repaired, in the frozen comparisons.
-- **Literature:** unverified drafts, and the review covered Priority A and the G3 search only.
+- **Literature:** the claims relied on were verified by the owner on 2026-11-16; the other analysis cells are assistant drafts, and the review covered Priority A and the G3 search only.
 - **Unrecorded diagnostics:** the re-sync's spread-formation duplicate diagnosis and charged utilities came from unrecorded reruns of recorded configurations with identical results; the held-out B4 split diagnosis was a scratch rerun later replaced by the recorded N1; the 5 000 km byte explanation and the N5 hypothesis are unrecorded. Their pages (and DL-129) say so.
 
 ## 9. Reproduction
