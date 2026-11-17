@@ -37,7 +37,7 @@
   - *Payload detection latency* runs from the fault start to the first DEGRADED belief. It is 0 if a false alarm was already active at the fault start.
 - **Intervals:** 95 % t-intervals, n = 10. A single number means every seed gave the same value. Intervals are not clipped to the possible range: with one outlying seed (S03, B3 + T) they extend below 0 or above 1.
 - **Consistency check:** every H-A run (80) reproduces the corresponding run of the recorded fault comparison exactly: utility, completions, duplicates and messages. Making the timeout explicit changes nothing.
-- **Reproduce:** `uv run python scripts/experiments/health_comparison.py`. It takes about 38 min on 6 workers.
+- **Reproduce:** `uv run python scripts/experiments/health_comparison.py --out <dir>` (without `--out` it overwrites the committed files in `docs/results/`). It takes about 38 min on 6 workers.
   - The recorded run wrote its outputs outside the repository, and the files were then copied in.
   - It matches a preview run from a dirty tree except in three places:
     - the config hashes (payload-check fields were renamed after the preview);

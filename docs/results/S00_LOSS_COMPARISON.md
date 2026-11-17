@@ -9,7 +9,7 @@
 - **Identical tasks and resources:** the task catalogue is checked to be identical across all four methods for every seed (Gate P2).
 - **Loss realisations differ between methods,** because each sends a different number of messages from the same `comms` stream. Pairing is by seed and configuration.
 - **Intervals:** 95% t-intervals with n = 10. Square brackets are the interval; for zero-variance cells it has zero width.
-- **Reproduce:** `uv run python scripts/experiments/s00_loss_comparison.py`. That takes about 6 minutes on 8 workers. The run rows are byte-identical to the preview run apart from wall time.
+- **Reproduce:** `uv run python scripts/experiments/s00_loss_comparison.py --out <dir>` (without `--out` it overwrites the committed files in `docs/results/`). That takes about 6 minutes on 8 workers. The run rows are byte-identical to the preview run apart from wall time.
 - **Files:**
   - [`s00_loss_comparison.csv`](s00_loss_comparison.csv): per run.
   - [`s00_loss_comparison_summary.csv`](s00_loss_comparison_summary.csv): per method and loss.

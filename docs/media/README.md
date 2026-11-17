@@ -17,6 +17,6 @@ It is not a real mission or flight data. The planner and protection settings are
 **Regenerate:**
 
     uv run python scripts/experiments/demo_trace.py --out <dir>        # about 2 min
-    uv run --group viz python scripts/figures/make_demo.py               # about 12 min
+    uv run --group viz python scripts/figures/make_demo.py --trace <dir>/demo_trace.json --out <dir>/demo.mp4   # about 12 min
 
 The `viz` group installs `imageio-ffmpeg`, whose bundled ffmpeg is a GPL v3+ build, used only as an external encoder. MP4 and PNG bytes depend on the encoder build, so they are not hashed.

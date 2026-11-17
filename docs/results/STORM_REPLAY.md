@@ -23,7 +23,7 @@
   - **exposure:** payload-on time during the hazard. The payload is on only while observing, so exposure ≤ unprotected hazard;
   - **false protection:** time in PROTECTIVE or RECOVERY outside the hazard.
 - **Runs:** 12 variants × 2 planners (B3 + timeout, B4) × seeds 1–10 = 240 runs of 8 days. The seeds change only message loss.
-- **Reproduce:** `uv run python scripts/experiments/storm_replay_comparison.py`.
+- **Reproduce:** `uv run python scripts/experiments/storm_replay_comparison.py --out <dir>` (without `--out` it overwrites the committed files in `docs/results/`).
   - A B4 run takes about 90 s and a B3 + timeout run about 20 min (see Limits), so the full set needs about 8.5 h on 6 workers. The recorded `total_wall_s` (64 175 s) also includes an overnight suspension of the machine.
   - The recorded run wrote its outputs outside the repository, and the files were then copied in.
   - DL-070 (`00372d9`) changed only the forecast-skill metric; nothing that S11 uses changed after `fc27fa3`.

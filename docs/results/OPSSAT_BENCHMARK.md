@@ -23,7 +23,7 @@
   - **`paper`:** the library's default decision. For the unsupervised methods that is PyOD defaults with contamination 0.2, as in the paper; for the supervised ones it is `predict`.
   - **`calibrated`:** the decision threshold maximises out-of-fold F1, and isotonic regression turns scores into probabilities. Both are fitted with 5-fold cross-validation inside the training rows only. The folds are stratified random for `official` and contiguous time blocks per channel for `time`. The test set is used once.
 - **Seeds:** 0–4. Mean ± sd over seeds; a single number means all five seeds agree (deterministic methods).
-- **Reproduce:** `uv run python scripts/experiments/opssat_benchmark.py`. It takes about 2.5 min on 6 workers. A repeat run reproduced every column except the CPU times exactly. The recorded run wrote its outputs outside the repository, and the files were then copied in; see DL-065.
+- **Reproduce:** `uv run python scripts/experiments/opssat_benchmark.py --out <dir> --workers 6` (without `--out` it overwrites the committed files in `docs/results/`). It takes about 2.5 min on 6 workers. A repeat run reproduced every column except the CPU times exactly. The recorded run wrote its outputs outside the repository, and the files were then copied in; see DL-065.
 - **Files:**
   - [`opssat_benchmark.csv`](opssat_benchmark.csv): one row per split, method, seed and protocol;
   - [`opssat_benchmark_summary.csv`](opssat_benchmark_summary.csv): mean and sd, plus the `all_anomalous` reference;
