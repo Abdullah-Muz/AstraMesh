@@ -60,6 +60,17 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | 4 | Full five-mode machine: STORM_WATCH, RECOVERY, three risk dimensions, hysteresis, dwell, invalid-input policy | **Done**: commit `e3c675f`, CI passing |
 | 5 | Fault-scenario comparison (S01–S10; S06 deferred) | **Done**: script `bb2ea8e`, B4 fix `311477a` (DL-059), 600-run results in [`docs/results/FAULT_COMPARISON.md`](results/FAULT_COMPARISON.md) (DL-060); reviewed and approved 2026-11-04 |
 
+## Maintenance after v2.0.1 (DL-134)
+
+| # | Item | Status |
+|---|---|---|
+| A | IERS data refresh (DL-021): refresh `astropy-iers-data` once a release carries a leap-second table expiring after 2027-06-28; rerun two recorded configurations and the pinned digests; patch release | **Deferred** to mid-January – June 2027 (plan DL-134 (A), approved 2026-11-16). Facts for the refresh recorded in DL-021 (DL-136): every recorded window uses final IERS values; the refresh must move the 2027-11-15 test date. DL-021 stays OPEN |
+| A2 | IERS prediction age check (DL-137): `configure_astropy_offline` left Astropy's 30-day `auto_max_age`, so predicted Earth-orientation values are refused from 2026-11-22; set a finite limit that keeps the leap-second warning | **Proposed** (DL-137, awaiting owner review); no code changed yet. No recorded result is affected |
+| B | Compute cost (spec §10.2: algorithm CPU time and peak memory): onboard CPU per agent and per entry point, ground planning, peak RSS; 50 reruns of recorded configurations | Plan DL-134 (B) approved 2026-11-16; code DL-135 (`181d46b`, revised `b7c97d8` after the first run stopped on its own check) **proposed**, awaiting owner review; measurement running; results and `docs/results/COMPUTE_COST.md` to follow in DL-138 |
+| C | Documentation consistency fixes from a read-only audit (decision-log table rows, literature headers after DL-133, stale status lines, documented commands) | **Proposed** (DL-136, awaiting owner review); commits `4d8a0f2`, `983d35b`, `1197b35`. No code or results changed |
+
+Release: the next patch release (after DL-137 and DL-138) bumps the version in `pyproject.toml` and `uv.lock`, as for v2.0.1 (DL-133).
+
 ## Phase 6 increments (DL-111)
 
 | # | Increment | Status |
