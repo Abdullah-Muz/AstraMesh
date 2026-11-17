@@ -7,19 +7,28 @@ Spec §10.2 lists algorithm CPU time and peak memory; Phases 2 - 6 did not measu
 This script reruns recorded configurations unchanged and measures them; nothing in
 ``src/`` changes.
 
-* **Onboard CPU.** ``SpacecraftAgent.receive_messages`` and ``SpacecraftAgent.step``
-  are wrapped with ``time.process_time_ns``, per agent and per call: the planner,
-  health beliefs and supervisor each spacecraft runs. **Ground planning** (the B0 /
-  B4 static plan and B1's centralised plan) is timed separately. **Run CPU** is the
-  whole simulation, including dynamics, network and bookkeeping.
+* **Onboard CPU.** Every public entry point the simulator calls on a spacecraft agent
+  is wrapped with ``time.process_time_ns``, per agent and per call:
+  ``receive_messages`` (one delivery), ``step`` (planner rounds, health, status),
+  ``payload_command`` (the supervisor, and the re-planning a mode change triggers)
+  and ``observe`` (sensor, forecast and ground packets, including B4's redistribution
+  after a ground notice). Only the outermost call is timed, so nothing counts twice.
+  **Ground planning** (the B0 / B4 static plan and B1's centralised plan) is timed
+  separately. **Run CPU** is the whole simulation, including dynamics, network and
+  bookkeeping.
 * **Memory.** Every run is a fresh worker process (``max_tasks_per_child=1``).
   ``ru_maxrss`` is read after the imports and the config (baseline) and after the run
-  (peak). It is whole-process memory and includes the simulator.
+  (peak). It is whole-process memory and includes the simulator. (A spawned child's
+  ``ru_maxrss`` cannot fall below the parent's RSS at spawn; the parent is smaller than
+  a worker after its imports.)
 * **Unchanged behaviour.** Each run's utility, completions, messages and bytes, and its
   config hash, must equal the recorded run's (``fault_comparison.csv``,
   ``handover_runs.csv``). The S00 loss runs were recorded in Phase 2, before fields
-  were renamed to ``*_fraction`` / ``*_probability`` (DL-075), so for
-  ``s00_loss_comparison.csv`` the hash is not compared, only the behaviour. B3 +
+  were renamed to ``*_fraction`` / ``*_probability`` (DL-067), so for
+  ``s00_loss_comparison.csv`` the hash is not compared. Phase 3 also added
+  ``,"health":"HEALTHY","mode":"NOMINAL"`` (36 bytes) to every status message
+  (DL-052, DL-055), so their bytes must equal the recorded bytes plus 36 per status
+  message (B0's message count, since B0 sends only status messages). B3 +
   timeout and B4 at 30 % loss have no recorded run, so their repeats must agree with
   each other instead. Any mismatch stops the script.
 
@@ -30,7 +39,8 @@ arm, under B3 + timeout and B4 (``handover_comparison.py``, 8 days, one repeat).
 
 Measured on one machine, in Python: not portable across hardware, and not
 representative of flight processors. Outputs in ``--out``: ``compute_cost.csv`` (one
-row per run), ``compute_cost_summary.csv`` (median and range over repeats) and
+row per run, written before the check so a failed check keeps the runs),
+``compute_cost_summary.csv`` (median and range over repeats) and
 ``compute_cost_meta.json`` (commit, dirty flag, lockfile hash, platform, settings).
 """
 
@@ -60,6 +70,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 ALL = ("static_b0", "centralized_b1", "auction_b2", "cbba_b3", "cbba_b3_timeout", "rule_b4")
 PAIR = ("cbba_b3_timeout", "rule_b4")
 LONG = "S11-H storm"
+KINDS = ("receive_messages", "step", "payload_command", "observe")
+STATUS_FIELDS_BYTES = 36  # ,"health":"HEALTHY","mode":"NOMINAL" (Phase 3; DL-052, DL-055)
 
 #: (case, method, repeat); the case names the recorded source.
 Job = tuple[str, str, int]
@@ -110,17 +122,22 @@ def run_one(job: Job) -> dict[str, Any]:
     cfg = parse_scenario(build(case, method))
     assert isinstance(cfg, NominalOperationsScenario)
 
-    onboard: dict[str, list[int]] = defaultdict(list)  # agent -> per-call ns
+    onboard: dict[tuple[str, str], list[int]] = defaultdict(list)  # (agent, kind) -> ns
     ground: list[int] = []
+    depth = [0]
 
-    def per_agent(fn: Callable[..., Any]) -> Callable[..., Any]:
+    def per_agent(kind: str, fn: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(fn)
         def wrapped(self: Any, *a: Any, **k: Any) -> Any:
+            if depth[0]:
+                return fn(self, *a, **k)
+            depth[0] += 1
             t = time.process_time_ns()
             try:
                 return fn(self, *a, **k)
             finally:
-                onboard[self.agent_id].append(time.process_time_ns() - t)
+                onboard[(self.agent_id, kind)].append(time.process_time_ns() - t)
+                depth[0] -= 1
 
         return wrapped
 
@@ -136,8 +153,8 @@ def run_one(job: Job) -> dict[str, Any]:
         return wrapped
 
     cls = agent_mod.SpacecraftAgent
-    cls.receive_messages = per_agent(cls.receive_messages)  # type: ignore[method-assign]
-    cls.step = per_agent(cls.step)  # type: ignore[method-assign]
+    for kind in KINDS:
+        setattr(cls, kind, per_agent(kind, getattr(cls, kind)))
     ops.plan_static = timed(ops.plan_static)  # type: ignore[assignment]
     ops.plan_centralized = timed(ops.plan_centralized)  # type: ignore[assignment]
 
@@ -147,10 +164,12 @@ def run_one(job: Job) -> dict[str, Any]:
     run_cpu_ns, wall = time.process_time_ns() - c0, time.perf_counter() - w0
     rss_peak = _maxrss_mb()
 
-    per_sc = {a: sum(v) for a, v in onboard.items()}
-    calls = [x for v in onboard.values() for x in v]
+    per_sc: dict[str, int] = defaultdict(int)
+    for (a, _), v in onboard.items():
+        per_sc[a] += sum(v)
     total = sum(per_sc.values())
-    return {
+    by_kind = {k: [x for (_, kk), v in onboard.items() if kk == k for x in v] for k in KINDS}
+    row: dict[str, Any] = {
         "case": case, "method": method, "repeat": rep,
         "utility": run.summary["operations"]["utility"],
         "n_completed": run.summary["operations"]["n_completed"],
@@ -164,9 +183,12 @@ def run_one(job: Job) -> dict[str, Any]:
         "onboard_cpu_s_max_sc": round(max(per_sc.values(), default=0) / 1e9, 3),
         "onboard_cpu_ms_per_sim_h_per_sc": round(
             total / 1e6 / max(len(per_sc), 1) / (cfg.time.duration_s / 3600), 3),
-        "calls": len(calls),
-        "call_us_mean": round(total / 1e3 / len(calls), 2) if calls else 0.0,
-        "call_ms_max": round(max(calls, default=0) / 1e6, 3),
+    }  # fmt: skip
+    for k, xs in by_kind.items():
+        row[f"{k}_cpu_s"] = round(sum(xs) / 1e9, 3)
+        row[f"{k}_calls"] = len(xs)
+        row[f"{k}_ms_max"] = round(max(xs, default=0) / 1e6, 3)
+    return row | {
         "ground_plan_cpu_s": round(sum(ground) / 1e9, 3),
         "rss_baseline_mb": round(rss_base, 1),
         "rss_peak_mb": round(rss_peak, 1),
@@ -197,9 +219,14 @@ def _recorded() -> dict[tuple[str, str], dict[str, str]]:
         ):
             case = "S00 1% loss" if r["scenario"] == "S00" else r["scenario"]
             rec[(case, r["method"])] = pick(r, with_hash=True)
-    for r in rows("s00_loss_comparison.csv"):
-        if r["seed"] == "1" and float(r["loss"]) == 0.30:
-            rec[("S00 30% loss", r["method"])] = pick(r, with_hash=False)
+    s00 = [
+        r for r in rows("s00_loss_comparison.csv") if r["seed"] == "1" and float(r["loss"]) == 0.30
+    ]
+    n_status = next(int(r["messages_sent"]) for r in s00 if r["method"] == "static_b0")
+    for r in s00:
+        want = pick(r, with_hash=False)
+        want["bytes_sent"] = str(int(want["bytes_sent"]) + STATUS_FIELDS_BYTES * n_status)
+        rec[("S00 30% loss", r["method"])] = want
     for r in rows("handover_runs.csv"):
         if (r["scenario"], r["forecast"], r["arm"], r["seed"]) == ("S11-H", "P-B", "baseline", "1"):
             rec[(LONG, r["planner"])] = pick(r, with_hash=True)
@@ -223,8 +250,9 @@ def check(rows: list[dict[str, Any]]) -> list[str]:
 
 
 SUMMED = ("run_cpu_s", "onboard_cpu_s", "onboard_share", "onboard_cpu_s_max_sc",
-          "onboard_cpu_ms_per_sim_h_per_sc", "call_us_mean", "call_ms_max",
-          "ground_plan_cpu_s", "rss_peak_mb", "rss_growth_mb", "wall_s")  # fmt: skip
+          "onboard_cpu_ms_per_sim_h_per_sc", *(f"{k}_cpu_s" for k in KINDS),
+          *(f"{k}_ms_max" for k in KINDS), "ground_plan_cpu_s", "rss_peak_mb",
+          "rss_growth_mb", "wall_s")  # fmt: skip
 
 
 def summarize(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -233,7 +261,8 @@ def summarize(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     for case, method in keys:
         sel = [r for r in rows if r["case"] == case and r["method"] == method]
         rec: dict[str, Any] = {"case": case, "method": method, "n_repeats": len(sel),
-                               "utility": sel[0]["utility"], "calls": sel[0]["calls"]}  # fmt: skip
+                               "utility": sel[0]["utility"],
+                               **{f"{k}_calls": sel[0][f"{k}_calls"] for k in KINDS}}  # fmt: skip
         for m in SUMMED:
             xs = [float(r[m]) for r in sel]
             rec[f"{m}_median"] = round(statistics.median(xs), 4)
@@ -276,11 +305,11 @@ def main() -> int:
         rows = list(ex.map(run_one, todo))
     order = {c: i for i, c in enumerate(dict.fromkeys(j[0] for j in cases(1)))}
     rows.sort(key=lambda r: (order[r["case"]], ALL.index(r["method"]), r["repeat"]))
-    bad = check(rows)
-    if bad:
-        raise SystemExit("behaviour changed:\n" + "\n".join(bad))
     args.out.mkdir(parents=True, exist_ok=True)
     _write(args.out / "compute_cost.csv", rows)
+    bad = check(rows)
+    if bad:
+        raise SystemExit("behaviour changed (rows kept, no summary):\n" + "\n".join(bad))
     _write(args.out / "compute_cost_summary.csv", summarize(rows))
     meta = {
         "experiment": "Compute cost per baseline (DL-134, DL-135)",

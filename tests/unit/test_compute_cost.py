@@ -59,3 +59,14 @@ def test_check_flags_a_changed_run_and_disagreeing_repeats() -> None:
     assert CC.check([{**ok, "utility": good["utility"] - 1}])
     assert CC.check([_row(), _row(repeat=2)]) == []
     assert CC.check([_row(), _row(repeat=2, bytes_sent=3)])
+
+
+def test_phase2_bytes_are_adjusted_for_the_phase3_status_fields() -> None:
+    # B0 sends only status messages, and loss does not change what is sent, so the
+    # adjusted Phase 2 value at 30 % loss equals the Phase 3 value at 1 % loss.
+    rec = CC._recorded()
+    assert (
+        rec[("S00 30% loss", "static_b0")]["bytes_sent"]
+        == rec[("S00 1% loss", "static_b0")]["bytes_sent"]
+    )
+    assert "config_hash" not in rec[("S00 30% loss", "static_b0")]
