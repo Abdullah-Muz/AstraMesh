@@ -186,7 +186,7 @@ AstraMesh is a **simulation and research project**. It is **not** a real satelli
 | [`configs/`](configs/) | Scenario configuration files (YAML) |
 | [`tests/`](tests/) | Unit, integration, and regression tests |
 | `data/` | Local, Git-ignored dataset area (no data committed) |
-| [`CHANGELOG.md`](CHANGELOG.md) | Release notes (v1.0.0: Phases 1–5) |
+| [`CHANGELOG.md`](CHANGELOG.md) | Release notes (v1.0.0, v2.0.0 and v2.0.1) |
 | `pyproject.toml`, `uv.lock`, `.python-version` | Project metadata and locked dependencies |
 | `.github/workflows/ci.yml` | Continuous integration: lint, type check, tests, baseline smoke runs |
 | [`LICENSE`](LICENSE) | MIT License — applies to source code |

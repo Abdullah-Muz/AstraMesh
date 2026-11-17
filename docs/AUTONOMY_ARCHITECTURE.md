@@ -1,6 +1,6 @@
 # Autonomy Architecture
 
-> **Owner:** Abdullah Muzher · **Status:** IN PROGRESS — Phase 2 increment 1 (agents, messages, network) implemented · **Spec:** §5, §14.1 · **Target phase:** 2 · **Last updated:** 2026-11-03
+> **Owner:** Abdullah Muzher · **Status:** IMPLEMENTED — agents, messages and network (Phase 2), allocation (Phase 2), health beliefs and fault response (Phase 3); the protection supervisor is in [`PROTECTION_MODES.md`](PROTECTION_MODES.md) · **Spec:** §5, §14.1 · **Target phase:** 2 · **Last updated:** 2026-11-16
 
 ## Purpose
 
@@ -118,4 +118,4 @@ Beliefs are compared with truth only after the run, in the summary's `health` se
 
 ### 9. Not yet implemented
 
-Inter-agent re-planning after faults beyond B4 / B3 + timeout, health beliefs (§5.4), estimators beyond the latest fix, safety supervisor. Each will be added behind the same boundary.
+Inter-agent re-planning after faults beyond B4 / B3 + timeout, and estimators beyond the latest fix. Health beliefs are in §8; the safety supervisor is in [`PROTECTION_MODES.md`](PROTECTION_MODES.md). *(Updated 2026-11-16, DL-136: this list previously still named both.)*

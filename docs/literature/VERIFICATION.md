@@ -1,6 +1,6 @@
 # Literature verification pack
 
-> **Status:** prepared 2026-11-16 for owner verification (DL-132, approved 2026-11-16). **Verified 2026-11-16 (DL-133):** the owner approved every check, V1 – V29 and M1 – M20 ("all approved"); V29 was accepted as worded, without a repeat search. Every literature row in [`LITERATURE_REVIEW.md`](../LITERATURE_REVIEW.md) is an assistant draft that the owner has not verified, carried since DL-049. This pack lists the claims that AstraMesh actually relies on, each with the place in the source to check, so they can be verified without re-reading every paper. It adds no new readings.
+> **Status:** prepared 2026-11-16 for owner verification (DL-132, approved 2026-11-16). **Verified 2026-11-16 (DL-133):** the owner approved every check, V1 – V29 and M1 – M20 ("all approved"); V29 was accepted as worded, without a repeat search. Before that, every literature row in [`LITERATURE_REVIEW.md`](../LITERATURE_REVIEW.md) was an assistant draft that the owner had not verified, carried since DL-049. This pack lists the claims that AstraMesh actually relies on, each with the place in the source to check, so they can be verified without re-reading every paper. It adds no new readings.
 
 ## How to use it
 
@@ -59,7 +59,7 @@ If any of these fails, the affected results would need a design entry and a reru
 | V5 | R08 §2, Fig. 2 | The cutoff is the invariant latitude (cos²Λ = 1/L) at which the count rate falls to half its mean above 70°, and the transition is sharp (most of the rise within ~3°). | Step access model (`forecast/access.py`); invariant latitude from L (`dynamics/geomagnetic.py`) | ✓ |
 | V6 | R06 §4, Figs. 2–4 | Cutoff variations correlate with Kp, Dst and SYM-H at **0.80, 0.78, 0.78**; the cutoff at ~80 MeV moved about 6° equatorward. | SYM-H as the Dst proxy | ✓ |
 | V7 | R09 p. 6-12, eq. 6.17 | Vertical Störmer cutoff **P_c = 14.9 cos⁴λ / R² GV**. | RK-02 cross-check (`tests/physics_validation/test_per_spacecraft_risk.py`) | ✓ |
-| V8 | R09 p. 6-12, eq. 6.18 and text | **P_c = 16.0 L⁻² GV**, with "a practical limit … within the domain of the L = 4 shell". | Why the quiet cutoff comes from R08, not from a dipole formula; the dipole is labelled a model | ✓ |
+| V8 | R09 p. 6-12, eq. 6.18 and text | **P_c = 16.0 L⁻² GV**, with "a practical limit … within the domain of the L = 4 shell". | RK-02 cross-check (`test_per_spacecraft_risk.py`, L from eq. 6.18); why the quiet cutoff comes from R08, not from a dipole formula; the dipole is labelled a model | ✓ |
 | V9 | P06 Table I (p. 917) against [`P06.md`](P06.md) §3(c) | The 17-row conflict-resolution table as transcribed in `P06.md` §3(c) matches the printed table row by row. | B3 Phase 2 (`agents/cbba.py`) | ✓ |
 | V10 | P06 Eq. (5) (Sec. IV-B) | Timestamp rule: s_ik = τ_r if g_ik = 1, otherwise max over neighbours m of s_mk. | B3 timestamp update | ✓ |
 | V11 | P06 Eq. (6), Sec. IV-B p. 916 | After an outbid, the agent releases the outbid task and every task added after it ("the agent also needs to release all the tasks added after the outbid task"). | B3 bundle release | ✓ |
@@ -68,7 +68,7 @@ If any of these fails, the affected results would need a design entry and a reru
 
 ## Part 2: claims in the released report (REPORT §7)
 
-The released [`REPORT.md`](../REPORT.md) §7 marks each of these unverified. A ✓ here lets that label be removed for the row.
+The v2.0.0 [`REPORT.md`](../REPORT.md) §7 marked each of these unverified; a ✓ here let that label be removed for the row (done in v2.0.1).
 
 | Check | Source, location | Claim as AstraMesh states it | Outcome |
 |---|---|---|---|
@@ -118,7 +118,7 @@ Check the title, authors, year and venue against the publisher or registry recor
 
 ## Discrepancies found while preparing this pack
 
-1. **Starling: four CubeSats, but DSA on three.** REPORT §7 and `LITERATURE_REVIEW.md` Finding 1 say Starling 1.0 "flew four CubeSats coordinating dual-band GPS ionospheric observations … with distributed onboard planning". That follows D01. However, D10 (pp. 3, 7) and P01S (Table 1) say Starling-1 never joined the DSA network, so the coordination ran on three spacecraft. **Proposed wording:** "flew four CubeSats; its distributed onboard planning of dual-band GPS ionospheric observations ran on three of them". This does not change any result or the no-novelty conclusion. If V15 is confirmed, the fix is a dated correction to the released report.
+1. **Starling: four CubeSats, but DSA on three** (corrected in v2.0.1, DL-133). Until then, REPORT §7 and `LITERATURE_REVIEW.md` Finding 1 said Starling 1.0 "flew four CubeSats coordinating dual-band GPS ionospheric observations … with distributed onboard planning". That follows D01. However, D10 (pp. 3, 7) and P01S (Table 1) say Starling-1 never joined the DSA network, so the coordination ran on three spacecraft. **Proposed wording:** "flew four CubeSats; its distributed onboard planning of dual-band GPS ionospheric observations ran on three of them". This does not change any result or the no-novelty conclusion. If V15 is confirmed, the fix is a dated correction to the released report.
 
 ## After verification
 

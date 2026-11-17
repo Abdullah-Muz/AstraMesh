@@ -1,6 +1,6 @@
 # Negative-result analysis
 
-> **Status:** recorded 2026-11-15 from clean commit `f2a1b3a` (`git_dirty: false`; 96 runs, 31 min on 12 workers). Phase 6 increment 3 (DL-119 design, DL-120 code, DL-121 results). The hypotheses were written into DL-119 before any run; nothing was tuned and no method changed.
+> **Status:** recorded 2026-11-15 from clean commit `f2a1b3a` (`git_dirty: false`; 96 runs, 31 min on 12 workers). Phase 6 increment 3 (DL-119 design, DL-120 code, DL-121 results). Approved by the owner 2026-11-15. The hypotheses were written into DL-119 before any run; nothing was tuned and no method changed.
 >
 > **Earlier run superseded (disclosed):** a first recorded run from `796563b` could not explain two cases, so the trace was extended (DL-120 revision). Every output that does not depend on the trace is byte-identical between the two runs: the per-run table, N3 – N6, the config hashes and the latency series. The `796563b` outputs were compared locally and are not committed.
 >

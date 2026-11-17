@@ -1,6 +1,6 @@
 # Dataset Registry
 
-> **Owner:** Abdullah Muzher · **Status:** Phase 4: five bounded datasets downloaded and pinned (DS-02, DS-06, DS-07; forecast training data DS-08, DS-09); Phase 5: DS-10 (MSIS drivers); GloTEC and COSMIC-2 left out of Phase 4 (DL-071) · **Spec:** §8 · **Last updated:** 2026-11-10
+> **Owner:** Abdullah Muzher · **Status:** Phase 4: five bounded datasets downloaded and pinned (DS-02, DS-06, DS-07; forecast training data DS-08, DS-09); Phase 5: DS-10 (MSIS drivers); Phase 6: DS-11, DS-12 (held-out GOES-18 and OMNI series); GloTEC and COSMIC-2 left out of Phase 4 (DL-071) · **Spec:** §8 · **Last updated:** 2026-11-16
 
 ## Rules (spec §8.2)
 

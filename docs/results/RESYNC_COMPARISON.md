@@ -1,6 +1,6 @@
 # B4 ownership re-sync
 
-> **Status:** recorded 2026-11-15 from clean commit `a94b654` (`git_dirty: false`; 214 runs, 1 h 20 min on 12 workers). Phase 6 increment 3b (DL-122 design, DL-123 code, DL-124 results). The mechanism, its settings and the expectations R1 – R6 were fixed in DL-122 before any test-storm run, and nothing was changed after it. The results are reported as they came out.
+> **Status:** recorded 2026-11-15 from clean commit `a94b654` (`git_dirty: false`; 214 runs, 1 h 20 min on 12 workers). Phase 6 increment 3b (DL-122 design, DL-123 code, DL-124 results). Approved by the owner 2026-11-15. The mechanism, its settings and the expectations R1 – R6 were fixed in DL-122 before any test-storm run, and nothing was changed after it. The results are reported as they came out.
 
 ## Setup
 

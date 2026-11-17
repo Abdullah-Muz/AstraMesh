@@ -49,7 +49,9 @@ The supervisor runs inside each agent, at the start of every `payload_command`. 
 - arbitrary messages and plan uplinks cannot reactivate a protected payload;
 - scenario truth check `payload_steps_in_protected_modes` = 0.
 
-### Not modelled yet
+### Not modelled yet (as written in Phase 3)
 
 - Effects of the navigation/comms and orbital risks on links and drag (Phase 5).
 - Real space-weather inputs (Phase 4).
+
+*(Update 2026-11-16, DL-136: real space-weather inputs were added in Phase 4 (GOES and OMNI replay, DL-071) and storm-time drag in Phase 5 (D2, DL-084, DL-085). Effects of the risks on links are still not modelled.)*
