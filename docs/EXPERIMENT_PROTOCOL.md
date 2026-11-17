@@ -1,6 +1,6 @@
 # Experiment Protocol
 
-> **Owner:** Abdullah Muzher · **Status:** ACTIVE — run artifacts implemented; statistical design written 2026-11-09 (§3, DL-072) · **Spec:** §10 · **Last updated:** 2026-11-09
+> **Owner:** Abdullah Muzher · **Status:** ACTIVE — run artifacts implemented; statistical design written 2026-11-09 (§3, DL-072) · **Spec:** §10 · **Last updated:** 2026-11-16 (addendum, DL-136)
 
 ## 1. Run artifacts — IMPLEMENTED (Phase 0)
 
@@ -106,3 +106,25 @@ Spec §10.3 asks for ablations of components "when those components exist".
 - **Later phases:**
   - Ablations of protective hysteresis, plan reconciliation and maneuver feasibility belong to Phases 5–6, where those components are combined.
   - Fleet size stays at 4 (spec §10.3).
+
+## Practice since Phase 4 (added 2026-11-16, DL-136)
+
+The rules above stay as written. This section records where later practice departed from them or extended them.
+
+1. **Test sets (§3.1).**
+   - May 2024 was used again in Phase 5, as the held-out storm for the handover candidate. That candidate was tuned on February 2024 only (DL-094, DL-096; [`HANDOVER_COMPARISON.md`](results/HANDOVER_COMPARISON.md)).
+   - The compute-cost measurement reruns it for timing only (DL-134 (B), DL-135).
+   - The later test sets are the six Phase 6 held-out storms (DL-113, DL-114; [`HELDOUT.md`](results/HELDOUT.md)) and the two reserved windows, used once for the re-sync (DL-122, DL-124; [`RESYNC_COMPARISON.md`](results/RESYNC_COMPARISON.md)).
+2. **Seeds (§3.2).**
+   - Storm comparisons use seeds 1 – 3 (DL-098, DL-099, DL-106, DL-113).
+   - The handover comparison uses B4 seeds 1 – 10 and B3 seeds 1 – 5 (DL-094).
+   - The re-sync uses seed 1 on the development storms and seeds 1 – 3 on the test storms (DL-122).
+   - The negative-result diagnostics use seed 1 (DL-119), and so does the compute-cost measurement (DL-134 (B)).
+   - Reason: seeds changed no storm outcome (DL-097 as cited in DL-098; DL-100, DL-103; expectation E5 in DL-113, used in DL-119).
+3. **Intervals (§3.3).** Results across storms are pooled over storms (n = 4 – 6): the mean, a 95 % t-interval and a Wilcoxon signed-rank test. This is defined in DL-094 and DL-099 and used in DL-106 (n = 5) and DL-113 (test storms) ([`ABLATIONS.md`](results/ABLATIONS.md), [`HELDOUT.md`](results/HELDOUT.md)). With n ≤ 6 the exact Wilcoxon p cannot fall below about 0.03 (0.0625 at n = 5, DL-108).
+4. **Ablations (§3.7).**
+   - A1 no look-ahead, A2 no forecast, A3 no hysteresis and A4 no reconciliation (B0) were run in Phase 5 (DL-106 – DL-108) and on the held-out storms (DL-113).
+   - The manoeuvre-feasibility ablation was not run. It is disclosed in [`REPORT.md`](REPORT.md) §8.
+5. **Run artifacts (§1).** Per-run artifacts (event logs, trajectories) are not stored. They are regenerated from the configurations, whose hashes every meta file records ([`GATE_P6.md`](results/GATE_P6.md), "Not stored"). The archive question in §1 is settled this way in practice; no decision entry records the choice.
+6. **Separation and collision (§3.4).** Spacing criteria were added with formation keeping (DL-087). Collision is not modelled ([`FORMATION_KEEPING.md`](results/FORMATION_KEEPING.md), Limits).
+7. **Regression digests (§2).** `tests/regression/test_two_body_determinism.py` also pins digests: the two-body and J2 trajectories.
