@@ -2,6 +2,15 @@
 
 Release versions of the AstraMesh software and results. The specification has its own version history (`ASTRAMESH_MASTER_SPEC.md`, currently v1.0); a software release number is not a specification version.
 
+## v2.0.2 — 2026-11-17
+
+Maintenance release after v2.0.1 (DL-134). One code fix, a new measurement and documentation corrections; no recorded result changes.
+
+- **Compute cost measured** ([`COMPUTE_COST.md`](docs/results/COMPUTE_COST.md); DL-135, DL-138). Onboard CPU time per spacecraft and per entry point, ground-planning time and peak memory, from 50 reruns of recorded configurations, each reproducing its recorded behaviour. CBBA (B3) uses about ten times the onboard CPU of the other planners; memory is dominated by the simulator. Measured in Python on one shared laptop, with the timer's own overhead disclosed and corrected as an estimate: not flight-processor figures.
+- **Fix: future-dated scenarios** (DL-137). With IERS downloads off, Astropy refused predicted Earth-orientation values once the wall clock was 30 days past the bundled table's predictions (from 2026-11-22 for this lock), so any scenario dated from late October 2026 onward would have failed. The leap-second table is now loaded first, under Astropy's default rule, and the prediction age limit is lifted afterwards. Recorded runs use final data and do not change; the pinned regression digests pass.
+- **Documentation corrections** (DL-136), from a read-only audit: five decision-log rows that displayed broken on GitHub; literature headers and draft cells corrected against their reports; stale status lines; documented commands that would have overwritten committed results; the data providers' requested credits added to the README, REPORT §3 and the figure and video pages; a table of committed derived data files in the dataset registry; REPORT §8 now discloses that peer-health belief calibration was not measured, and §9 that nine data-dependent tests run only locally; a dated protocol addendum records how practice departed from the experiment protocol; two figure captions now match what is plotted.
+- **IERS data refresh** (DL-021) is deferred to January – June 2027, when a release with a later leap-second expiry exists; the facts it needs are recorded.
+
 ## v2.0.1 — 2026-11-16
 
 Documentation patch: the literature that AstraMesh relies on is now owner-verified. No code paths, results or runs changed; the version change alters only the project's own entry in `uv.lock`.

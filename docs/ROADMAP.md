@@ -69,7 +69,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | B | Compute cost (spec §10.2: algorithm CPU time and peak memory): onboard CPU per agent and per entry point, ground planning, peak RSS; 50 reruns of recorded configurations | Plan DL-134 (B) approved 2026-11-16; code DL-135 (`181d46b`, revised `b7c97d8` after the first run stopped on its own check) approved 2026-11-17; 50 runs recorded from `b7c97d8` in [`COMPUTE_COST.md`](results/COMPUTE_COST.md) (DL-138); **Done**, approved 2026-11-17 |
 | C | Documentation consistency fixes from a read-only audit (decision-log table rows, literature headers after DL-133, stale status lines, documented commands) | **Done**: DL-136 approved 2026-11-17; commits `4d8a0f2`, `983d35b`, `1197b35`. No code or results changed |
 
-Release: the next patch release (after DL-137 and DL-138) bumps the version in `pyproject.toml` and `uv.lock`, as for v2.0.1 (DL-133).
+Release: v2.0.2 (2026-11-17, DL-139) carries B, C and A2.
 
 ## Phase 6 increments (DL-111)
 

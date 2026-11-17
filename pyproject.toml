@@ -1,6 +1,6 @@
 [project]
 name = "astramesh"
-version = "2.0.1"
+version = "2.0.2"
 description = "Research platform for fault-tolerant decentralized spacecraft autonomy, intelligent mission planning, and space-weather resilience."
 readme = "README.md"
 license = "MIT"
