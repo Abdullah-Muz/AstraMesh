@@ -220,7 +220,7 @@ uv run python scripts/figures/make_figures.py            # F1 – F9 from commit
 uv run --group viz python scripts/figures/make_demo.py   # the MP4 (optional ffmpeg group)
 ```
 
-Each results page names its script, clean commit and run time; [`GATE_P6.md`](results/GATE_P6.md) lists them all. The long experiments ran on one laptop (16 threads, 12 workers); an 8-day B3 + timeout run takes 20 – 96 min. CI runs the test suite (726 tests), not the experiments.
+Each results page names its script, clean commit and run time; [`GATE_P6.md`](results/GATE_P6.md) lists them all. The long experiments ran on one laptop (16 threads, 12 workers); an 8-day B3 + timeout run takes 20 – 96 min. CI runs the test suite (726 tests at v2.0.0), not the experiments. Nine data-dependent tests skip in CI, which downloads no external data: the MSIS checks MS-02 and MS-05 and the D2 drag comparison (DS-10), the storm-week data checks (DS-06 – DS-09), the OPS-SAT split counts and feature check (DS-02), and the hash check of downloaded files. They run only locally; the full local run of 2026-11-16 (DL-129) passed all 726 with none skipped. *(Added 2026-11-16, DL-136.)*
 
 ## 10. Conclusion
 
