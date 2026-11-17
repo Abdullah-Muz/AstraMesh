@@ -1,6 +1,6 @@
 # Protection Modes and Safety Supervisor
 
-> **Owner:** Abdullah Muzher · **Status:** IMPLEMENTED — five-mode machine (Phase 3 increments 3–4) · **Spec:** §6, §14.1 · **Target phase:** 3 · **Last updated:** 2026-11-04
+> **Owner:** Abdullah Muzher · **Status:** IMPLEMENTED — five-mode machine (Phase 3 increments 3–4) · **Spec:** §6, §14.1 · **Target phase:** 3 · **Last updated:** 2026-11-16
 
 ## Purpose
 
