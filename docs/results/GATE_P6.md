@@ -105,7 +105,7 @@ Every results page carries its own Limits section. The Phase 5 pages were review
 - **Earlier carry-overs:**
   - CBBA has no stop rule; an 8-day B3 + timeout run takes 20 – 96 min.
   - S06 is deferred.
-  - CPU time and memory are not measured.
+  - CPU time and memory are not measured. *(Update 2026-11-16, after the sign-off: measured in [`COMPUTE_COST.md`](COMPUTE_COST.md), DL-138.)*
   - Refresh `astropy-iers-data` before 2027-06-28 (DL-021).
 
 ## Reproduce (Phase 6)
