@@ -480,12 +480,13 @@ SIM = "Simulated"
 FIGURES: tuple[FigureSpec, ...] = (
     FigureSpec(
         "f1_storm_mar2024.png",
-        "F1. The 23 - 24 March 2024 storm",
+        "F1. The March 2024 storm window (21 - 28 March)",
         "Measured GOES ≥ 10 MeV proton flux (5-min records) and the P-B forecasts of the next-hour "
         "maximum, plotted at their issue time (record start + 600 s latency), with the three "
         "modelled spacecraft tolerances; below, measured OMNI SYM-H. The forecasts are model "
         "outputs from the pinned series; the tolerances are synthetic limits, not properties "
-        "of a real payload.",
+        "of a real payload. The whole 8-day pinned window is shown (21 - 28 Mar 2024); the "
+        "onset is on 23 Mar.",
         (F1_SERIES,),
         draw_f1,
     ),
@@ -548,7 +549,8 @@ FIGURES: tuple[FigureSpec, ...] = (
         "F7. B4 ownership re-sync: tasks lost while available",
         f"{SIM}: tasks completed in the storm's B4 QUIET but lost while some spacecraft was in "
         "a tasking mode for a whole window, summed over the storm's arms, B4 against B4 + "
-        "re-sync, on the development storms (seed 1; RESYNC_COMPARISON.md, DL-124). Dark: "
+        "re-sync, on the development storms (five Phase 5 and six held-out storms) and the "
+        "two spread runs (2 000 and 5 000 km) (seed 1; RESYNC_COMPARISON.md, DL-124). Dark: "
         "split tasks. These storms were used to develop the re-sync; on the two test storms "
         "nothing changed. Not shown: in the 2 000 km spread run the re-sync raised duplicates "
         "from 15 to 111.",
@@ -590,6 +592,10 @@ def readme(figures: tuple[FigureSpec, ...]) -> str:
         "",
         "Simulated: the formation, utility, hazard and protection. Measured: GOES proton flux and "
         "OMNI SYM-H. No figure shows a real mission.",
+        "",
+        "Data credits (GOES-18 SGPS: NOAA NCEI and GOES-R SEISS; OMNI: NASA/GSFC SPDF "
+        "OMNIWeb, with the data citation) are in the project "
+        "[README](../../README.md#external-data).",
         "",
     ]
     for f in figures:
