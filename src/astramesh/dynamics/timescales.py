@@ -9,7 +9,10 @@ Conventions (``docs/CONVENTIONS.md`` §2.2):
 * Earth-orientation data (UT1-UTC, polar motion) and the leap-second table
   come **only** from the locked ``astropy-iers-data`` / ``pyerfa`` packages.
   Automatic downloads are disabled so that every run on every machine uses the
-  same data. Astropy itself silently reuses the last tabulated value beyond
+  same data, and IERS-A predictions are used however long ago the table was
+  made (DL-137; see :func:`configure_astropy_offline` for why the leap-second
+  table is loaded before the age limit is lifted).
+  Astropy itself silently reuses the last tabulated value beyond
   the table, so :func:`require_eop_coverage` checks coverage explicitly and
   raises instead (PA-10); Earth-fixed transforms call it. The IERS data
   version is the ``astropy-iers-data`` package version, recorded in each run
@@ -36,9 +39,19 @@ class EarthOrientationRangeError(ValueError):
 
 
 def configure_astropy_offline() -> None:
-    """Disable IERS/leap-second downloads (coverage is enforced by require_eop_coverage)."""
+    """Disable IERS/leap-second downloads and the wall-clock age limit on predictions.
+
+    Coverage is enforced by :func:`require_eop_coverage` instead. Astropy uses
+    ``auto_max_age`` for two things: the age limit on IERS-A predictions and the
+    choice of leap-second table. So the leap-second table is loaded first, under
+    Astropy's default rule, which picks the bundled table and warns once it has
+    expired (DL-021); only then is the prediction age limit lifted (DL-137).
+    Astropy loads the leap-second table once per process.
+    """
     iers.conf.auto_download = False
     iers.conf.iers_degraded_accuracy = "error"
+    Time("2000-01-01T00:00:00", scale="utc").tai  # noqa: B018  load leap seconds (DL-137)
+    iers.conf.auto_max_age = None  # DL-137: no wall-clock age limit on predictions
 
 
 configure_astropy_offline()
