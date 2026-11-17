@@ -58,6 +58,14 @@ Every external file is pinned by SHA-256 in [`DATASET_REGISTRY.md`](DATASET_REGI
 | DS-10 | OMNI2 hourly F10.7 and ap (2023 – 2024) | NRLMSIS drivers | as DS-06 |
 | DS-11, DS-12 | GOES-18 SGPS and OMNI 1-min (Jun 2024 – Oct 2026) | held-out storms | as DS-07 and DS-06 |
 
+**Data credits** (as each provider requests; [`DATASET_REGISTRY.md`](DATASET_REGISTRY.md)):
+
+- **OPS-SAT-AD:** Ruszczak et al., The OPS-SAT benchmark for detecting anomalies in satellite telemetry, *Scientific Data* (2025), doi:10.1038/s41597-025-05035-3; dataset doi:10.5281/zenodo.15108715 (CC BY 4.0 and MIT).
+- **OMNI:** Papitashvili, N. E. and King, J. H. (2020), OMNI 1-min Data [Data set], NASA SPDF, doi:10.48322/45bb-8792, accessed 2026-11-04, 2026-11-05 and 2026-11-13; OMNI2 hourly accessed 2026-11-10. We acknowledge NASA/GSFC's Space Physics Data Facility's OMNIWeb service, and OMNI data.
+- **GOES-18:** we acknowledge NOAA NCEI and the GOES-R SEISS instrument team for the SGPS proton data.
+
+*(Data credits added 2026-11-16, DL-136: the providers' requested citations were in the registry only.)*
+
 **Partitions.** Forecasts were trained on January 2023 – April 2024 and never refitted. May 2024 was the Phase 4 held-out storm. Phase 5 tuned on February 2024 and tested on May 2024 and four out-of-sample storms from the training period, each with forecasts fitted only on data before its fold (DL-099). Phase 6 selected six test storms and two reserved windows from 1 Jun 2024 – 31 Oct 2026 by a rule fixed before any run (DL-113). One test storm (17 Jan 2026) has a peak 37 times the training maximum and a newer GOES processing version (v3-0-3).
 
 **Planned but not used:** ESA-ADB (sized only, too large to unpack in the available memory; DL-062), NOAA GloTEC (starts in 2025) and UCAR COSMIC-2 (licence unverified) (DL-071), and CelesTrak GP / OMM.
