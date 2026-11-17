@@ -101,7 +101,7 @@ retrieved_files:   # sha256 and sizes pinned in configs/data/sources.yaml; provi
   - segments.csv (18 987 091 B): 303 493 rows; columns channel, timestamp, value, label, sampling, anomaly, segment, train
   - dataset.csv (507 550 B): 2 123 segments x 18 engineered features + segment, anomaly, train, channel, sampling
   - LICENSE (1 091 B): MIT License for OPS-SAT Dataset, Copyright (c) 2024 KP Labs
-license_terms: "CC BY 4.0 (Zenodo record metadata) and MIT (LICENSE file in the record). Comply with both: cite the dataset and paper (D05), keep the MIT notice with any redistributed copy (we redistribute nothing)."
+license_terms: "CC BY 4.0 (Zenodo record metadata) and MIT (LICENSE file in the record). Comply with both: cite the dataset and paper (D05), keep the MIT notice with any redistributed copy (no raw OPS-SAT-AD file is redistributed; only derived anomaly probabilities are committed, in `configs/data/opssat_score_sensor.json`, with this citation)."
 license_verified_utc: "2026-11-04"
 citation_required: "Ruszczak et al., The OPS-SAT benchmark for detecting anomalies in satellite telemetry, Scientific Data (2025), doi:10.1038/s41597-025-05035-3; dataset doi:10.5281/zenodo.15108715"
 sampling_interval: "1 s (793 segments) or 5 s (1 330 segments); segment length 8-1 040 samples, median 70"
@@ -327,3 +327,40 @@ Not yet started. GloTEC and COSMIC-2 are left out of Phase 4 (DL-071, approved 2
 - **GloTEC:** operational global product begins in 2025 (NCEI archive "2025-Feb to present"); it is an assimilated model product, not ground truth. Not usable as 2024 truth.
 - **CelesTrak GP:** general-perturbations elements are not exact inertial truth; prefer OMM over TLE-only. CelesTrak links its own usage policy; read it before any download.
 - **COSMIC-2:** multiple processing levels (podTc2 absolute TEC is level 1b; ionPrf electron density is level 2); suggested citation "UCAR COSMIC Program, 2019: COSMIC-2 Data Products, doi:10.5065/T353-C093"; no licence text found on the data page yet. Check dependency with GloTEC (which assimilates it).
+
+## Derived files committed to the repository (added 2026-11-16, DL-136)
+
+No raw external file is committed. The files below are derived from registered data and are committed, so each carries its sources' credit lines.
+
+**Credits (registry wording):**
+- **OMNI** (DS-06, DS-09, DS-12; line 134): "Papitashvili, N. E. and King, J. H. (2020), OMNI 1-min Data [Data set], NASA SPDF, doi:10.48322/45bb-8792 (with access date); acknowledge 'NASA/GSFC's Space Physics Data Facility's OMNIWeb service, and OMNI data'".
+- **GOES-18** (DS-07, DS-08, DS-11; lines 162, 192, 278): "acknowledge NOAA NCEI and GOES-R SEISS".
+- **OPS-SAT-AD** (DS-02; line 106): "Ruszczak et al., The OPS-SAT benchmark for detecting anomalies in satellite telemetry, Scientific Data (2025), doi:10.1038/s41597-025-05035-3; dataset doi:10.5281/zenodo.15108715".
+
+| File | Sources | Contains | Produced by | SHA-256 | Credits |
+|---|---|---|---|---|---|
+| [`s11_storm_series.json`](../configs/data/s11_storm_series.json) | DS-06, DS-07, DS-08, DS-09 | 8 – 15 May 2024: GOES ≥ 10 MeV flux, 1 h forecasts, OMNI SYM-H and AE (5-min) | `scripts/data/make_storm_series.py` (DL-069) | `0a85ddd42028b8d5718da13fa349f6685d3a7bbdd1255475708cc40661c021d4` | OMNI, GOES |
+| [`tuning_feb2024_series.json`](../configs/data/tuning_feb2024_series.json) | DS-08, DS-09 | February 2024 tuning storm, same fields | `scripts/data/make_tuning_series.py` (DL-095) | `2854446b8c57e16b4d180646730c6c7e23309762d1b321dabcc1f01654fa982d` | OMNI, GOES |
+| [`fold_jul18_2023_series.json`](../configs/data/fold_jul18_2023_series.json) | DS-08, DS-09 | evaluation storm, forecasts fitted before its fold | `scripts/data/make_fold_storm_series.py` (DL-099) | `f359a7da3e879df99bd9f87d5c2efeb91c1cc8601d2141b533e66503b6cd92bb` | OMNI, GOES |
+| [`fold_jul29_2023_series.json`](../configs/data/fold_jul29_2023_series.json) | DS-08, DS-09 | as above | as above | `bc7080ec122cff9fe11e84dd1dc3ff74f36adbebb3afc0ebb1c169ee3d5774a5` | OMNI, GOES |
+| [`fold_jan29_2024_series.json`](../configs/data/fold_jan29_2024_series.json) | DS-08, DS-09 | as above | as above | `f800a9865cbc7e917da6f329c84e8b0a5ddf0e534dbdbcf37e5e65eeb4a995ed` | OMNI, GOES |
+| [`fold_mar23_2024_series.json`](../configs/data/fold_mar23_2024_series.json) | DS-08, DS-09 | as above | as above | `0f63027f661df7e0c3ee3efb814c131b4d6f972dd963631183fc5f7c41a00acc` | OMNI, GOES |
+| [`heldout_20240606_series.json`](../configs/data/heldout_20240606_series.json) | DS-08, DS-09, DS-11, DS-12 | held-out storm, 8 days; forecasts fitted on Jan 2023 – Apr 2024 | `scripts/data/make_heldout_series.py` (DL-114) | `5d14f4ba959549d95137c4cfab822c0c2a642129915ecd5c7ac3295c64098774` | OMNI, GOES |
+| [`heldout_20241007_series.json`](../configs/data/heldout_20241007_series.json) | as above | as above | as above | `edc75e022a55ba2c25a393a4a08c9dd850dc47a571c3ce7efe0d6dbb25626b9c` | OMNI, GOES |
+| [`heldout_20241025_series.json`](../configs/data/heldout_20241025_series.json) | as above | as above | as above | `c6a85d44e5eba8ba163fe2b1babdb8b15d2f074c601e02c83aff85868c11e885` | OMNI, GOES |
+| [`heldout_20250330_series.json`](../configs/data/heldout_20250330_series.json) | as above | as above | as above | `c632220e8fda6bc6d369d887b73c17ea52180e2174e20c0e50fa25ccdadc036b` | OMNI, GOES |
+| [`heldout_20251109_series.json`](../configs/data/heldout_20251109_series.json) | as above | as above | as above | `68fb89c6eb1f491ee7c52f5fe14606da3f3d04d9a889753b9637cfa4bf4a7f86` | OMNI, GOES |
+| [`heldout_20260117_series.json`](../configs/data/heldout_20260117_series.json) | as above | as above | as above | `936ed3de3a460002026c04b8c59a2cf40019727eba986c2e7fcce358242f38aa` | OMNI, GOES |
+| [`reserved_20241119_series.json`](../configs/data/reserved_20241119_series.json) | DS-08, DS-09, DS-11, DS-12 | reserved window, 8 days | `scripts/data/make_heldout_series.py --reserved` (DL-123) | `9e9ac3c05107d59f2304bf955c8423a2288f5280a867779d4ca8c85ea8bba5c2` | OMNI, GOES |
+| [`reserved_20250530_series.json`](../configs/data/reserved_20250530_series.json) | as above | as above | as above | `f9afd8f932200d2296655379bf7611b2813422b55c050f520846f3ea29cf35b6` | OMNI, GOES |
+| [`heldout_selection.json`](../configs/data/heldout_selection.json) | DS-11, DS-12 | storm-selection rule and per-storm facts (peak flux, SYM-H min) | `scripts/data/make_heldout_series.py` (DL-114; rule DL-113) | `dea50ab485a4ad2291bbbf09041c3f404adee63e5e50be7c0e4553cda50b91a9` | OMNI, GOES |
+| [`reserved_selection.json`](../configs/data/reserved_selection.json) | DS-11, DS-12 | the two reserved windows | `scripts/data/make_heldout_series.py --reserved` (DL-123) | `dc63b8b635cd1773a4500f09d0dc88c310bd1361229b8dcb217223cddca729ec` | OMNI, GOES |
+| [`opssat_score_sensor.json`](../configs/data/opssat_score_sensor.json) | DS-02 | calibrated anomaly probabilities of test segments, by true label | `scripts/data/make_score_sensor.py` (DL-066) | `a7a28cbe22e2bd93a651fb4e7f2da5d14849ca2d65c10933c63fc26833d958de` | OPS-SAT-AD |
+| [`demo_trace.json`](results/demo_trace.json) | DS-08, DS-09 (via `fold_mar23_2024_series.json`) | 23 – 24 Mar 2024 trace: measured flux and SYM-H-based cutoff with simulated states | `scripts/experiments/demo_trace.py` (design DL-125; recorded DL-127) | `e813e55323869f0eb15f795378eab0db26641ac71cf9b87bd4cf02b812956ff4` | OMNI, GOES |
+| [`storm_diagnostics.json`](results/storm_diagnostics.json) | DS-08, DS-09 (via the fold series) | protection diagnostics with measured flux at onsets | `scripts/experiments/storm_diagnostics.py` (recorded DL-108) | `ea71a70361d0d61aab2f755826658723a94382a64de1621cf34086b7fd3ebe1a` | OMNI, GOES |
+| [`figures/`](figures/README.md) F1, F9; [`media/`](media/README.md) MP4 and PNG | DS-07 – DS-09 | plots and video of measured flux and SYM-H | `scripts/figures/make_figures.py`, `scripts/figures/make_demo.py` (design DL-125, code DL-126, recorded DL-127) | not hashed (not byte-reproducible) | OMNI, GOES |
+
+**Notes:**
+- `negative_results.json` holds no measured values, so it is not listed.
+- **DS-10** (OMNI2 hourly, F10.7 and ap) has no committed derived file. Its credit is unconfirmed: registry line 250 says "As DS-06", which reuses the OMNI 1-min citation (doi:10.48322/45bb-8792), but OMNI2 hourly data have their own dataset citation, not yet recorded.
+- Every row's decision entry and script were checked against `DECISION_LOG.md` and `scripts/` on 2026-11-16 (DL-136).

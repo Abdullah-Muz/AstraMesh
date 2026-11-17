@@ -61,7 +61,7 @@ Every external file is pinned by SHA-256 in [`DATASET_REGISTRY.md`](DATASET_REGI
 **Data credits** (as each provider requests; [`DATASET_REGISTRY.md`](DATASET_REGISTRY.md)):
 
 - **OPS-SAT-AD:** Ruszczak et al., The OPS-SAT benchmark for detecting anomalies in satellite telemetry, *Scientific Data* (2025), doi:10.1038/s41597-025-05035-3; dataset doi:10.5281/zenodo.15108715 (CC BY 4.0 and MIT).
-- **OMNI:** Papitashvili, N. E. and King, J. H. (2020), OMNI 1-min Data [Data set], NASA SPDF, doi:10.48322/45bb-8792, accessed 2026-11-04, 2026-11-05 and 2026-11-13; OMNI2 hourly accessed 2026-11-10. We acknowledge NASA/GSFC's Space Physics Data Facility's OMNIWeb service, and OMNI data.
+- **OMNI 1-min** (DS-06, DS-09, DS-12): Papitashvili, N. E. and King, J. H. (2020), OMNI 1-min Data [Data set], NASA SPDF, doi:10.48322/45bb-8792, accessed 2026-11-04, 2026-11-05 and 2026-11-13. **OMNI2 hourly** (DS-10, accessed 2026-11-10): its own data citation is still to be confirmed (the registry says "As DS-06"). We acknowledge NASA/GSFC's Space Physics Data Facility's OMNIWeb service, and OMNI data.
 - **GOES-18:** we acknowledge NOAA NCEI and the GOES-R SEISS instrument team for the SGPS proton data.
 
 *(Data credits added 2026-11-16, DL-136: the providers' requested citations were in the registry only.)*
