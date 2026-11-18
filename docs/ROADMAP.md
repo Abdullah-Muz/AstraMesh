@@ -70,7 +70,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | C | Documentation consistency fixes from a read-only audit (decision-log table rows, literature headers after DL-133, stale status lines, documented commands) | **Done**: DL-136 approved 2026-11-17; commits `4d8a0f2`, `983d35b`, `1197b35`. No code or results changed |
 | D | DS-10 (OMNI2 hourly) data citation: the registry pointed to the 1-min data DOI; record the hourly data's own DOI in the registry and the credits | **Done**: DL-140 approved 2026-11-17 (`b922f2c`); documentation and metadata only, to be carried by the next release |
 | E | CI pins the uv release (setup-uv `version`; found in DL-137) | **Done**: DL-141 approved 2026-11-17 (`11d1815`; CI installed uv 0.13.9 as pinned) |
-| F | Calibration of the agents' health beliefs (spec §10.2; the gap disclosed in REPORT §8 by DL-136): H-B peer and H-C payload probabilities against simulator truth, from 360 reruns of the recorded health-comparison runs | Design DL-142 approved 2026-11-17; code DL-143 proposed (2026-11-17); next: the recorded run and results |
+| F | Calibration of the agents' health beliefs (spec §10.2; the gap disclosed in REPORT §8 by DL-136): H-B peer and H-C payload probabilities against simulator truth, from 360 reruns of the recorded health-comparison runs | Design DL-142 approved 2026-11-17; code DL-143 (`92555d4`); 360 runs recorded from `92555d4` in [`BELIEF_CALIBRATION.md`](results/BELIEF_CALIBRATION.md); results DL-144 proposed (2026-11-17) |
 
 Release: v2.0.2 (2026-11-17, DL-139) carries B, C and A2.
 

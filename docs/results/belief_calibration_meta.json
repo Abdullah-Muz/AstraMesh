@@ -1,0 +1,64 @@
+{
+  "experiment": "Calibration of the agents' health beliefs (DL-142, DL-143)",
+  "git_commit": "92555d4016b4ea8f489411784145878c1b5ec7e4",
+  "git_dirty": false,
+  "lockfile_sha256": "c5e7b5cccec5decff0b16fbf4b2573b9f116fe3cbacc32a70c2ecc51d2994fa4",
+  "recorded_runs": "docs/results/health_comparison.csv",
+  "recorded_sha256": "33863a2c43d63ecde03410a0780afc955cc469a15bf412e2196fa4b55ab5b629",
+  "sensor_sha256": "a7a28cbe22e2bd93a651fb4e7f2da5d14849ca2d65c10933c63fc26833d958de",
+  "plan": {
+    "H-B": [
+      "S00",
+      "S01",
+      "S03",
+      "S04"
+    ],
+    "H-C": [
+      "S00",
+      "S01",
+      "S03",
+      "S04"
+    ],
+    "H-C/official": [
+      "S00",
+      "S03"
+    ],
+    "H-C/shift05": [
+      "S00",
+      "S03"
+    ],
+    "H-B/mtbf3d": [
+      "S00",
+      "S01",
+      "S04"
+    ],
+    "H-B/mtbf300d": [
+      "S00",
+      "S01",
+      "S04"
+    ]
+  },
+  "planners": [
+    "cbba_b3_timeout",
+    "rule_b4"
+  ],
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "bins": 10,
+  "min_bin_samples": 30,
+  "n_runs": 360,
+  "n_checked": 360,
+  "check_failures": [],
+  "workers": 6,
+  "total_wall_s": 3443.9
+}
