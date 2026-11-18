@@ -1,6 +1,6 @@
 # Dataset Registry
 
-> **Owner:** Abdullah Muzher · **Status:** Phase 4: five bounded datasets downloaded and pinned (DS-02, DS-06, DS-07; forecast training data DS-08, DS-09); Phase 5: DS-10 (MSIS drivers); Phase 6: DS-11, DS-12 (held-out GOES-18 and OMNI series); GloTEC and COSMIC-2 left out of Phase 4 (DL-071) · **Spec:** §8 · **Last updated:** 2026-11-16
+> **Owner:** Abdullah Muzher · **Status:** Phase 4: five bounded datasets downloaded and pinned (DS-02, DS-06, DS-07; forecast training data DS-08, DS-09); Phase 5: DS-10 (MSIS drivers); Phase 6: DS-11, DS-12 (held-out GOES-18 and OMNI series); GloTEC and COSMIC-2 left out of Phase 4 (DL-071) · **Spec:** §8 · **Last updated:** 2026-11-17
 
 ## Rules (spec §8.2)
 
@@ -241,13 +241,13 @@ id: DS-10
 name: "OMNI2 low-resolution (hourly) data, 2023 and 2024"
 owner_provider: "NASA/GSFC Space Physics Data Facility (OMNIWeb)"
 url: https://spdf.gsfc.nasa.gov/pub/data/omni/low_res_omni/
-doi: null
+doi: "10.48322/1shr-ht18"
 version_or_date: "files as served on 2026-11-10 (omni2_2024.dat last modified 2025-12-10)"
 retrieved_utc: "2026-11-10"
 retrieved_files: "omni2_2023.dat, omni2_2024.dat (sha256 pinned in configs/data/sources.yaml)"
 license_terms: "As DS-06"
 license_verified_utc: "2026-11-10"
-citation_required: "As DS-06"
+citation_required: "Papitashvili, N. E. and King, J. H. (2020), OMNI Hourly Data [Data set], NASA SPDF, doi:10.48322/1shr-ht18, (with access date); acknowledge 'NASA/GSFC's Space Physics Data Facility's OMNIWeb service, and OMNI data' (https://omniweb.gsfc.nasa.gov/html/citing.html; DOI checked against DataCite and the SPASE record, whose access URL is the low_res_omni directory above, 2026-11-17, DL-140). Until DL-140 this field read 'As DS-06', which pointed to the 1-min data DOI"
 sampling_interval: "1 h; 8 760 + 8 784 rows, contiguous; format omni2.text (55 whitespace-separated words)"
 units: "columns used: word 50 ap-index [nT] (3-hourly value repeated per hour), word 51 F10.7 [sfu] (daily value repeated per hour)"
 time_conventions: "UT; year, day of year, hour"
@@ -362,5 +362,5 @@ No raw external file is committed. The files below are derived from registered d
 
 **Notes:**
 - `negative_results.json` holds no measured values, so it is not listed.
-- **DS-10** (OMNI2 hourly, F10.7 and ap) has no committed derived file. Its credit is unconfirmed: registry line 250 says "As DS-06", which reuses the OMNI 1-min citation (doi:10.48322/45bb-8792), but OMNI2 hourly data have their own dataset citation, not yet recorded.
+- **DS-10** (OMNI2 hourly, F10.7 and ap) has no committed derived file. Its citation is the OMNI Hourly Data DOI (doi:10.48322/1shr-ht18), confirmed 2026-11-17 (DL-140); until then its record said "As DS-06", which pointed to the 1-min data DOI.
 - Every row's decision entry and script were checked against `DECISION_LOG.md` and `scripts/` on 2026-11-16 (DL-136).

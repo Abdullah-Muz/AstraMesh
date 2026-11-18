@@ -55,13 +55,13 @@ Every external file is pinned by SHA-256 in [`DATASET_REGISTRY.md`](DATASET_REGI
 | DS-02 | ESA OPS-SAT-AD (19.5 MB) | anomaly benchmark; the H-C detector scores | CC BY 4.0 and MIT |
 | DS-06, DS-09 | NASA OMNI 1-min (May 2024; Jan 2023 – Apr 2024) | SYM-H and AE for the cutoff and forecasts | citation requested |
 | DS-07, DS-08 | GOES-18 SEISS / SGPS 5-min (May 2024; Jan 2023 – Apr 2024) | proton flux; forecast training | "may be redistributed and used without restriction" |
-| DS-10 | OMNI2 hourly F10.7 and ap (2023 – 2024) | NRLMSIS drivers | as DS-06 |
+| DS-10 | OMNI2 hourly F10.7 and ap (2023 – 2024) | NRLMSIS drivers | citation requested (its own DOI) |
 | DS-11, DS-12 | GOES-18 SGPS and OMNI 1-min (Jun 2024 – Oct 2026) | held-out storms | as DS-07 and DS-06 |
 
 **Data credits** (as each provider requests; [`DATASET_REGISTRY.md`](DATASET_REGISTRY.md)):
 
 - **OPS-SAT-AD:** Ruszczak et al., The OPS-SAT benchmark for detecting anomalies in satellite telemetry, *Scientific Data* (2025), doi:10.1038/s41597-025-05035-3; dataset doi:10.5281/zenodo.15108715 (CC BY 4.0 and MIT).
-- **OMNI 1-min** (DS-06, DS-09, DS-12): Papitashvili, N. E. and King, J. H. (2020), OMNI 1-min Data [Data set], NASA SPDF, doi:10.48322/45bb-8792, accessed 2026-11-04, 2026-11-05 and 2026-11-13. **OMNI2 hourly** (DS-10, accessed 2026-11-10): its own data citation is still to be confirmed (the registry says "As DS-06"). We acknowledge NASA/GSFC's Space Physics Data Facility's OMNIWeb service, and OMNI data.
+- **OMNI 1-min** (DS-06, DS-09, DS-12): Papitashvili, N. E. and King, J. H. (2020), OMNI 1-min Data [Data set], NASA SPDF, doi:10.48322/45bb-8792, accessed 2026-11-04, 2026-11-05 and 2026-11-13. **OMNI hourly (OMNI2)** (DS-10): Papitashvili, N. E. and King, J. H. (2020), OMNI Hourly Data [Data set], NASA SPDF, doi:10.48322/1shr-ht18, accessed 2026-11-10. The citation was confirmed on 2026-11-17 (DL-140); before that, this line said it was still to be confirmed. We acknowledge NASA/GSFC's Space Physics Data Facility's OMNIWeb service, and OMNI data.
 - **GOES-18:** we acknowledge NOAA NCEI and the GOES-R SEISS instrument team for the SGPS proton data.
 
 *(Data credits added 2026-11-16, DL-136: the providers' requested citations were in the registry only.)*
