@@ -72,7 +72,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | E | CI pins the uv release (setup-uv `version`; found in DL-137) | **Done**: DL-141 approved 2026-11-17 (`11d1815`; CI installed uv 0.13.9 as pinned) |
 | F | Calibration of the agents' health beliefs (spec §10.2; the gap disclosed in REPORT §8 by DL-136): H-B peer and H-C payload probabilities against simulator truth, from 360 reruns of the recorded health-comparison runs | Design DL-142 approved 2026-11-17; code DL-143 (`92555d4`); 360 runs recorded from `92555d4` in [`BELIEF_CALIBRATION.md`](results/BELIEF_CALIBRATION.md); results DL-144; **Done**, DL-143 and DL-144 approved 2026-11-17 |
 
-Release: v2.0.2 (2026-11-17, DL-139) carries B, C and A2.
+Release: v2.0.2 (2026-11-17, DL-139) carries B, C and A2; v2.0.3 (2026-11-17, DL-145) carries D, E and F.
 
 ## Phase 6 increments (DL-111)
 

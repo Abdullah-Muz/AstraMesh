@@ -4,7 +4,7 @@
 
 AstraMesh is an independent, public-methods computational research project. It is a Python-first, CPU-feasible simulation platform for a **simulated four-spacecraft, decentralized low-Earth-orbit mission** that cooperatively schedules ionospheric observations, coordinates over constrained inter-satellite links, assesses its own health and environmental risk, and tries to preserve scientific value when spacecraft become unavailable or space-weather conditions worsen.
 
-> **Project status: Phases 1–6 complete; Gate P6 signed off 2026-11-16 ([`docs/results/GATE_P6.md`](docs/results/GATE_P6.md)). v2.0.2 (Phases 1–6, with maintenance) is released ([`CHANGELOG.md`](CHANGELOG.md)).**
+> **Project status: Phases 1–6 complete; Gate P6 signed off 2026-11-16 ([`docs/results/GATE_P6.md`](docs/results/GATE_P6.md)). v2.0.3 (Phases 1–6, with maintenance) is released ([`CHANGELOG.md`](CHANGELOG.md)).**
 > **Read first: the technical report, [`docs/REPORT.md`](docs/REPORT.md).** It sets out the question, the simulated system, the data, the methods and every result with its interval, the negative results, related work and limitations.
 
 The repository contains:
@@ -192,7 +192,7 @@ AstraMesh is a **simulation and research project**. It is **not** a real satelli
 | [`configs/`](configs/) | Scenario configuration files (YAML) |
 | [`tests/`](tests/) | Unit, integration, and regression tests |
 | `data/` | Local, Git-ignored dataset area (no data committed) |
-| [`CHANGELOG.md`](CHANGELOG.md) | Release notes (v1.0.0 – v2.0.2) |
+| [`CHANGELOG.md`](CHANGELOG.md) | Release notes (v1.0.0 – v2.0.3) |
 | `pyproject.toml`, `uv.lock`, `.python-version` | Project metadata and locked dependencies |
 | `.github/workflows/ci.yml` | Continuous integration: lint, type check, tests, baseline smoke runs |
 | [`LICENSE`](LICENSE) | MIT License — applies to source code |

@@ -2,6 +2,15 @@
 
 Release versions of the AstraMesh software and results. The specification has its own version history (`ASTRAMESH_MASTER_SPEC.md`, currently v1.0); a software release number is not a specification version.
 
+## v2.0.3 — 2026-11-17
+
+Maintenance release after v2.0.2. A new measurement, a data-citation fix and a CI pin; no code path or recorded result changes.
+
+- **Belief calibration measured** ([`BELIEF_CALIBRATION.md`](docs/results/BELIEF_CALIBRATION.md); DL-142 – DL-144), the last spec §10.2 metric REPORT §8 listed as not measured. 360 reruns of the recorded health-comparison runs, each reproducing its recorded behaviour, compare the agents' probabilities with simulator truth. H-B's peer probabilities are almost always near 0 or 1: right when a peer has failed, and near 1 for over 99 % of a radio outage on a spacecraft that still works, since silence is its only evidence. H-C's payload probability is well calibrated (98.7 % of its confident samples true). All five expectations stated before the run held. New script `scripts/experiments/belief_calibration.py`; nothing in `src/` changes.
+- **DS-10 data citation** (DL-140). The OMNI2 hourly data (the NRLMSIS drivers) borrowed the OMNI 1-min DOI; the registry, README and REPORT credits now give the hourly data's own DOI (doi:10.48322/1shr-ht18), checked against the provider, DataCite and the SPASE record.
+- **CI pins uv 0.13.9** (DL-141), so a new uv release cannot change how CI reads the lockfile.
+- **IERS data refresh** (DL-021) is still due between January and June 2027.
+
 ## v2.0.2 — 2026-11-17
 
 Maintenance release after v2.0.1 (DL-134). One code fix, a new measurement and documentation corrections; no recorded result changes.
