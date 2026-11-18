@@ -68,7 +68,7 @@ Phase definitions and exit gates are defined in spec §13; this file tracks stat
 | A2 | IERS prediction age check (DL-137): `configure_astropy_offline` left Astropy's 30-day `auto_max_age`, so predicted Earth-orientation values are refused from 2026-11-22; set a finite limit that keeps the leap-second warning | **Done**: DL-137 approved 2026-11-17, implemented with an amendment (the leap-second table is loaded before the age limit is lifted); no recorded result changes |
 | B | Compute cost (spec §10.2: algorithm CPU time and peak memory): onboard CPU per agent and per entry point, ground planning, peak RSS; 50 reruns of recorded configurations | Plan DL-134 (B) approved 2026-11-16; code DL-135 (`181d46b`, revised `b7c97d8` after the first run stopped on its own check) approved 2026-11-17; 50 runs recorded from `b7c97d8` in [`COMPUTE_COST.md`](results/COMPUTE_COST.md) (DL-138); **Done**, approved 2026-11-17 |
 | C | Documentation consistency fixes from a read-only audit (decision-log table rows, literature headers after DL-133, stale status lines, documented commands) | **Done**: DL-136 approved 2026-11-17; commits `4d8a0f2`, `983d35b`, `1197b35`. No code or results changed |
-| D | DS-10 (OMNI2 hourly) data citation: the registry pointed to the 1-min data DOI; record the hourly data's own DOI in the registry and the credits | **Proposed**: DL-140 (2026-11-17); documentation and metadata only |
+| D | DS-10 (OMNI2 hourly) data citation: the registry pointed to the 1-min data DOI; record the hourly data's own DOI in the registry and the credits | **Done**: DL-140 approved 2026-11-17 (`b922f2c`); documentation and metadata only, to be carried by the next release |
 
 Release: v2.0.2 (2026-11-17, DL-139) carries B, C and A2.
 
